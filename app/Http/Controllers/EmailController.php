@@ -7,6 +7,7 @@ use App\Models\EmailAccount;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class EmailController extends Controller
 {
@@ -85,8 +86,12 @@ class EmailController extends Controller
         return back()->with('error', 'Failed to change password: ' . $error);
     }
 
-    public function destroy(EmailAccount $emailAccount)
+    public function destroy(Request $request, EmailAccount $emailAccount)
     {
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+
         $emailAccount->load('domain.account.server');
 
         AgentService::for($emailAccount->domain->account->server)->post('/email/delete', [
