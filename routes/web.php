@@ -6,6 +6,7 @@ use App\Http\Controllers\DomainController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\CronJobController;
+use App\Http\Controllers\DnsController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\PhpController;
@@ -50,6 +51,11 @@ Route::middleware([
     Route::post('/ssl/upload', [SslController::class, 'upload'])->name('ssl.upload');
     Route::post('/ssl/{certificate}/renew', [SslController::class, 'renew'])->name('ssl.renew');
     Route::delete('/ssl/{certificate}', [SslController::class, 'destroy'])->name('ssl.destroy');
+
+    // DNS Zone Editor
+    Route::get('/dns/{domain}', [DnsController::class, 'index'])->name('dns.index');
+    Route::post('/dns/{domain}/add-record', [DnsController::class, 'addRecord'])->name('dns.add-record');
+    Route::post('/dns/{domain}/delete-record', [DnsController::class, 'deleteRecord'])->name('dns.delete-record');
 
     // PHP Management
     Route::get('/php', [PhpController::class, 'index'])->name('php.index');

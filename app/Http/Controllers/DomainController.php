@@ -60,6 +60,15 @@ class DomainController extends Controller
 
         if ($response && $response->successful()) {
             $domain->update(['status' => 'active']);
+
+            // Auto-create DNS zone
+            AgentService::for($account->server)->post('/dns/create-zone', [
+                'domain'    => $domain->domain,
+                'server_ip' => $account->server->ip_address,
+                'ns1'       => config('opterius.ns1', 'ns1.' . $domain->domain),
+                'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
+            ]);
+
             return redirect()->route('domains.index')->with('success', 'Domain ' . $domain->domain . ' created successfully.');
         }
 

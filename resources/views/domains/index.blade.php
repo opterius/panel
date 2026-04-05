@@ -96,7 +96,7 @@
 
                     <!-- Module Icons -->
                     <div class="px-6 py-4">
-                        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-7 gap-3">
+                        <div class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-3">
                             {{-- File Manager --}}
                             <a href="{{ route('filemanager.index', ['domain' => $domain->id]) }}"
                                class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
@@ -149,6 +149,15 @@
                                     <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
                                 </div>
                                 <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-indigo-700">Subdomains</span>
+                            </a>
+
+                            {{-- DNS --}}
+                            <a href="{{ route('dns.index', $domain) }}"
+                               class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
+                                <div class="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center group-hover:bg-rose-200 transition">
+                                    <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                                </div>
+                                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-indigo-700">DNS</span>
                             </a>
 
                             {{-- PHP Settings --}}
