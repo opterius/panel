@@ -7,6 +7,7 @@ use App\Models\Database;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class DatabaseController extends Controller
@@ -82,8 +83,12 @@ class DatabaseController extends Controller
         return redirect()->route('user.databases.index')->with('success', 'Database ' . $database->name . ' created successfully.');
     }
 
-    public function destroy(Database $database)
+    public function destroy(Request $request, Database $database)
     {
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+
         $database->load('account.server');
 
         // Delete database on server

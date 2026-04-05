@@ -8,6 +8,7 @@ use App\Models\Server;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class DomainController extends Controller
 {
@@ -78,8 +79,12 @@ class DomainController extends Controller
         return redirect()->route('user.domains.index')->with('warning', 'Domain saved but agent setup failed: ' . $error);
     }
 
-    public function destroy(Domain $domain)
+    public function destroy(Request $request, Domain $domain)
     {
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+
         $domain->load('account.server');
 
         // Send delete request to the Go agent

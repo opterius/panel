@@ -7,6 +7,7 @@ use App\Models\SslCertificate;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class SslController extends Controller
 {
@@ -114,8 +115,12 @@ class SslController extends Controller
         return redirect()->route('user.ssl.index')->with('error', 'SSL renewal failed: ' . $error);
     }
 
-    public function destroy(SslCertificate $certificate)
+    public function destroy(Request $request, SslCertificate $certificate)
     {
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+
         $certificate->delete();
 
         return redirect()->route('user.ssl.index')->with('success', 'SSL certificate record removed.');

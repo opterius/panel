@@ -78,15 +78,40 @@
                                 @endif
                             </div>
                             @if(!$ver['installed'])
-                                <form action="{{ route('admin.php.install') }}" method="POST" class="mt-3"
-                                      onsubmit="return confirm('Install PHP {{ $ver['version'] }}? This may take a few minutes.')">
-                                    @csrf
-                                    <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
-                                    <input type="hidden" name="version" value="{{ $ver['version'] }}">
-                                    <button type="submit" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition">
+                                <div x-data="{ confirmInstall: false }" class="mt-3">
+                                    <button type="button" @click="confirmInstall = true" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition">
                                         Install
                                     </button>
-                                </form>
+                                    <template x-teleport="body">
+                                        <div x-show="confirmInstall" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true">
+                                            <div x-show="confirmInstall" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" @click="confirmInstall = false"></div>
+                                            <div class="fixed inset-0 flex items-center justify-center p-4">
+                                                <div x-show="confirmInstall" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" @click.stop @keydown.escape.window="confirmInstall = false" class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                                                    <div class="p-6 pb-0">
+                                                        <div class="flex items-start space-x-4">
+                                                            <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                                                                <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                                                            </div>
+                                                            <div>
+                                                                <h3 class="text-lg font-semibold text-gray-900">Install PHP {{ $ver['version'] }}</h3>
+                                                                <p class="mt-1 text-sm text-gray-500">This will install PHP {{ $ver['version'] }} on the server. The process may take a few minutes.</p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
+                                                        <button type="button" @click="confirmInstall = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                        <form action="{{ route('admin.php.install') }}" method="POST">
+                                                            @csrf
+                                                            <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
+                                                            <input type="hidden" name="version" value="{{ $ver['version'] }}">
+                                                            <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">Install</button>
+                                                        </form>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
                             @endif
                         </div>
                     @endforeach

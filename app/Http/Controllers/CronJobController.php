@@ -7,6 +7,7 @@ use App\Models\CronJob;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class CronJobController extends Controller
 {
@@ -93,8 +94,12 @@ class CronJobController extends Controller
         return back()->with('error', 'Failed to toggle cron job: ' . $error);
     }
 
-    public function destroy(CronJob $cronJob)
+    public function destroy(Request $request, CronJob $cronJob)
     {
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+
         $cronJob->load('account.server');
 
         AgentService::for($cronJob->account->server)->post('/cron/delete', [
