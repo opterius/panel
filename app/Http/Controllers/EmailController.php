@@ -89,6 +89,36 @@ class EmailController extends Controller
         return back()->with('error', 'Failed to change password: ' . $error);
     }
 
+    public function updateQuota(Request $request, EmailAccount $emailAccount)
+    {
+        $validated = $request->validate([
+            'quota' => 'required|integer|min:0|max:51200',
+        ]);
+
+        $emailAccount->update(['quota' => $validated['quota']]);
+
+        return redirect()->route('user.emails.index')->with('success', 'Quota updated for ' . $emailAccount->email);
+    }
+
+    public function updateRestrictions(Request $request, EmailAccount $emailAccount)
+    {
+        $validated = $request->validate([
+            'can_send'          => 'boolean',
+            'can_receive'       => 'boolean',
+            'max_send_per_hour' => 'nullable|integer|min:0|max:10000',
+            'max_send_per_day'  => 'nullable|integer|min:0|max:100000',
+        ]);
+
+        $emailAccount->update([
+            'can_send'          => $request->boolean('can_send'),
+            'can_receive'       => $request->boolean('can_receive'),
+            'max_send_per_hour' => $validated['max_send_per_hour'] ?? 0,
+            'max_send_per_day'  => $validated['max_send_per_day'] ?? 0,
+        ]);
+
+        return redirect()->route('user.emails.index')->with('success', 'Restrictions updated for ' . $emailAccount->email);
+    }
+
     public function destroy(Request $request, EmailAccount $emailAccount)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {

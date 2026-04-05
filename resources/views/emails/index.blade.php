@@ -192,23 +192,25 @@
     @endif
 
     <!-- Email Accounts List -->
-    <div class="bg-white rounded-xl shadow-sm">
-        <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Email Accounts</h3>
-            <p class="text-sm text-gray-500 mt-1">Manage email accounts for your domains.</p>
+    <div class="space-y-4">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold text-gray-800">Email Accounts</h3>
+                <p class="text-sm text-gray-500 mt-1">Manage email accounts for your domains.</p>
+            </div>
         </div>
 
         @if($emailAccounts->isEmpty())
-            <div class="px-6 py-16 text-center">
+            <div class="bg-white rounded-xl shadow-sm px-6 py-16 text-center">
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                 <h3 class="mt-4 text-base font-medium text-gray-700">No email accounts</h3>
                 <p class="mt-2 text-sm text-gray-500">Create your first email account above.</p>
             </div>
         @else
-            <div class="divide-y divide-gray-100">
-                @foreach($emailAccounts as $account)
-                    <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition"
-                         x-data="{ showPassword: false }">
+            @foreach($emailAccounts as $account)
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden" x-data="{ open: false, tab: 'password' }">
+                    {{-- Header --}}
+                    <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 transition" @click="open = !open">
                         <div class="flex items-center space-x-4">
                             <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
                                 <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -216,56 +218,151 @@
                             <div>
                                 <div class="text-sm font-semibold text-gray-800">{{ $account->email }}</div>
                                 <div class="text-xs text-gray-500">
-                                    {{ $account->domain->domain }}
-                                    &middot; Quota: {{ $account->quota > 0 ? $account->quota . ' MB' : 'Unlimited' }}
+                                    Quota: {{ $account->quota > 0 ? ($account->quota >= 1024 ? round($account->quota / 1024, 1) . ' GB' : $account->quota . ' MB') : 'Unlimited' }}
+                                    @if(!$account->can_send) &middot; <span class="text-red-500">Sending disabled</span> @endif
+                                    @if(!$account->can_receive) &middot; <span class="text-red-500">Receiving disabled</span> @endif
+                                    @if($account->max_send_per_hour > 0) &middot; {{ $account->max_send_per_hour }}/hr @endif
                                 </div>
                             </div>
                         </div>
-
                         <div class="flex items-center space-x-3">
-                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                                @if($account->status === 'active') bg-green-100 text-green-700 @else bg-red-100 text-red-700 @endif">
                                 {{ ucfirst($account->status) }}
                             </span>
-
-                            <!-- Change Password -->
-                            <button @click="showPassword = !showPassword" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition">
-                                Password
-                            </button>
-
-                            <!-- Delete -->
-                            <x-delete-modal
-                                :action="route('user.emails.destroy', $account)"
-                                title="Delete Email Account"
-                                message="Are you sure you want to delete {{ $account->email }}? All emails in this mailbox will be permanently deleted."
-                                :confirm-password="true">
-                                <x-slot name="trigger">
-                                    <button type="button" class="text-gray-400 hover:text-red-600 transition">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                    </button>
-                                </x-slot>
-                            </x-delete-modal>
+                            <svg class="w-5 h-5 text-gray-400 transition" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
                         </div>
                     </div>
 
-                    <!-- Inline password change form -->
-                    <div x-show="showPassword" x-collapse class="px-6 py-3 bg-gray-50 border-b border-gray-100">
-                        <form action="{{ route('user.emails.password', $account) }}" method="POST" class="flex items-end gap-3">
-                            @csrf
-                            <div class="flex-1">
-                                <label class="block text-xs font-medium text-gray-600 mb-1">New Password for {{ $account->email }}</label>
-                                <input type="password" name="password" placeholder="Min 8 characters"
-                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    {{-- Expandable Panel --}}
+                    <div x-show="open" x-collapse>
+                        {{-- Tabs --}}
+                        <div class="px-6 py-2 border-t border-gray-100 bg-gray-50">
+                            <div class="flex space-x-1">
+                                @foreach(['password' => 'Password', 'quota' => 'Quota', 'restrictions' => 'Restrictions', 'delete' => 'Delete'] as $key => $label)
+                                    <button type="button" @click="tab = '{{ $key }}'"
+                                        class="px-4 py-1.5 text-xs font-medium rounded-md transition"
+                                        :class="tab === '{{ $key }}' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+                                        {{ $label }}
+                                    </button>
+                                @endforeach
                             </div>
-                            <button type="submit" class="px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
-                                Update
-                            </button>
-                            <button type="button" @click="showPassword = false" class="px-4 py-2.5 text-sm text-gray-600 hover:text-gray-800 transition">
-                                Cancel
-                            </button>
-                        </form>
+                        </div>
+
+                        <div class="px-6 py-5 border-t border-gray-100">
+                            {{-- Password Tab --}}
+                            <div x-show="tab === 'password'">
+                                <form action="{{ route('user.emails.password', $account) }}" method="POST" class="max-w-md space-y-4">
+                                    @csrf
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+                                        <input type="password" name="password" placeholder="Min 8 characters"
+                                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    </div>
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                                        Update Password
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- Quota Tab --}}
+                            <div x-show="tab === 'quota'" x-data="{ quotaOpt: '{{ $account->quota }}', customQ: '' }">
+                                <form action="{{ route('user.emails.quota', $account) }}" method="POST" class="space-y-4">
+                                    @csrf
+                                    <input type="hidden" name="quota" :value="quotaOpt === 'custom' ? customQ : quotaOpt">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">Mailbox Quota</label>
+                                        <div class="flex flex-wrap gap-2">
+                                            @foreach(['100' => '100 MB', '500' => '500 MB', '1024' => '1 GB', '2560' => '2.5 GB', '5120' => '5 GB', '0' => 'Unlimited', 'custom' => 'Custom'] as $val => $lbl)
+                                                <button type="button" @click="quotaOpt = '{{ $val }}'"
+                                                    class="px-3 py-1.5 text-xs font-medium rounded-lg border transition"
+                                                    :class="quotaOpt === '{{ $val }}' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'">
+                                                    {{ $lbl }}
+                                                </button>
+                                            @endforeach
+                                        </div>
+                                        <div x-show="quotaOpt === 'custom'" x-collapse class="mt-3">
+                                            <div class="flex items-center gap-2">
+                                                <input type="number" x-model="customQ" min="1" max="51200"
+                                                    class="w-32 rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. 2048">
+                                                <span class="text-sm text-gray-500">MB</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                                        Update Quota
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- Restrictions Tab --}}
+                            <div x-show="tab === 'restrictions'">
+                                <form action="{{ route('user.emails.restrictions', $account) }}" method="POST" class="space-y-5">
+                                    @csrf
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                                        <div class="space-y-4">
+                                            <h4 class="text-sm font-semibold text-gray-700">Access</h4>
+                                            <label class="flex items-center justify-between p-3 border rounded-lg">
+                                                <div>
+                                                    <span class="text-sm font-medium text-gray-700">Can Send Emails</span>
+                                                    <p class="text-xs text-gray-400">Allow this account to send emails</p>
+                                                </div>
+                                                <input type="checkbox" name="can_send" value="1" @checked($account->can_send)
+                                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                            </label>
+                                            <label class="flex items-center justify-between p-3 border rounded-lg">
+                                                <div>
+                                                    <span class="text-sm font-medium text-gray-700">Can Receive Emails</span>
+                                                    <p class="text-xs text-gray-400">Allow this account to receive emails</p>
+                                                </div>
+                                                <input type="checkbox" name="can_receive" value="1" @checked($account->can_receive)
+                                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
+                                            </label>
+                                        </div>
+                                        <div class="space-y-4">
+                                            <h4 class="text-sm font-semibold text-gray-700">Send Limits</h4>
+                                            <div>
+                                                <label class="block text-sm text-gray-600 mb-1">Max emails per hour</label>
+                                                <input type="number" name="max_send_per_hour" value="{{ $account->max_send_per_hour }}" min="0" max="10000"
+                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                                <p class="text-xs text-gray-400 mt-1">0 = unlimited</p>
+                                            </div>
+                                            <div>
+                                                <label class="block text-sm text-gray-600 mb-1">Max emails per day</label>
+                                                <input type="number" name="max_send_per_day" value="{{ $account->max_send_per_day }}" min="0" max="100000"
+                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                                <p class="text-xs text-gray-400 mt-1">0 = unlimited</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                                        Save Restrictions
+                                    </button>
+                                </form>
+                            </div>
+
+                            {{-- Delete Tab --}}
+                            <div x-show="tab === 'delete'">
+                                <div class="max-w-md">
+                                    <p class="text-sm text-gray-600 mb-4">Permanently delete <strong>{{ $account->email }}</strong> and all emails in this mailbox. This cannot be undone.</p>
+                                    <x-delete-modal
+                                        :action="route('user.emails.destroy', $account)"
+                                        title="Delete Email Account"
+                                        message="This will permanently delete {{ $account->email }} and all emails in this mailbox."
+                                        :confirm-password="true">
+                                        <x-slot name="trigger">
+                                            <button type="button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">
+                                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                                                Delete {{ $account->email }}
+                                            </button>
+                                        </x-slot>
+                                    </x-delete-modal>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                @endforeach
-            </div>
+                </div>
+            @endforeach
         @endif
     </div>
 

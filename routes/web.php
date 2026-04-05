@@ -119,6 +119,8 @@ Route::middleware([
         Route::get('/emails', [EmailController::class, 'index'])->name('emails.index');
         Route::post('/emails', [EmailController::class, 'store'])->name('emails.store');
         Route::post('/emails/{emailAccount}/password', [EmailController::class, 'changePassword'])->name('emails.password');
+        Route::post('/emails/{emailAccount}/quota', [EmailController::class, 'updateQuota'])->name('emails.quota');
+        Route::post('/emails/{emailAccount}/restrictions', [EmailController::class, 'updateRestrictions'])->name('emails.restrictions');
         Route::delete('/emails/{emailAccount}', [EmailController::class, 'destroy'])->name('emails.destroy');
 
         // SSH Access
