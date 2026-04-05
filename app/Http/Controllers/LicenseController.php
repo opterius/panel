@@ -30,7 +30,7 @@ class LicenseController extends Controller
         $license = new LicenseService();
         $license->clearCache();
 
-        return redirect()->route('license.index')->with('success', 'License key updated. Verifying...');
+        return redirect()->route('admin.license.index')->with('success', 'License key updated. Verifying...');
     }
 
     public function refresh()
@@ -40,10 +40,10 @@ class LicenseController extends Controller
         $status = $license->verify();
 
         if ($status['valid'] ?? false) {
-            return redirect()->route('license.index')->with('success', 'License verified successfully.');
+            return redirect()->route('admin.license.index')->with('success', 'License verified successfully.');
         }
 
-        return redirect()->route('license.index')->with('error', $status['message'] ?? 'License verification failed.');
+        return redirect()->route('admin.license.index')->with('error', $status['message'] ?? 'License verification failed.');
     }
 
     private function setEnvValue(string $key, string $value): void

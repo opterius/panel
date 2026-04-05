@@ -56,7 +56,7 @@ class SshController extends Controller
 
         if ($response && $response->successful()) {
             return redirect()
-                ->route('ssh.index', ['account_id' => $account->id])
+                ->route('user.ssh.index', ['account_id' => $account->id])
                 ->with('success', 'SSH key imported successfully.');
         }
 
@@ -80,7 +80,7 @@ class SshController extends Controller
 
         if ($response && $response->successful()) {
             return redirect()
-                ->route('ssh.index', ['account_id' => $account->id])
+                ->route('user.ssh.index', ['account_id' => $account->id])
                 ->with('success', 'SSH key removed.');
         }
 
@@ -106,7 +106,7 @@ class SshController extends Controller
             $account->update(['ssh_enabled' => (bool) $validated['enabled']]);
             $state = $validated['enabled'] ? 'enabled' : 'disabled';
             return redirect()
-                ->route('ssh.index', ['account_id' => $account->id])
+                ->route('user.ssh.index', ['account_id' => $account->id])
                 ->with('success', "SSH access $state for {$account->username}.");
         }
 

@@ -51,7 +51,7 @@ class PhpController extends Controller
 
         if ($response && $response->successful()) {
             return redirect()
-                ->route('php.index', ['server_id' => $server->id])
+                ->route('admin.php.index', ['server_id' => $server->id])
                 ->with('success', 'PHP ' . $validated['version'] . ' installed successfully.');
         }
 
@@ -80,7 +80,7 @@ class PhpController extends Controller
             $domain->update(['php_version' => $validated['new_version']]);
 
             return redirect()
-                ->route('php.index', ['server_id' => $domain->server_id])
+                ->route('admin.php.index', ['server_id' => $domain->server_id])
                 ->with('success', $domain->domain . ' switched from PHP ' . $oldVersion . ' to PHP ' . $validated['new_version']);
         }
 
@@ -120,7 +120,7 @@ class PhpController extends Controller
 
         if ($response && $response->successful()) {
             return redirect()
-                ->route('php.index', ['server_id' => $domain->server_id])
+                ->route('admin.php.index', ['server_id' => $domain->server_id])
                 ->with('success', 'PHP configuration updated for ' . $domain->domain);
         }
 

@@ -47,7 +47,7 @@ class DnsController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return redirect()->route('dns.index', $domain)->with('success', $validated['type'] . ' record added.');
+            return redirect()->route('user.dns.index', $domain)->with('success', $validated['type'] . ' record added.');
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
@@ -68,7 +68,7 @@ class DnsController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return redirect()->route('dns.index', $domain)->with('success', 'Record deleted.');
+            return redirect()->route('user.dns.index', $domain)->with('success', 'Record deleted.');
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';

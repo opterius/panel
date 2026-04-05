@@ -79,7 +79,7 @@ class DatabaseController extends Controller
             'status'      => 'active',
         ]);
 
-        return redirect()->route('databases.index')->with('success', 'Database ' . $database->name . ' created successfully.');
+        return redirect()->route('user.databases.index')->with('success', 'Database ' . $database->name . ' created successfully.');
     }
 
     public function destroy(Database $database)
@@ -106,6 +106,6 @@ class DatabaseController extends Controller
 
         $database->delete();
 
-        return redirect()->route('databases.index')->with('success', 'Database ' . $database->name . ' deleted.');
+        return redirect()->route('user.databases.index')->with('success', 'Database ' . $database->name . ' deleted.');
     }
 }

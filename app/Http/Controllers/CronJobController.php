@@ -65,7 +65,7 @@ class CronJobController extends Controller
                 'enabled'    => true,
             ]);
 
-            return redirect()->route('cronjobs.index')->with('success', 'Cron job created successfully.');
+            return redirect()->route('user.cronjobs.index')->with('success', 'Cron job created successfully.');
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
@@ -86,7 +86,7 @@ class CronJobController extends Controller
         if ($response && $response->successful()) {
             $cronJob->update(['enabled' => $newState]);
             $state = $newState ? 'enabled' : 'disabled';
-            return redirect()->route('cronjobs.index')->with('success', "Cron job $state.");
+            return redirect()->route('user.cronjobs.index')->with('success', "Cron job $state.");
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
@@ -104,6 +104,6 @@ class CronJobController extends Controller
 
         $cronJob->delete();
 
-        return redirect()->route('cronjobs.index')->with('success', 'Cron job deleted.');
+        return redirect()->route('user.cronjobs.index')->with('success', 'Cron job deleted.');
     }
 }

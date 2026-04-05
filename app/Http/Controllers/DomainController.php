@@ -69,13 +69,13 @@ class DomainController extends Controller
                 'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
             ]);
 
-            return redirect()->route('domains.index')->with('success', 'Domain ' . $domain->domain . ' created successfully.');
+            return redirect()->route('user.domains.index')->with('success', 'Domain ' . $domain->domain . ' created successfully.');
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
         $domain->update(['status' => 'error']);
 
-        return redirect()->route('domains.index')->with('warning', 'Domain saved but agent setup failed: ' . $error);
+        return redirect()->route('user.domains.index')->with('warning', 'Domain saved but agent setup failed: ' . $error);
     }
 
     public function destroy(Domain $domain)
@@ -91,6 +91,6 @@ class DomainController extends Controller
 
         $domain->delete();
 
-        return redirect()->route('domains.index')->with('success', 'Domain ' . $domain->domain . ' removed.');
+        return redirect()->route('user.domains.index')->with('success', 'Domain ' . $domain->domain . ' removed.');
     }
 }

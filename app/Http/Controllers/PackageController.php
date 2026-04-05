@@ -54,7 +54,7 @@ class PackageController extends Controller
 
         Package::create($validated);
 
-        return redirect()->route('packages.index')->with('success', 'Package created successfully.');
+        return redirect()->route('admin.packages.index')->with('success', 'Package created successfully.');
     }
 
     public function edit(Package $package)
@@ -94,7 +94,7 @@ class PackageController extends Controller
 
         $package->update($validated);
 
-        return redirect()->route('packages.index')->with('success', 'Package updated successfully.');
+        return redirect()->route('admin.packages.index')->with('success', 'Package updated successfully.');
     }
 
     public function destroy(Package $package)
@@ -105,6 +105,6 @@ class PackageController extends Controller
 
         $package->delete();
 
-        return redirect()->route('packages.index')->with('success', 'Package deleted.');
+        return redirect()->route('admin.packages.index')->with('success', 'Package deleted.');
     }
 }

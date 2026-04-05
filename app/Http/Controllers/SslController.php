@@ -52,11 +52,11 @@ class SslController extends Controller
                 ]
             );
 
-            return redirect()->route('ssl.index')->with('success', 'SSL certificate issued for ' . $domain->domain);
+            return redirect()->route('user.ssl.index')->with('success', 'SSL certificate issued for ' . $domain->domain);
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('ssl.index')->with('error', 'SSL issuance failed: ' . $error);
+        return redirect()->route('user.ssl.index')->with('error', 'SSL issuance failed: ' . $error);
     }
 
     public function upload(Request $request)
@@ -86,11 +86,11 @@ class SslController extends Controller
                 ]
             );
 
-            return redirect()->route('ssl.index')->with('success', 'Custom SSL certificate installed for ' . $domain->domain);
+            return redirect()->route('user.ssl.index')->with('success', 'Custom SSL certificate installed for ' . $domain->domain);
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('ssl.index')->with('error', 'SSL upload failed: ' . $error);
+        return redirect()->route('user.ssl.index')->with('error', 'SSL upload failed: ' . $error);
     }
 
     public function renew(SslCertificate $certificate)
@@ -107,17 +107,17 @@ class SslController extends Controller
                 'expires_at' => now()->addDays(90),
             ]);
 
-            return redirect()->route('ssl.index')->with('success', 'SSL certificate renewed for ' . $certificate->domain->domain);
+            return redirect()->route('user.ssl.index')->with('success', 'SSL certificate renewed for ' . $certificate->domain->domain);
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('ssl.index')->with('error', 'SSL renewal failed: ' . $error);
+        return redirect()->route('user.ssl.index')->with('error', 'SSL renewal failed: ' . $error);
     }
 
     public function destroy(SslCertificate $certificate)
     {
         $certificate->delete();
 
-        return redirect()->route('ssl.index')->with('success', 'SSL certificate record removed.');
+        return redirect()->route('user.ssl.index')->with('success', 'SSL certificate record removed.');
     }
 }

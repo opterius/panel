@@ -38,7 +38,7 @@ class ServerController extends Controller
 
         $server = Server::create($validated);
 
-        return redirect()->route('servers.show', $server)->with('success', 'Server added successfully.');
+        return redirect()->route('admin.servers.show', $server)->with('success', 'Server added successfully.');
     }
 
     public function show(Server $server)
@@ -58,6 +58,6 @@ class ServerController extends Controller
 
         $server->delete();
 
-        return redirect()->route('servers.index')->with('success', 'Server removed.');
+        return redirect()->route('admin.servers.index')->with('success', 'Server removed.');
     }
 }

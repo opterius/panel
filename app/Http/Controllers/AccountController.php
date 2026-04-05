@@ -91,11 +91,11 @@ class AccountController extends Controller
                 'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
             ]);
 
-            return redirect()->route('accounts.show', $account)->with('success', 'Account created with domain ' . $validated['domain']);
+            return redirect()->route('admin.accounts.show', $account)->with('success', 'Account created with domain ' . $validated['domain']);
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('accounts.show', $account)->with('warning', 'Account saved but server setup failed: ' . $error);
+        return redirect()->route('admin.accounts.show', $account)->with('warning', 'Account saved but server setup failed: ' . $error);
     }
 
     public function show(Account $account)
@@ -113,6 +113,6 @@ class AccountController extends Controller
 
         $account->delete();
 
-        return redirect()->route('accounts.index')->with('success', 'Account deleted.');
+        return redirect()->route('admin.accounts.index')->with('success', 'Account deleted.');
     }
 }
