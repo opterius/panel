@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">License</h2>
     </x-slot>
@@ -51,7 +51,7 @@
                     </div>
                     <p class="text-sm text-gray-500 mt-1">{{ $status['message'] ?? '' }}</p>
                 </div>
-                <form action="{{ route('license.refresh') }}" method="POST">
+                <form action="{{ route('admin.license.refresh') }}" method="POST">
                     @csrf
                     <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 bg-white border border-indigo-300 rounded-lg hover:bg-indigo-50 transition">
                         <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
@@ -99,7 +99,7 @@
             <h3 class="text-base font-semibold text-gray-800">License Key</h3>
             <p class="text-sm text-gray-500 mt-1">Enter your Opterius license key. Get one at <a href="https://opterius.com" target="_blank" class="text-indigo-600 hover:text-indigo-800">opterius.com</a>.</p>
         </div>
-        <form action="{{ route('license.update') }}" method="POST" class="px-6 py-5">
+        <form action="{{ route('admin.license.update') }}" method="POST" class="px-6 py-5">
             @csrf
             @method('PUT')
             <div class="flex items-end gap-4">
@@ -119,4 +119,4 @@
             </div>
         </form>
     </div>
-</x-app-layout>
+</x-admin-layout>

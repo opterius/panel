@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">SSL Certificates</h2>
     </x-slot>
@@ -22,7 +22,7 @@
                 <h3 class="text-base font-semibold text-gray-800">Issue Free SSL Certificate</h3>
                 <p class="text-sm text-gray-500 mt-1">Issue a free Let's Encrypt certificate for a domain without SSL.</p>
             </div>
-            <form action="{{ route('ssl.issue') }}" method="POST" class="px-6 py-5">
+            <form action="{{ route('user.ssl.issue') }}" method="POST" class="px-6 py-5">
                 @csrf
                 <div class="flex flex-col sm:flex-row gap-4">
                     <div class="flex-1">
@@ -115,7 +115,7 @@
                             </span>
 
                             @if($cert->type === 'letsencrypt')
-                                <form action="{{ route('ssl.renew', $cert) }}" method="POST">
+                                <form action="{{ route('user.ssl.renew', $cert) }}" method="POST">
                                     @csrf
                                     <button type="submit" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium transition" title="Renew certificate">
                                         Renew
@@ -123,7 +123,7 @@
                                 </form>
                             @endif
 
-                            <form action="{{ route('ssl.destroy', $cert) }}" method="POST"
+                            <form action="{{ route('user.ssl.destroy', $cert) }}" method="POST"
                                   onsubmit="return confirm('Remove this SSL certificate record?')">
                                 @csrf
                                 @method('DELETE')
@@ -148,7 +148,7 @@
             <svg class="w-5 h-5 text-gray-400 transition" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
         </button>
 
-        <form action="{{ route('ssl.upload') }}" method="POST" x-show="open" x-collapse>
+        <form action="{{ route('user.ssl.upload') }}" method="POST" x-show="open" x-collapse>
             @csrf
             <div class="px-6 pb-5 space-y-4">
                 <div>
@@ -187,4 +187,4 @@
             </div>
         </form>
     </div>
-</x-app-layout>
+</x-user-layout>

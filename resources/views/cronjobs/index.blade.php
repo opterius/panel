@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">Cron Jobs</h2>
     </x-slot>
@@ -21,7 +21,7 @@
                 <h3 class="text-base font-semibold text-gray-800">All Cron Jobs</h3>
                 <p class="text-sm text-gray-500 mt-1">Schedule commands to run automatically.</p>
             </div>
-            <a href="{{ route('cronjobs.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+            <a href="{{ route('user.cronjobs.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                 Add Cron Job
             </a>
@@ -32,7 +32,7 @@
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                 <h3 class="mt-4 text-base font-medium text-gray-700">No cron jobs yet</h3>
                 <p class="mt-2 text-sm text-gray-500">Schedule your first automated task.</p>
-                <a href="{{ route('cronjobs.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                <a href="{{ route('user.cronjobs.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     Add Cron Job
                 </a>
             </div>
@@ -67,7 +67,7 @@
                                 {{ $cron->enabled ? 'Active' : 'Disabled' }}
                             </span>
 
-                            <form action="{{ route('cronjobs.toggle', $cron) }}" method="POST">
+                            <form action="{{ route('user.cronjobs.toggle', $cron) }}" method="POST">
                                 @csrf
                                 <button type="submit" class="text-sm font-medium transition
                                     @if($cron->enabled) text-yellow-600 hover:text-yellow-800
@@ -76,7 +76,7 @@
                                 </button>
                             </form>
 
-                            <form action="{{ route('cronjobs.destroy', $cron) }}" method="POST"
+                            <form action="{{ route('user.cronjobs.destroy', $cron) }}" method="POST"
                                   onsubmit="return confirm('Delete this cron job?')">
                                 @csrf
                                 @method('DELETE')
@@ -90,4 +90,4 @@
             </div>
         @endif
     </div>
-</x-app-layout>
+</x-user-layout>

@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">Databases</h2>
     </x-slot>
@@ -22,7 +22,7 @@
                 <h3 class="text-base font-semibold text-gray-800">All Databases</h3>
                 <p class="text-sm text-gray-500 mt-1">Manage MySQL databases and users.</p>
             </div>
-            <a href="{{ route('databases.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+            <a href="{{ route('user.databases.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                 Create Database
             </a>
@@ -33,7 +33,7 @@
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
                 <h3 class="mt-4 text-base font-medium text-gray-700">No databases yet</h3>
                 <p class="mt-2 text-sm text-gray-500">Create your first database to get started.</p>
-                <a href="{{ route('databases.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                <a href="{{ route('user.databases.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     Create Database
                 </a>
             </div>
@@ -72,7 +72,7 @@
                                 {{ ucfirst($database->status) }}
                             </span>
 
-                            <form action="{{ route('databases.destroy', $database) }}" method="POST"
+                            <form action="{{ route('user.databases.destroy', $database) }}" method="POST"
                                   onsubmit="return confirm('Delete database {{ $database->name }}? This will permanently remove the database and its user from the server.')">
                                 @csrf
                                 @method('DELETE')
@@ -86,4 +86,4 @@
             </div>
         @endif
     </div>
-</x-app-layout>
+</x-user-layout>

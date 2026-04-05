@@ -210,7 +210,7 @@
                     class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                 {{ $package ? 'Save Changes' : 'Create Package' }}
             </button>
-            <a href="{{ route('packages.index') }}"
+            <a href="{{ route('admin.packages.index') }}"
                class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                 Cancel
             </a>

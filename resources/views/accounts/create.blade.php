@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <div class="flex items-center space-x-3">
-            <a href="{{ route('accounts.index') }}" class="text-gray-400 hover:text-gray-600 transition">
+            <a href="{{ route('admin.accounts.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
             <h2 class="text-lg font-semibold text-gray-800">Create Account</h2>
@@ -14,7 +14,7 @@
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
                 <h3 class="mt-4 text-base font-medium text-gray-700">No servers available</h3>
                 <p class="mt-2 text-sm text-gray-500">You need to add a server before creating an account.</p>
-                <a href="{{ route('servers.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                <a href="{{ route('admin.servers.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     Add Server
                 </a>
             </div>
@@ -35,7 +35,7 @@
             $defaultId = $defaultPackage?->id ?? $packages->first()?->id;
         @endphp
 
-        <form action="{{ route('accounts.store') }}" method="POST"
+        <form action="{{ route('admin.accounts.store') }}" method="POST"
               x-data="{
                   username: '{{ old('username') }}',
                   domain: '{{ old('domain') }}',
@@ -129,7 +129,7 @@
                                     <p class="text-sm text-gray-500">Assign a package to define PHP version, disk quota, and limits.</p>
                                 </div>
                             </div>
-                            <a href="{{ route('packages.create') }}" target="_blank"
+                            <a href="{{ route('admin.packages.create') }}" target="_blank"
                                class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition">
                                 + New Package
                             </a>
@@ -140,7 +140,7 @@
                         @if($packages->isEmpty())
                             <div class="text-center py-6 bg-gray-50 rounded-lg border border-dashed border-gray-200">
                                 <p class="text-sm text-gray-500 mb-3">No packages created yet.</p>
-                                <a href="{{ route('packages.create') }}" target="_blank"
+                                <a href="{{ route('admin.packages.create') }}" target="_blank"
                                    class="text-sm text-indigo-600 hover:text-indigo-800 font-medium">
                                     Create your first package →
                                 </a>
@@ -211,7 +211,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                         Create Account
                     </button>
-                    <a href="{{ route('accounts.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.accounts.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                         Cancel
                     </a>
                 </div>
@@ -219,4 +219,4 @@
             </div>
         </form>
     @endif
-</x-app-layout>
+</x-admin-layout>

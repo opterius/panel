@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <div class="flex items-center space-x-3">
-            <a href="{{ route('servers.index') }}" class="text-gray-400 hover:text-gray-600 transition">
+            <a href="{{ route('admin.servers.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
             <h2 class="text-lg font-semibold text-gray-800">{{ $server->name }}</h2>
@@ -94,7 +94,7 @@
         @endif
 
         <x-delete-modal
-            :action="route('servers.destroy', $server)"
+            :action="route('admin.servers.destroy', $server)"
             title="Remove Server"
             message="This will disconnect the server from Opterius. All associated domains, databases, and accounts will be removed from the panel. Nothing on the server itself will be deleted."
             :confirm-password="true">
@@ -105,4 +105,4 @@
             </x-slot>
         </x-delete-modal>
     </div>
-</x-app-layout>
+</x-admin-layout>

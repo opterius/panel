@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <div class="flex items-center space-x-3">
-            <a href="{{ route('domains.index') }}" class="text-gray-400 hover:text-gray-600 transition">
+            <a href="{{ route('user.domains.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
             <h2 class="text-lg font-semibold text-gray-800">Add Domain</h2>
@@ -20,7 +20,7 @@
             </div>
         </div>
     @else
-        <form action="{{ route('domains.store') }}" method="POST"
+        <form action="{{ route('user.domains.store') }}" method="POST"
               x-data="{
                   domain: '{{ old('domain') }}',
                   selectedAccountId: '{{ old('account_id', $accounts->first()->id) }}',
@@ -139,7 +139,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                         Add Domain
                     </button>
-                    <a href="{{ route('domains.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <a href="{{ route('user.domains.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                         Cancel
                     </a>
                 </div>
@@ -147,4 +147,4 @@
             </div>
         </form>
     @endif
-</x-app-layout>
+</x-user-layout>

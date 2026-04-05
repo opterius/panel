@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <div class="flex items-center space-x-3">
-            <a href="{{ route('databases.index') }}" class="text-gray-400 hover:text-gray-600 transition">
+            <a href="{{ route('user.databases.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
             <h2 class="text-lg font-semibold text-gray-800">Create Database</h2>
@@ -14,13 +14,13 @@
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                 <h3 class="mt-4 text-base font-medium text-gray-700">No accounts available</h3>
                 <p class="mt-2 text-sm text-gray-500">You need to create an account before adding a database.</p>
-                <a href="{{ route('accounts.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                <a href="{{ route('admin.accounts.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     Create Account
                 </a>
             </div>
         </div>
     @else
-        <form action="{{ route('databases.store') }}" method="POST"
+        <form action="{{ route('user.databases.store') }}" method="POST"
               x-data="{
                   dbName: '{{ old('name') }}',
                   dbUser: '{{ old('db_username') }}',
@@ -152,7 +152,7 @@
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                         Create Database
                     </button>
-                    <a href="{{ route('databases.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <a href="{{ route('user.databases.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                         Cancel
                     </a>
                 </div>
@@ -160,4 +160,4 @@
             </div>
         </form>
     @endif
-</x-app-layout>
+</x-user-layout>

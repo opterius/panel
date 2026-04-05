@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">Add Server</h2>
     </x-slot>
@@ -10,7 +10,7 @@
                 <p class="text-sm text-gray-500 mt-1">Enter your server's IP address to connect it to Opterius.</p>
             </div>
 
-            <form action="{{ route('servers.store') }}" method="POST" class="space-y-5">
+            <form action="{{ route('admin.servers.store') }}" method="POST" class="space-y-5">
                 @csrf
 
                 <!-- Name -->
@@ -51,7 +51,7 @@
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                         Add Server
                     </button>
-                    <a href="{{ route('servers.index') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.servers.index') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                         Cancel
                     </a>
                 </div>
@@ -69,4 +69,4 @@
             </ol>
         </div>
     </div>
-</x-app-layout>
+</x-admin-layout>

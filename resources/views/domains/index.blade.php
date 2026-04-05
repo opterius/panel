@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">Domains</h2>
     </x-slot>
@@ -20,7 +20,7 @@
         <div>
             <p class="text-sm text-gray-500">Manage domains and virtual hosts across your servers.</p>
         </div>
-        <a href="{{ route('domains.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+        <a href="{{ route('user.domains.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
             Add Domain
         </a>
@@ -31,7 +31,7 @@
             <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
             <h3 class="mt-4 text-base font-medium text-gray-700">No domains yet</h3>
             <p class="mt-2 text-sm text-gray-500">Add your first domain to start hosting.</p>
-            <a href="{{ route('domains.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+            <a href="{{ route('user.domains.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                 Add Domain
             </a>
         </div>
@@ -83,7 +83,7 @@
                                 {{ ucfirst($domain->status) }}
                             </span>
 
-                            <form action="{{ route('domains.destroy', $domain) }}" method="POST"
+                            <form action="{{ route('user.domains.destroy', $domain) }}" method="POST"
                                   onsubmit="return confirm('Remove {{ $domain->domain }}? This will delete the Nginx vhost and PHP-FPM pool on the server.')">
                                 @csrf
                                 @method('DELETE')
@@ -152,7 +152,7 @@
                             </a>
 
                             {{-- DNS --}}
-                            <a href="{{ route('dns.index', $domain) }}"
+                            <a href="{{ route('user.dns.index', $domain) }}"
                                class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
                                 <div class="w-10 h-10 rounded-lg bg-rose-100 flex items-center justify-center group-hover:bg-rose-200 transition">
                                     <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
@@ -174,4 +174,4 @@
             @endforeach
         </div>
     @endif
-</x-app-layout>
+</x-user-layout>

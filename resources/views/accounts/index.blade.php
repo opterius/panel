@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">Accounts</h2>
     </x-slot>
@@ -16,7 +16,7 @@
                 <h3 class="text-base font-semibold text-gray-800">All Accounts</h3>
                 <p class="text-sm text-gray-500 mt-1">Hosting accounts with isolated system users.</p>
             </div>
-            <a href="{{ route('accounts.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+            <a href="{{ route('admin.accounts.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                 Create Account
             </a>
@@ -28,14 +28,14 @@
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                 <h3 class="mt-4 text-base font-medium text-gray-700">No accounts yet</h3>
                 <p class="mt-2 text-sm text-gray-500">Create your first hosting account to start adding domains.</p>
-                <a href="{{ route('accounts.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                <a href="{{ route('admin.accounts.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     Create Account
                 </a>
             </div>
         @else
             <div class="divide-y divide-gray-100">
                 @foreach($accounts as $account)
-                    <a href="{{ route('accounts.show', $account) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.accounts.show', $account) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
                         <div class="flex items-center space-x-4">
                             <!-- Avatar -->
                             <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
@@ -70,4 +70,4 @@
             </div>
         @endif
     </div>
-</x-app-layout>
+</x-admin-layout>

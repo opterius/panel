@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">Servers</h2>
     </x-slot>
@@ -16,7 +16,7 @@
                 <h3 class="text-base font-semibold text-gray-800">All Servers</h3>
                 <p class="text-sm text-gray-500 mt-1">Manage your connected servers and view their status.</p>
             </div>
-            <a href="{{ route('servers.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+            <a href="{{ route('admin.servers.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                 Add Server
             </a>
@@ -28,14 +28,14 @@
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
                 <h3 class="mt-4 text-base font-medium text-gray-700">No servers yet</h3>
                 <p class="mt-2 text-sm text-gray-500">Add your first server to start managing it.</p>
-                <a href="{{ route('servers.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                <a href="{{ route('admin.servers.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     Add Server
                 </a>
             </div>
         @else
             <div class="divide-y divide-gray-100">
                 @foreach($servers as $server)
-                    <a href="{{ route('servers.show', $server) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.servers.show', $server) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
                         <div class="flex items-center space-x-4">
                             <!-- Status Indicator -->
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center
@@ -86,4 +86,4 @@
             </div>
         @endif
     </div>
-</x-app-layout>
+</x-admin-layout>

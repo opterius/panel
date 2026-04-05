@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">PHP Management</h2>
     </x-slot>
@@ -22,7 +22,7 @@
             <p class="text-sm text-gray-500 mt-1">Manage PHP versions and settings per server.</p>
         </div>
         <div class="px-6 py-5">
-            <form method="GET" action="{{ route('php.index') }}" class="flex items-end gap-4">
+            <form method="GET" action="{{ route('admin.php.index') }}" class="flex items-end gap-4">
                 <div class="flex-1">
                     <label for="server_id" class="block text-sm font-medium text-gray-700 mb-1.5">Server</label>
                     <select name="server_id" id="server_id"
@@ -78,7 +78,7 @@
                                 @endif
                             </div>
                             @if(!$ver['installed'])
-                                <form action="{{ route('php.install') }}" method="POST" class="mt-3"
+                                <form action="{{ route('admin.php.install') }}" method="POST" class="mt-3"
                                       onsubmit="return confirm('Install PHP {{ $ver['version'] }}? This may take a few minutes.')">
                                     @csrf
                                     <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
@@ -118,7 +118,7 @@
                             </div>
 
                             <div class="flex items-center space-x-3">
-                                <form action="{{ route('php.switch') }}" method="POST" class="flex items-center space-x-2">
+                                <form action="{{ route('admin.php.switch') }}" method="POST" class="flex items-center space-x-2">
                                     @csrf
                                     <input type="hidden" name="domain_id" value="{{ $domain->id }}">
                                     <select name="new_version"
@@ -150,7 +150,7 @@
                     <h3 class="text-base font-semibold text-gray-800">PHP Configuration</h3>
                     <p class="text-sm text-gray-500 mt-1">Edit php.ini values per domain (memory_limit, upload size, etc).</p>
                 </div>
-                <form action="{{ route('php.config') }}" method="POST" class="px-6 py-5 space-y-5">
+                <form action="{{ route('admin.php.config') }}" method="POST" class="px-6 py-5 space-y-5">
                     @csrf
                     <div>
                         <label for="config_domain_id" class="block text-sm font-medium text-gray-700 mb-1.5">Domain</label>
@@ -198,4 +198,4 @@
             </div>
         @endif
     @endif
-</x-app-layout>
+</x-admin-layout>

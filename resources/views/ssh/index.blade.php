@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">SSH Access</h2>
     </x-slot>
@@ -25,7 +25,7 @@
             @if($accounts->isEmpty())
                 <p class="text-sm text-gray-500">No accounts available.</p>
             @else
-                <form method="GET" action="{{ route('ssh.index') }}" class="flex items-end gap-4">
+                <form method="GET" action="{{ route('user.ssh.index') }}" class="flex items-end gap-4">
                     <div class="flex-1">
                         <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">Account</label>
                         <select name="account_id" id="account_id"
@@ -61,7 +61,7 @@
                         @endif
                     </p>
                 </div>
-                <form action="{{ route('ssh.toggle-shell') }}" method="POST">
+                <form action="{{ route('user.ssh.toggle-shell') }}" method="POST">
                     @csrf
                     <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                     <input type="hidden" name="enabled" value="{{ $sshEnabled ? '0' : '1' }}">
@@ -110,7 +110,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <form action="{{ route('ssh.delete-key') }}" method="POST"
+                            <form action="{{ route('user.ssh.delete-key') }}" method="POST"
                                   onsubmit="return confirm('Remove this SSH key?')">
                                 @csrf
                                 <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
@@ -131,7 +131,7 @@
                 <h3 class="text-base font-semibold text-gray-800">Import Public Key</h3>
                 <p class="text-sm text-gray-500 mt-1">Paste an SSH public key to authorize it for this account.</p>
             </div>
-            <form action="{{ route('ssh.import-key') }}" method="POST" class="px-6 py-5 space-y-4">
+            <form action="{{ route('user.ssh.import-key') }}" method="POST" class="px-6 py-5 space-y-4">
                 @csrf
                 <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                 <div>
@@ -151,4 +151,4 @@
             </form>
         </div>
     @endif
-</x-app-layout>
+</x-user-layout>

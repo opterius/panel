@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-admin-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">Packages</h2>
     </x-slot>
@@ -17,7 +17,7 @@
 
     <div class="flex justify-between items-center mb-6">
         <p class="text-sm text-gray-500">Define resource limits and PHP versions for hosting accounts.</p>
-        <a href="{{ route('packages.create') }}"
+        <a href="{{ route('admin.packages.create') }}"
            class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -33,7 +33,7 @@
             </svg>
             <h3 class="mt-4 text-base font-medium text-gray-700">No packages yet</h3>
             <p class="mt-2 text-sm text-gray-500">Create packages to quickly assign PHP version, disk quota, and limits when creating accounts.</p>
-            <a href="{{ route('packages.create') }}"
+            <a href="{{ route('admin.packages.create') }}"
                class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                 Create First Package
             </a>
@@ -98,13 +98,13 @@
                     </div>
 
                     <div class="px-5 py-3 border-t border-gray-100 flex items-center justify-between">
-                        <a href="{{ route('packages.edit', $package) }}"
+                        <a href="{{ route('admin.packages.edit', $package) }}"
                            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">
                             Edit
                         </a>
                         @if($package->accounts_count === 0)
                             <x-delete-modal
-                                :action="route('packages.destroy', $package)"
+                                :action="route('admin.packages.destroy', $package)"
                                 title="Delete Package"
                                 message="This will permanently delete the '{{ $package->name }}' package. This cannot be undone."
                                 :confirm-password="false">
@@ -120,4 +120,4 @@
             @endforeach
         </div>
     @endif
-</x-app-layout>
+</x-admin-layout>

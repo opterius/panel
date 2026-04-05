@@ -1,7 +1,7 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <div class="flex items-center space-x-3">
-            <a href="{{ route('domains.index') }}" class="text-gray-400 hover:text-gray-600 transition">
+            <a href="{{ route('user.domains.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
             <h2 class="text-lg font-semibold text-gray-800">DNS Zone: {{ $domain->domain }}</h2>
@@ -67,7 +67,7 @@
                         <div class="col-span-1 text-xs text-gray-500">{{ $record['priority'] ?: '—' }}</div>
                         <div class="col-span-1 text-right">
                             @if($record['type'] !== 'SOA' && $record['type'] !== 'NS')
-                                <form action="{{ route('dns.delete-record', $domain) }}" method="POST" class="inline"
+                                <form action="{{ route('user.dns.delete-record', $domain) }}" method="POST" class="inline"
                                       onsubmit="return confirm('Delete this {{ $record['type'] }} record?')">
                                     @csrf
                                     <input type="hidden" name="record_id" value="{{ $record['id'] }}">
@@ -88,7 +88,7 @@
         <div class="px-6 py-5 border-b border-gray-100">
             <h3 class="text-base font-semibold text-gray-800">Add Record</h3>
         </div>
-        <form action="{{ route('dns.add-record', $domain) }}" method="POST" class="px-6 py-5"
+        <form action="{{ route('user.dns.add-record', $domain) }}" method="POST" class="px-6 py-5"
               x-data="{ type: 'A' }">
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-6 gap-4">
@@ -148,4 +148,4 @@
             </div>
         </form>
     </div>
-</x-app-layout>
+</x-user-layout>

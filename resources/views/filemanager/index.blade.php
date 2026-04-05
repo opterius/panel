@@ -1,4 +1,4 @@
-<x-app-layout>
+<x-user-layout>
     <x-slot name="header">
         <h2 class="text-lg font-semibold text-gray-800">File Manager</h2>
     </x-slot>
@@ -26,7 +26,7 @@
                 @if($accounts->isEmpty())
                     <p class="text-sm text-gray-500">No accounts available.</p>
                 @else
-                    <form method="GET" action="{{ route('filemanager.index') }}" class="flex items-end gap-4">
+                    <form method="GET" action="{{ route('user.filemanager.index') }}" class="flex items-end gap-4">
                         <div class="flex-1">
                             <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">Account</label>
                             <select name="account_id" id="account_id"
@@ -59,7 +59,7 @@
                     @foreach($parts as $i => $part)
                         @php $breadcrumb .= '/' . $part; @endphp
                         @if($i < count($parts) - 1)
-                            <a href="{{ route('filemanager.index', ['account_id' => $selectedAccount->id, 'path' => $breadcrumb]) }}"
+                            <a href="{{ route('user.filemanager.index', ['account_id' => $selectedAccount->id, 'path' => $breadcrumb]) }}"
                                class="text-indigo-600 hover:text-indigo-800 transition">{{ $part }}</a>
                             <span class="text-gray-400">/</span>
                         @else
@@ -76,7 +76,7 @@
                     </button>
 
                     <!-- Upload -->
-                    <form action="{{ route('filemanager.upload') }}" method="POST" enctype="multipart/form-data" class="inline-flex">
+                    <form action="{{ route('user.filemanager.upload') }}" method="POST" enctype="multipart/form-data" class="inline-flex">
                         @csrf
                         <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                         <input type="hidden" name="path" value="{{ $currentPath }}">
@@ -91,7 +91,7 @@
 
             <!-- New Folder Input -->
             <div x-show="newFolder" x-collapse class="px-6 py-3 border-b border-gray-100 bg-indigo-50">
-                <form action="{{ route('filemanager.mkdir') }}" method="POST" class="flex items-center gap-3">
+                <form action="{{ route('user.filemanager.mkdir') }}" method="POST" class="flex items-center gap-3">
                     @csrf
                     <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                     <input type="text" name="path" x-model="folderName" placeholder="Folder name"
@@ -112,7 +112,7 @@
                 $homeDir = '/home/' . $selectedAccount->username;
             @endphp
             @if($currentPath !== $homeDir && strlen($currentPath) > strlen($homeDir))
-                <a href="{{ route('filemanager.index', ['account_id' => $selectedAccount->id, 'path' => $parentPath]) }}"
+                <a href="{{ route('user.filemanager.index', ['account_id' => $selectedAccount->id, 'path' => $parentPath]) }}"
                    class="flex items-center px-6 py-3 text-sm text-gray-500 hover:bg-gray-50 border-b border-gray-100 transition">
                     <svg class="w-4 h-4 mr-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" /></svg>
                     ..
@@ -141,7 +141,7 @@
                             <div class="col-span-6 flex items-center space-x-3 min-w-0">
                                 @if($entry['is_dir'])
                                     <svg class="w-5 h-5 text-yellow-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" /></svg>
-                                    <a href="{{ route('filemanager.index', ['account_id' => $selectedAccount->id, 'path' => $entry['path']]) }}"
+                                    <a href="{{ route('user.filemanager.index', ['account_id' => $selectedAccount->id, 'path' => $entry['path']]) }}"
                                        class="text-indigo-600 hover:text-indigo-800 font-medium truncate transition">
                                         {{ $entry['name'] }}
                                     </a>
@@ -174,11 +174,11 @@
                             <!-- Actions -->
                             <div class="col-span-2 flex items-center justify-end space-x-2">
                                 @if(!$entry['is_dir'] && $entry['size'] < 2097152)
-                                    <a href="{{ route('filemanager.edit', ['account_id' => $selectedAccount->id, 'path' => $entry['path']]) }}"
+                                    <a href="{{ route('user.filemanager.edit', ['account_id' => $selectedAccount->id, 'path' => $entry['path']]) }}"
                                        class="text-indigo-600 hover:text-indigo-800 text-xs font-medium transition">Edit</a>
                                 @endif
 
-                                <form action="{{ route('filemanager.archive') }}" method="POST" class="inline">
+                                <form action="{{ route('user.filemanager.archive') }}" method="POST" class="inline">
                                     @csrf
                                     <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                                     <input type="hidden" name="path" value="{{ $entry['path'] }}">
@@ -187,7 +187,7 @@
                                     </button>
                                 </form>
 
-                                <form action="{{ route('filemanager.delete') }}" method="POST" class="inline"
+                                <form action="{{ route('user.filemanager.delete') }}" method="POST" class="inline"
                                       onsubmit="return confirm('Delete {{ $entry['name'] }}?')">
                                     @csrf
                                     <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
@@ -203,4 +203,4 @@
             @endif
         </div>
     @endif
-</x-app-layout>
+</x-user-layout>

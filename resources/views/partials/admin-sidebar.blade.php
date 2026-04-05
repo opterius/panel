@@ -1,0 +1,84 @@
+<aside class="w-64 bg-gray-900 text-gray-300 flex flex-col shrink-0">
+    <!-- Logo -->
+    <div class="h-16 flex items-center px-6 border-b border-gray-800">
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
+            <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
+                <span class="text-white font-bold text-sm">O</span>
+            </div>
+            <span class="text-white font-semibold text-lg">Opterius</span>
+        </a>
+    </div>
+
+    <!-- Switcher -->
+    <div class="px-3 py-3 border-b border-gray-800">
+        <div class="flex items-center rounded-lg bg-gray-800 p-1">
+            <span class="flex-1 text-center py-1.5 text-xs font-semibold rounded-md bg-indigo-600 text-white">
+                Admin
+            </span>
+            <a href="{{ route('user.dashboard') }}" class="flex-1 text-center py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md">
+                User Panel
+            </a>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+        <x-sidebar-link href="{{ route('admin.dashboard') }}" :active="request()->routeIs('admin.dashboard')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-4 0a1 1 0 01-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 01-1 1h-2z" /></svg>
+            </x-slot>
+            Dashboard
+        </x-sidebar-link>
+
+        <div class="pt-4 pb-2 px-3">
+            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Server</span>
+        </div>
+
+        <x-sidebar-link href="{{ route('admin.servers.index') }}" :active="request()->routeIs('admin.servers.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
+            </x-slot>
+            Servers
+        </x-sidebar-link>
+
+        <x-sidebar-link href="{{ route('admin.accounts.index') }}" :active="request()->routeIs('admin.accounts.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </x-slot>
+            Accounts
+        </x-sidebar-link>
+
+        <div class="pt-4 pb-2 px-3">
+            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Configuration</span>
+        </div>
+
+        <x-sidebar-link href="{{ route('admin.packages.index') }}" :active="request()->routeIs('admin.packages.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+            </x-slot>
+            Packages
+        </x-sidebar-link>
+
+        <x-sidebar-link href="{{ route('admin.php.index') }}" :active="request()->routeIs('admin.php.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </x-slot>
+            PHP Versions
+        </x-sidebar-link>
+
+        <div class="pt-4 pb-2 px-3">
+            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Settings</span>
+        </div>
+
+        <x-sidebar-link href="{{ route('admin.license.index') }}" :active="request()->routeIs('admin.license.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+            </x-slot>
+            License
+        </x-sidebar-link>
+    </nav>
+
+    <div class="px-4 py-3 border-t border-gray-800 text-xs text-gray-500">
+        <div>Opterius Panel v1.0</div>
+    </div>
+</aside>
