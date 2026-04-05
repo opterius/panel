@@ -17,6 +17,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SshController;
 use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\SslController;
+use App\Http\Controllers\WordPressController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -97,6 +98,12 @@ Route::middleware([
             }
             return redirect()->route('user.dashboard');
         })->name('return-to-admin');
+
+        // WordPress
+        Route::get('/wordpress', [WordPressController::class, 'index'])->name('wordpress.index');
+        Route::get('/wordpress/install', [WordPressController::class, 'create'])->name('wordpress.create');
+        Route::post('/wordpress/install', [WordPressController::class, 'store'])->name('wordpress.store');
+        Route::post('/wordpress/update', [WordPressController::class, 'update'])->name('wordpress.update');
 
         // Domains
         Route::resource('domains', DomainController::class)->only(['index', 'create', 'store', 'destroy']);
