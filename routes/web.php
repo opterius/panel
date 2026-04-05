@@ -6,6 +6,7 @@ use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DnsController;
 use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EmailController;
+use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\PackageController;
@@ -58,6 +59,10 @@ Route::middleware([
         Route::post('/php/switch', [PhpController::class, 'switchVersion'])->name('php.switch');
         Route::post('/php/config', [PhpController::class, 'config'])->name('php.config');
         Route::post('/php/extension', [PhpController::class, 'toggleExtension'])->name('php.extension');
+
+        // Email Settings (global)
+        Route::get('/email-settings', [EmailSettingsController::class, 'index'])->name('email-settings.index');
+        Route::put('/email-settings', [EmailSettingsController::class, 'update'])->name('email-settings.update');
 
         // License
         Route::get('/license', [LicenseController::class, 'index'])->name('license.index');

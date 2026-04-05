@@ -73,6 +73,13 @@
             PHP Versions
         </x-sidebar-link>
 
+        <x-sidebar-link href="{{ route('admin.email-settings.index') }}" :active="request()->routeIs('admin.email-settings.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            </x-slot>
+            Email Settings
+        </x-sidebar-link>
+
         <div class="pt-4 pb-2 px-3">
             <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Settings</span>
         </div>
