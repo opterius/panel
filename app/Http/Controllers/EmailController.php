@@ -30,9 +30,12 @@ class EmailController extends Controller
     {
         $validated = $request->validate([
             'domain_id' => 'required|exists:domains,id',
-            'username'  => 'required|string|max:64|alpha_dash',
-            'password'  => 'required|string|min:8',
-            'quota'     => 'nullable|integer|min:0',
+            'username'  => ['required', 'string', 'min:2', 'max:25', 'regex:/^[a-zA-Z0-9][a-zA-Z0-9._-]*[a-zA-Z0-9]$/'],
+            'password'  => ['required', 'string', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).+$/'],
+            'quota'     => 'nullable|integer|min:0|max:51200',
+        ], [
+            'username.regex' => 'Username can only contain letters, numbers, dots, hyphens, underscores. Must start and end with a letter or number.',
+            'password.regex' => 'Password must contain at least one uppercase, one lowercase, and one number.',
         ]);
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
