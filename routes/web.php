@@ -12,6 +12,7 @@ use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PhpController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\SshController;
+use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\SslController;
 use Illuminate\Support\Facades\Route;
 
@@ -86,6 +87,10 @@ Route::middleware([
 
         // Domains
         Route::resource('domains', DomainController::class)->only(['index', 'create', 'store', 'destroy']);
+
+        // Subdomains
+        Route::get('/subdomains/{domain}/create', [SubdomainController::class, 'create'])->name('subdomains.create');
+        Route::post('/subdomains/{domain}', [SubdomainController::class, 'store'])->name('subdomains.store');
 
         // DNS Zone Editor
         Route::get('/dns/{domain}', [DnsController::class, 'index'])->name('dns.index');
