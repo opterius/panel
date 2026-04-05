@@ -17,4 +17,27 @@ return [
 
     'default_php_version' => '8.3',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Agent Settings
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the Go agent running on managed servers.
+    | The agent_port is used when auto-generating the agent URL.
+    |
+    */
+
+    'agent_port' => env('OPTERIUS_AGENT_PORT', 7443),
+    'agent_timeout' => env('OPTERIUS_AGENT_TIMEOUT', 30),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Licensing
+    |--------------------------------------------------------------------------
+    */
+
+    'version' => '1.0.0',
+    'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
+    'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),
+
 ];

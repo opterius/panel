@@ -7,7 +7,6 @@ use App\Models\Domain;
 use App\Models\Package;
 use App\Models\Server;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
@@ -25,7 +24,7 @@ class AccountController extends Controller
     public function create()
     {
         $servers = Server::all();
-        $packages = Package::where('user_id', Auth::id())->orderByDesc('is_default')->orderBy('name')->get();
+        $packages = Package::orderByDesc('is_default')->orderBy('name')->get();
         $defaultPackage = $packages->firstWhere('is_default', true);
 
         return view('accounts.create', compact('servers', 'packages', 'defaultPackage'));

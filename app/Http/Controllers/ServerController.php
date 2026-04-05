@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Server;
+use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -33,7 +34,7 @@ class ServerController extends Controller
 
         $validated['user_id'] = auth()->id();
         $validated['agent_token'] = Str::random(64);
-        $validated['agent_url'] = 'https://' . $validated['ip_address'] . ':7443';
+        $validated['agent_url'] = 'http://' . $validated['ip_address'] . ':' . config('opterius.agent_port');
 
         $server = Server::create($validated);
 
@@ -44,7 +45,9 @@ class ServerController extends Controller
     {
         $server->load('domains', 'accounts', 'databases', 'cronJobs');
 
-        return view('servers.show', compact('server'));
+        $agentHealth = AgentService::for($server)->health();
+
+        return view('servers.show', compact('server', 'agentHealth'));
     }
 
     public function destroy(Request $request, Server $server)

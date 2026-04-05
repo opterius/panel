@@ -18,7 +18,6 @@ class DatabaseSeeder extends Seeder
         ]);
 
         Package::create([
-            'user_id' => $admin->id,
             'name' => 'Default',
             'description' => 'Default hosting package',
             'php_versions' => config('opterius.php_versions'),

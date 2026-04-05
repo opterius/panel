@@ -4,14 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Package;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class PackageController extends Controller
 {
     public function index()
     {
-        $packages = Package::where('user_id', Auth::id())
-            ->withCount('accounts')
+        $packages = Package::withCount('accounts')
             ->orderByDesc('is_default')
             ->orderBy('name')
             ->get();
@@ -46,13 +44,12 @@ class PackageController extends Controller
             return back()->withErrors(['default_php_version' => 'The default PHP version must be one of the allowed versions.'])->withInput();
         }
 
-        $validated['user_id'] = Auth::id();
         $validated['ssl_enabled'] = $request->boolean('ssl_enabled');
         $validated['cron_jobs_enabled'] = $request->boolean('cron_jobs_enabled');
         $validated['is_default'] = $request->boolean('is_default');
 
         if ($validated['is_default']) {
-            Package::where('user_id', Auth::id())->update(['is_default' => false]);
+            Package::query()->update(['is_default' => false]);
         }
 
         Package::create($validated);
@@ -62,15 +59,11 @@ class PackageController extends Controller
 
     public function edit(Package $package)
     {
-        abort_unless($package->user_id === Auth::id(), 403);
-
         return view('packages.edit', compact('package'));
     }
 
     public function update(Request $request, Package $package)
     {
-        abort_unless($package->user_id === Auth::id(), 403);
-
         $validated = $request->validate([
             'name'                => 'required|string|max:100',
             'description'         => 'nullable|string|max:255',
@@ -96,9 +89,7 @@ class PackageController extends Controller
         $validated['is_default'] = $request->boolean('is_default');
 
         if ($validated['is_default']) {
-            Package::where('user_id', Auth::id())
-                ->where('id', '!=', $package->id)
-                ->update(['is_default' => false]);
+            Package::where('id', '!=', $package->id)->update(['is_default' => false]);
         }
 
         $package->update($validated);
@@ -108,8 +99,6 @@ class PackageController extends Controller
 
     public function destroy(Package $package)
     {
-        abort_unless($package->user_id === Auth::id(), 403);
-
         if ($package->accounts()->exists()) {
             return back()->with('error', 'Cannot delete a package that has accounts assigned to it.');
         }

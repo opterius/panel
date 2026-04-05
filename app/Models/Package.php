@@ -3,13 +3,11 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Package extends Model
 {
     protected $fillable = [
-        'user_id',
         'name',
         'description',
         'php_versions',
@@ -34,11 +32,6 @@ class Package extends Model
     public function allowsPhpVersion(string $version): bool
     {
         return in_array($version, $this->php_versions ?? []);
-    }
-
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class);
     }
 
     public function accounts(): HasMany

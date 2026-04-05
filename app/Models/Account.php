@@ -9,8 +9,15 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Account extends Model
 {
     protected $fillable = [
-        'server_id', 'user_id', 'package_id', 'username', 'home_directory', 'disk_quota', 'php_version',
+        'server_id', 'user_id', 'package_id', 'username', 'home_directory', 'disk_quota', 'php_version', 'ssh_enabled',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'ssh_enabled' => 'boolean',
+        ];
+    }
 
     public function server(): BelongsTo
     {
