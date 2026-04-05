@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Domain;
 use App\Models\Package;
 use App\Models\Server;
+use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -68,7 +69,24 @@ class AccountController extends Controller
             return $account;
         });
 
-        return redirect()->route('accounts.show', $account)->with('success', 'Account created with domain ' . $validated['domain']);
+        // Tell the agent to create the domain on the server
+        $server = Server::findOrFail($validated['server_id']);
+        $domain = $account->domains()->first();
+
+        $response = AgentService::for($server)->post('/domains/create', [
+            'domain'        => $domain->domain,
+            'document_root' => $domain->document_root,
+            'username'      => $account->username,
+            'php_version'   => $domain->php_version,
+        ]);
+
+        if ($response && $response->successful()) {
+            $domain->update(['status' => 'active']);
+            return redirect()->route('accounts.show', $account)->with('success', 'Account created with domain ' . $validated['domain']);
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
+        return redirect()->route('accounts.show', $account)->with('warning', 'Account saved but server setup failed: ' . $error);
     }
 
     public function show(Account $account)
