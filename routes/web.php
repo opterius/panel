@@ -5,6 +5,7 @@ use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DnsController;
 use App\Http\Controllers\DomainController;
+use App\Http\Controllers\EmailController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\PackageController;
@@ -100,6 +101,12 @@ Route::middleware([
         Route::post('/ssl/upload', [SslController::class, 'upload'])->name('ssl.upload');
         Route::post('/ssl/{certificate}/renew', [SslController::class, 'renew'])->name('ssl.renew');
         Route::delete('/ssl/{certificate}', [SslController::class, 'destroy'])->name('ssl.destroy');
+
+        // Email Accounts
+        Route::get('/emails', [EmailController::class, 'index'])->name('emails.index');
+        Route::post('/emails', [EmailController::class, 'store'])->name('emails.store');
+        Route::post('/emails/{emailAccount}/password', [EmailController::class, 'changePassword'])->name('emails.password');
+        Route::delete('/emails/{emailAccount}', [EmailController::class, 'destroy'])->name('emails.destroy');
 
         // SSH Access
         Route::get('/ssh', [SshController::class, 'index'])->name('ssh.index');

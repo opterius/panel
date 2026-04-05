@@ -125,12 +125,12 @@
                             </a>
 
                             {{-- Email --}}
-                            <a href="#"
-                               class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition opacity-50 cursor-not-allowed" title="Coming soon">
-                                <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+                            <a href="{{ route('user.emails.index') }}"
+                               class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
+                                <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center group-hover:bg-orange-200 transition">
                                     <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                 </div>
-                                <span class="mt-2 text-xs font-medium text-gray-400">Email</span>
+                                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-indigo-700">Email</span>
                             </a>
 
                             {{-- Cron Jobs --}}
