@@ -13,10 +13,10 @@
     <div class="px-3 py-3 border-b border-gray-800">
         <div class="flex items-center rounded-lg bg-gray-800 p-1">
             <span class="flex-1 text-center py-1.5 text-xs font-semibold rounded-md bg-indigo-600 text-white">
-                Admin
+                Server Mode
             </span>
             <a href="{{ route('user.dashboard') }}" class="flex-1 text-center py-1.5 text-xs font-medium text-gray-400 hover:text-white transition rounded-md">
-                User Panel
+                Hosting Mode
             </a>
         </div>
     </div>
