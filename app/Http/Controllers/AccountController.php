@@ -102,7 +102,19 @@ class AccountController extends Controller
     {
         $account->load('server', 'user', 'domains', 'databases', 'cronJobs');
 
-        return view('accounts.show', compact('account'));
+        // Fetch account stats from agent
+        $stats = null;
+        $response = AgentService::for($account->server)->post('/stats/account', [
+            'username'  => $account->username,
+            'domains'   => $account->domains->pluck('domain')->toArray(),
+            'databases' => $account->databases->pluck('name')->toArray(),
+        ]);
+
+        if ($response && $response->successful()) {
+            $stats = $response->json('stats');
+        }
+
+        return view('accounts.show', compact('account', 'stats'));
     }
 
     public function destroy(Request $request, Account $account)

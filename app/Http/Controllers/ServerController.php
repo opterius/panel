@@ -47,7 +47,14 @@ class ServerController extends Controller
 
         $agentHealth = AgentService::for($server)->health();
 
-        return view('servers.show', compact('server', 'agentHealth'));
+        // Fetch server stats
+        $serverStats = null;
+        $response = AgentService::for($server)->post('/stats/server', []);
+        if ($response && $response->successful()) {
+            $serverStats = $response->json('stats');
+        }
+
+        return view('servers.show', compact('server', 'agentHealth', 'serverStats'));
     }
 
     public function destroy(Request $request, Server $server)
