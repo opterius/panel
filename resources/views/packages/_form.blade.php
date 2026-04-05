@@ -168,10 +168,66 @@
                     </div>
                 </div>
             </div>
-            <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                <x-limit-picker name="max_domains" label="Addon Domains" :value="$package?->max_domains ?? 0" />
                 <x-limit-picker name="max_subdomains" label="Subdomains" :value="$package?->max_subdomains ?? 0" />
                 <x-limit-picker name="max_databases" label="Databases" :value="$package?->max_databases ?? 0" />
                 <x-limit-picker name="max_email_accounts" label="Email Accounts" :value="$package?->max_email_accounts ?? 0" />
+            </div>
+        </div>
+
+        {{-- PHP Resources --}}
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div class="px-6 py-5 border-b border-gray-100">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <span class="text-sm font-bold text-indigo-600">4</span>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-800">PHP Resources</h3>
+                        <p class="text-sm text-gray-500">Control CPU and memory usage per account via PHP-FPM limits.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">PHP Workers per Domain</label>
+                    <p class="text-xs text-gray-400 mb-2">Max concurrent PHP processes (pm.max_children). Controls CPU usage indirectly.</p>
+                    <div class="flex flex-wrap gap-2" x-data="{ workers: '{{ old('max_php_workers', $package?->max_php_workers ?? 5) }}' }">
+                        @foreach([2, 3, 5, 10, 15, 25] as $w)
+                            <button type="button" @click="workers = '{{ $w }}'"
+                                class="px-3 py-1.5 text-xs font-medium rounded-lg border transition"
+                                :class="workers == '{{ $w }}' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'">
+                                {{ $w }} workers
+                            </button>
+                        @endforeach
+                        <input type="hidden" name="max_php_workers" :value="workers">
+                    </div>
+                    <p class="mt-2 text-xs text-gray-400">Recommended: 2-5 for shared hosting, 10-25 for dedicated.</p>
+                    @error('max_php_workers')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Memory per PHP Process</label>
+                    <p class="text-xs text-gray-400 mb-2">PHP memory_limit per process. Controls max RAM usage.</p>
+                    <div class="flex flex-wrap gap-2" x-data="{ memory: '{{ old('memory_per_process', $package?->memory_per_process ?? 256) }}' }">
+                        @foreach([64, 128, 256, 512, 1024, 2048] as $m)
+                            <button type="button" @click="memory = '{{ $m }}'"
+                                class="px-3 py-1.5 text-xs font-medium rounded-lg border transition"
+                                :class="memory == '{{ $m }}' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'">
+                                {{ $m >= 1024 ? ($m / 1024) . ' GB' : $m . ' MB' }}
+                            </button>
+                        @endforeach
+                        <input type="hidden" name="memory_per_process" :value="memory">
+                    </div>
+                    <p class="mt-2 text-xs text-gray-400">
+                        Max RAM per domain: <span class="font-semibold" x-data x-text="'workers x memory'"></span>
+                    </p>
+                    @error('memory_per_process')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                </div>
             </div>
         </div>
 
@@ -180,7 +236,7 @@
             <div class="px-6 py-5 border-b border-gray-100">
                 <div class="flex items-center space-x-3">
                     <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
-                        <span class="text-sm font-bold text-indigo-600">4</span>
+                        <span class="text-sm font-bold text-indigo-600">5</span>
                     </div>
                     <div>
                         <h3 class="text-base font-semibold text-gray-800">Features</h3>
