@@ -55,7 +55,7 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm font-semibold text-gray-800">{{ $database->name }}</div>
+                                <a href="{{ route('user.databases.show', $database) }}" class="text-sm font-semibold text-indigo-600 hover:text-indigo-800 transition">{{ $database->name }}</a>
                                 <div class="text-xs text-gray-500">
                                     User: <span class="font-mono">{{ $database->db_username }}</span>
                                     &middot; {{ $database->server->name }}

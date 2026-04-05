@@ -53,6 +53,14 @@ return [
 
     'webmail_url' => env('OPTERIUS_WEBMAIL_URL', 'http://SERVER_IP:8080'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | phpMyAdmin
+    |--------------------------------------------------------------------------
+    */
+
+    'phpmyadmin_url' => env('OPTERIUS_PHPMYADMIN_URL', 'http://SERVER_IP:8081'),
+
     'version' => '1.0.0',
     'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
     'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),

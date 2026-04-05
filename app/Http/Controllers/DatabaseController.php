@@ -44,7 +44,6 @@ class DatabaseController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
         $host = $request->boolean('remote') ? '%' : 'localhost';
 
-        // 1. Create database on server
         $response = AgentService::for($account->server)->post('/databases/create', [
             'name' => $validated['name'],
         ]);
@@ -54,7 +53,6 @@ class DatabaseController extends Controller
             return back()->with('error', 'Failed to create database: ' . $error)->withInput();
         }
 
-        // 2. Create database user and grant privileges
         $response = AgentService::for($account->server)->post('/databases/user-create', [
             'username' => $validated['db_username'],
             'password' => $validated['db_password'],
@@ -63,7 +61,6 @@ class DatabaseController extends Controller
         ]);
 
         if (!$response || !$response->successful()) {
-            // Rollback: delete the database we just created
             AgentService::for($account->server)->post('/databases/delete', [
                 'name' => $validated['name'],
             ]);
@@ -71,7 +68,6 @@ class DatabaseController extends Controller
             return back()->with('error', 'Failed to create database user: ' . $error)->withInput();
         }
 
-        // 3. Save to panel database
         $database = Database::create([
             'server_id'   => $account->server_id,
             'account_id'  => $account->id,
@@ -80,7 +76,63 @@ class DatabaseController extends Controller
             'status'      => 'active',
         ]);
 
-        return redirect()->route('user.databases.index')->with('success', 'Database ' . $database->name . ' created successfully.');
+        return redirect()->route('user.databases.show', $database)->with('success', 'Database ' . $database->name . ' created successfully.');
+    }
+
+    public function show(Database $database)
+    {
+        $database->load('account.server');
+
+        $info = null;
+        $response = AgentService::for($database->account->server)->post('/databases/info', [
+            'name' => $database->name,
+        ]);
+
+        if ($response && $response->successful()) {
+            $info = $response->json();
+        }
+
+        return view('databases.show', compact('database', 'info'));
+    }
+
+    public function changePassword(Request $request, Database $database)
+    {
+        $validated = $request->validate([
+            'db_password' => 'required|string|min:8',
+        ]);
+
+        $database->load('account.server');
+
+        $response = AgentService::for($database->account->server)->post('/databases/user-password', [
+            'username' => $database->db_username,
+            'password' => $validated['db_password'],
+            'host'     => 'localhost',
+        ]);
+
+        if ($response && $response->successful()) {
+            return redirect()->route('user.databases.show', $database)->with('success', 'Password changed for ' . $database->db_username);
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
+        return back()->with('error', 'Failed to change password: ' . $error);
+    }
+
+    public function repair(Request $request, Database $database)
+    {
+        $database->load('account.server');
+        $action = $request->input('action', 'repair');
+
+        $response = AgentService::for($database->account->server)->post('/databases/repair', [
+            'name'   => $database->name,
+            'action' => $action,
+        ]);
+
+        if ($response && $response->successful()) {
+            return redirect()->route('user.databases.show', $database)->with('success', 'Database ' . $action . ' completed.');
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
+        return back()->with('error', ucfirst($action) . ' failed: ' . $error);
     }
 
     public function destroy(Request $request, Database $database)
@@ -91,18 +143,15 @@ class DatabaseController extends Controller
 
         $database->load('account.server');
 
-        // Delete database on server
         AgentService::for($database->account->server)->post('/databases/delete', [
             'name' => $database->name,
         ]);
 
-        // Delete user on server
         if ($database->db_username) {
             AgentService::for($database->account->server)->post('/databases/user-delete', [
                 'username' => $database->db_username,
                 'host'     => 'localhost',
             ]);
-            // Also try removing remote user
             AgentService::for($database->account->server)->post('/databases/user-delete', [
                 'username' => $database->db_username,
                 'host'     => '%',

@@ -93,7 +93,9 @@ Route::middleware([
         Route::post('/dns/{domain}/delete-record', [DnsController::class, 'deleteRecord'])->name('dns.delete-record');
 
         // Databases
-        Route::resource('databases', DatabaseController::class)->only(['index', 'create', 'store', 'destroy']);
+        Route::resource('databases', DatabaseController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
+        Route::post('/databases/{database}/password', [DatabaseController::class, 'changePassword'])->name('databases.password');
+        Route::post('/databases/{database}/repair', [DatabaseController::class, 'repair'])->name('databases.repair');
 
         // SSL Certificates
         Route::get('/ssl', [SslController::class, 'index'])->name('ssl.index');
