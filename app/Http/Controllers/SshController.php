@@ -71,15 +71,17 @@ class SshController extends Controller
     public function importKey(Request $request)
     {
         $validated = $request->validate([
-            'account_id' => 'required|exists:accounts,id',
-            'public_key' => 'required|string',
+            'account_id'  => 'required|exists:accounts,id',
+            'public_key'  => 'required|string',
+            'private_key' => 'nullable|string',
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         $response = AgentService::for($account->server)->post('/ssh/import-key', [
-            'username'   => $account->username,
-            'public_key' => $validated['public_key'],
+            'username'    => $account->username,
+            'public_key'  => $validated['public_key'],
+            'private_key' => $validated['private_key'] ?? '',
         ]);
 
         if ($response && $response->successful()) {

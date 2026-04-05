@@ -235,23 +235,32 @@
 
             <!-- Import Tab -->
             <div x-show="tab === 'import'" class="px-6 py-5">
-                <p class="text-sm text-gray-500 mb-4">Paste an existing SSH public key to authorize it for this account.</p>
+                <p class="text-sm text-gray-500 mb-4">Import an existing SSH key pair. The public key authorizes access, the private key is stored on the server for outgoing connections.</p>
                 <form action="{{ route('user.ssh.import-key') }}" method="POST" class="space-y-4">
                     @csrf
                     <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                     <div>
                         <label for="public_key" class="block text-sm font-medium text-gray-700 mb-1.5">Public Key</label>
-                        <textarea name="public_key" id="public_key" rows="4"
+                        <textarea name="public_key" id="public_key" rows="3"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-xs font-mono focus:border-indigo-500 focus:ring-indigo-500"
-                            placeholder="ssh-rsa AAAA... user@machine&#10;or&#10;ssh-ed25519 AAAA... user@machine">{{ old('public_key') }}</textarea>
-                        <p class="mt-1.5 text-xs text-gray-400">Supported types: ssh-rsa, ssh-ed25519, ecdsa</p>
-                    @error('public_key')
-                        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                    @enderror
-                </div>
+                            placeholder="ssh-rsa AAAA... user@machine">{{ old('public_key') }}</textarea>
+                        @error('public_key')
+                            <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label for="private_key" class="block text-sm font-medium text-gray-700 mb-1.5">Private Key <span class="text-gray-400 font-normal">(optional)</span></label>
+                        <textarea name="private_key" id="private_key" rows="5"
+                            class="w-full rounded-lg border-gray-300 shadow-sm text-xs font-mono focus:border-indigo-500 focus:ring-indigo-500"
+                            placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;...&#10;-----END OPENSSH PRIVATE KEY-----">{{ old('private_key') }}</textarea>
+                        <p class="mt-1.5 text-xs text-gray-400">If provided, the private key will be stored in ~/.ssh/ for outgoing SSH connections (e.g., Git deployments).</p>
+                        @error('private_key')
+                            <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                        Import Key
+                        Import Key Pair
                     </button>
                 </form>
             </div>
