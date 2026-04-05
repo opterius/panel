@@ -11,6 +11,7 @@ use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PhpController;
 use App\Http\Controllers\ServerController;
+use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SshController;
 use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\SslController;
@@ -46,6 +47,10 @@ Route::middleware([
         Route::resource('servers', ServerController::class)->except(['edit', 'update']);
         Route::resource('accounts', AccountController::class)->except(['edit', 'update']);
         Route::resource('packages', PackageController::class)->except(['show']);
+
+        // Services
+        Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+        Route::post('/services/action', [ServiceController::class, 'action'])->name('services.action');
 
         // PHP Versions (server-level)
         Route::get('/php', [PhpController::class, 'index'])->name('php.index');
