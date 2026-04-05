@@ -9,10 +9,18 @@ class PackageController extends Controller
 {
     public function index()
     {
-        $packages = Package::withCount('accounts')
+        $query = Package::withCount('accounts')
             ->orderByDesc('is_default')
-            ->orderBy('name')
-            ->get();
+            ->orderBy('name');
+
+        // Resellers see global packages (owner_id null) + their own
+        if (auth()->user()->isReseller()) {
+            $query->where(function ($q) {
+                $q->whereNull('owner_id')->orWhere('owner_id', auth()->id());
+            });
+        }
+
+        $packages = $query->get();
 
         return view('packages.index', compact('packages'));
     }

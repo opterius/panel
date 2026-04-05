@@ -33,6 +33,12 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'reseller_max_accounts',
+        'reseller_max_disk',
+        'reseller_max_bandwidth',
+        'reseller_max_domains',
+        'reseller_max_databases',
+        'reseller_max_email',
     ];
 
     /**
@@ -92,5 +98,39 @@ class User extends Authenticatable
     public function accounts(): HasMany
     {
         return $this->hasMany(Account::class);
+    }
+
+    public function packages(): HasMany
+    {
+        return $this->hasMany(Package::class, 'owner_id');
+    }
+
+    /**
+     * Get the reseller's current usage against their limits.
+     */
+    public function resellerUsage(): array
+    {
+        $accounts = $this->accounts()->count();
+        $domains = Domain::whereHas('account', fn ($q) => $q->where('user_id', $this->id))->count();
+        $databases = Database::whereHas('account', fn ($q) => $q->where('user_id', $this->id))->count();
+        $emails = EmailAccount::whereHas('domain.account', fn ($q) => $q->where('user_id', $this->id))->count();
+
+        return [
+            'accounts'  => ['used' => $accounts, 'limit' => $this->reseller_max_accounts],
+            'domains'   => ['used' => $domains, 'limit' => $this->reseller_max_domains],
+            'databases' => ['used' => $databases, 'limit' => $this->reseller_max_databases],
+            'email'     => ['used' => $emails, 'limit' => $this->reseller_max_email],
+        ];
+    }
+
+    /**
+     * Check if reseller can create more of a resource.
+     */
+    public function resellerCanCreate(string $resource): bool
+    {
+        $usage = $this->resellerUsage();
+        if (!isset($usage[$resource])) return true;
+        if ($usage[$resource]['limit'] === 0) return true; // 0 = unlimited
+        return $usage[$resource]['used'] < $usage[$resource]['limit'];
     }
 }

@@ -15,9 +15,14 @@ class AccountController extends Controller
 {
     public function index()
     {
-        $accounts = Account::with('server', 'user', 'domains', 'databases')
-            ->latest()
-            ->get();
+        $query = Account::with('server', 'user', 'domains', 'databases');
+
+        // Resellers only see their own accounts
+        if (auth()->user()->isReseller()) {
+            $query->where('user_id', auth()->id());
+        }
+
+        $accounts = $query->latest()->get();
 
         return view('accounts.index', compact('accounts'));
     }

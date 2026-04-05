@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Package extends Model
 {
     protected $fillable = [
+        'owner_id',
         'name',
         'description',
         'php_versions',

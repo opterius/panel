@@ -11,6 +11,7 @@ use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PhpController;
+use App\Http\Controllers\ResellerController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SshController;
@@ -48,6 +49,7 @@ Route::middleware([
         Route::resource('servers', ServerController::class)->except(['edit', 'update']);
         Route::resource('accounts', AccountController::class)->except(['edit', 'update']);
         Route::resource('packages', PackageController::class)->except(['show']);
+        Route::resource('resellers', ResellerController::class);
 
         // Services
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
