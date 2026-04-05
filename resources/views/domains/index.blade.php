@@ -101,7 +101,7 @@
                     <div class="px-6 py-4">
                         <div class="grid grid-cols-4 sm:grid-cols-4 md:grid-cols-8 gap-3">
                             {{-- File Manager --}}
-                            <a href="{{ route('filemanager.index', ['domain' => $domain->id]) }}"
+                            <a href="{{ route('user.filemanager.index', ['domain' => $domain->id]) }}"
                                class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
                                 <div class="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center group-hover:bg-blue-200 transition">
                                     <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
@@ -110,7 +110,7 @@
                             </a>
 
                             {{-- Databases --}}
-                            <a href="{{ route('databases.index', ['domain' => $domain->id]) }}"
+                            <a href="{{ route('user.databases.index', ['domain' => $domain->id]) }}"
                                class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
                                 <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center group-hover:bg-purple-200 transition">
                                     <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
@@ -119,7 +119,7 @@
                             </a>
 
                             {{-- SSL --}}
-                            <a href="{{ route('ssl.index', ['domain' => $domain->id]) }}"
+                            <a href="{{ route('user.ssl.index', ['domain' => $domain->id]) }}"
                                class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
                                 <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition">
                                     <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
@@ -137,7 +137,7 @@
                             </a>
 
                             {{-- Cron Jobs --}}
-                            <a href="{{ route('cronjobs.index', ['domain' => $domain->id]) }}"
+                            <a href="{{ route('user.cronjobs.index', ['domain' => $domain->id]) }}"
                                class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
                                 <div class="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center group-hover:bg-teal-200 transition">
                                     <svg class="w-5 h-5 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
