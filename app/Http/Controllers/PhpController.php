@@ -33,7 +33,48 @@ class PhpController extends Controller
                 ->get();
         }
 
-        return view('php.index', compact('servers', 'selectedServer', 'versions', 'domains'));
+        // Get extensions for the selected PHP version
+        $extensions = [];
+        $selectedVersion = $request->get('php_version', '');
+        if ($selectedServer && $selectedVersion) {
+            $response = AgentService::for($selectedServer)->post('/php/list-extensions', [
+                'version' => $selectedVersion,
+            ]);
+            if ($response && $response->successful()) {
+                $extensions = $response->json('extensions', []);
+            }
+        }
+
+        return view('php.index', compact('servers', 'selectedServer', 'versions', 'domains', 'extensions', 'selectedVersion'));
+    }
+
+    public function toggleExtension(Request $request)
+    {
+        $validated = $request->validate([
+            'server_id' => 'required|exists:servers,id',
+            'version'   => 'required|string|regex:/^\d+\.\d+$/',
+            'extension' => 'required|string|max:50',
+            'enable'    => 'required|boolean',
+        ]);
+
+        $server = Server::findOrFail($validated['server_id']);
+
+        $response = AgentService::for($server)->post('/php/extensions', [
+            'version'   => $validated['version'],
+            'extension' => $validated['extension'],
+            'enable'    => (bool) $validated['enable'],
+        ]);
+
+        $action = $validated['enable'] ? 'enabled' : 'disabled';
+
+        if ($response && $response->successful()) {
+            return redirect()
+                ->route('admin.php.index', ['server_id' => $server->id, 'php_version' => $validated['version']])
+                ->with('success', ucfirst($validated['extension']) . ' ' . $action . ' for PHP ' . $validated['version']);
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
+        return back()->with('error', 'Failed to ' . $action . ' extension: ' . $error);
     }
 
     public function install(Request $request)

@@ -119,6 +119,62 @@
             @endif
         </div>
 
+        <!-- PHP Extensions -->
+        @php
+            $installedVersionsList = collect($versions)->where('installed', true)->pluck('version')->toArray();
+        @endphp
+        @if(!empty($installedVersionsList))
+            <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+                <div class="px-6 py-5 border-b border-gray-100">
+                    <h3 class="text-base font-semibold text-gray-800">PHP Extensions</h3>
+                    <p class="text-sm text-gray-500 mt-1">Manage extensions per PHP version. Select a version to view and toggle extensions.</p>
+                </div>
+                <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+                    <div class="flex flex-wrap gap-2">
+                        @foreach($installedVersionsList as $ver)
+                            <a href="{{ route('admin.php.index', ['server_id' => $selectedServer->id, 'php_version' => $ver]) }}"
+                               class="px-4 py-1.5 text-sm font-medium rounded-lg transition
+                                @if(($selectedVersion ?? '') === $ver) bg-indigo-600 text-white
+                                @else bg-white border border-gray-200 text-gray-700 hover:bg-gray-50
+                                @endif">
+                                PHP {{ $ver }}
+                            </a>
+                        @endforeach
+                    </div>
+                </div>
+
+                @if(!empty($extensions))
+                    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 p-6">
+                        @foreach($extensions as $ext)
+                            <div class="flex items-center justify-between border rounded-lg px-3 py-2
+                                @if($ext['installed']) border-green-200 bg-green-50 @else border-gray-200 bg-gray-50 @endif">
+                                <span class="text-sm font-medium @if($ext['installed']) text-green-800 @else text-gray-500 @endif">
+                                    {{ $ext['name'] }}
+                                </span>
+                                <form action="{{ route('admin.php.extension') }}" method="POST">
+                                    @csrf
+                                    <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
+                                    <input type="hidden" name="version" value="{{ $selectedVersion }}">
+                                    <input type="hidden" name="extension" value="{{ $ext['name'] }}">
+                                    <input type="hidden" name="enable" value="{{ $ext['installed'] ? '0' : '1' }}">
+                                    <button type="submit" class="text-xs font-medium px-2 py-1 rounded transition
+                                        @if($ext['installed']) text-red-600 hover:bg-red-100
+                                        @else text-green-600 hover:bg-green-100
+                                        @endif">
+                                        {{ $ext['installed'] ? 'Disable' : 'Enable' }}
+                                    </button>
+                                </form>
+                            </div>
+                        @endforeach
+                    </div>
+                @else
+                    <div class="px-6 py-8 text-center text-sm text-gray-400">
+                        Select a PHP version above to view its extensions.
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <!-- Per-Domain PHP Settings -->
         @if($domains->isNotEmpty())
             <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">

@@ -52,6 +52,7 @@ Route::middleware([
         Route::post('/php/install', [PhpController::class, 'install'])->name('php.install');
         Route::post('/php/switch', [PhpController::class, 'switchVersion'])->name('php.switch');
         Route::post('/php/config', [PhpController::class, 'config'])->name('php.config');
+        Route::post('/php/extension', [PhpController::class, 'toggleExtension'])->name('php.extension');
 
         // License
         Route::get('/license', [LicenseController::class, 'index'])->name('license.index');
