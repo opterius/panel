@@ -180,30 +180,81 @@
             @endif
         </div>
 
-        <!-- Import Key -->
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <!-- Add Key (tabs: Generate / Import) -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden" x-data="{ tab: 'generate' }">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Import Public Key</h3>
-                <p class="text-sm text-gray-500 mt-1">Paste an SSH public key to authorize it for this account.</p>
+                <h3 class="text-base font-semibold text-gray-800">Add SSH Key</h3>
+                <div class="flex space-x-1 mt-3 bg-gray-100 rounded-lg p-1 w-fit">
+                    <button type="button" @click="tab = 'generate'"
+                        class="px-4 py-1.5 text-xs font-medium rounded-md transition"
+                        :class="tab === 'generate' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+                        Generate New Key
+                    </button>
+                    <button type="button" @click="tab = 'import'"
+                        class="px-4 py-1.5 text-xs font-medium rounded-md transition"
+                        :class="tab === 'import' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
+                        Import Existing Key
+                    </button>
+                </div>
             </div>
-            <form action="{{ route('user.ssh.import-key') }}" method="POST" class="px-6 py-5 space-y-4">
-                @csrf
-                <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
-                <div>
-                    <label for="public_key" class="block text-sm font-medium text-gray-700 mb-1.5">Public Key</label>
-                    <textarea name="public_key" id="public_key" rows="4"
-                        class="w-full rounded-lg border-gray-300 shadow-sm text-xs font-mono focus:border-indigo-500 focus:ring-indigo-500"
-                        placeholder="ssh-rsa AAAA... user@machine&#10;or&#10;ssh-ed25519 AAAA... user@machine">{{ old('public_key') }}</textarea>
-                    <p class="mt-1.5 text-xs text-gray-400">Supported types: ssh-rsa, ssh-ed25519, ecdsa</p>
+
+            <!-- Generate Tab -->
+            <div x-show="tab === 'generate'" class="px-6 py-5">
+                <p class="text-sm text-gray-500 mb-4">Generate a new SSH key pair. The public key will be added to the server automatically. You will download the private key — keep it safe.</p>
+                <form action="{{ route('user.ssh.generate-key') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Key Type</label>
+                        <div class="flex space-x-3">
+                            <label class="relative">
+                                <input type="radio" name="key_type" value="ed25519" class="peer sr-only" checked>
+                                <div class="px-4 py-2.5 border border-gray-200 rounded-lg cursor-pointer text-sm font-medium
+                                    peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700
+                                    hover:bg-gray-50 transition">
+                                    Ed25519 <span class="text-xs text-gray-400 ml-1">(recommended)</span>
+                                </div>
+                            </label>
+                            <label class="relative">
+                                <input type="radio" name="key_type" value="rsa" class="peer sr-only">
+                                <div class="px-4 py-2.5 border border-gray-200 rounded-lg cursor-pointer text-sm font-medium
+                                    peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700
+                                    hover:bg-gray-50 transition">
+                                    RSA 4096
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
+                        Generate &amp; Download Private Key
+                    </button>
+                    <p class="text-xs text-gray-400">The private key file will download automatically. The public key is added to the server.</p>
+                </form>
+            </div>
+
+            <!-- Import Tab -->
+            <div x-show="tab === 'import'" class="px-6 py-5">
+                <p class="text-sm text-gray-500 mb-4">Paste an existing SSH public key to authorize it for this account.</p>
+                <form action="{{ route('user.ssh.import-key') }}" method="POST" class="space-y-4">
+                    @csrf
+                    <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
+                    <div>
+                        <label for="public_key" class="block text-sm font-medium text-gray-700 mb-1.5">Public Key</label>
+                        <textarea name="public_key" id="public_key" rows="4"
+                            class="w-full rounded-lg border-gray-300 shadow-sm text-xs font-mono focus:border-indigo-500 focus:ring-indigo-500"
+                            placeholder="ssh-rsa AAAA... user@machine&#10;or&#10;ssh-ed25519 AAAA... user@machine">{{ old('public_key') }}</textarea>
+                        <p class="mt-1.5 text-xs text-gray-400">Supported types: ssh-rsa, ssh-ed25519, ecdsa</p>
                     @error('public_key')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
-                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                    Import Key
-                </button>
-            </form>
+                    <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                        Import Key
+                    </button>
+                </form>
+            </div>
         </div>
     @endif
 </x-user-layout>

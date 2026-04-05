@@ -112,6 +112,7 @@ Route::middleware([
 
         // SSH Access
         Route::get('/ssh', [SshController::class, 'index'])->name('ssh.index');
+        Route::post('/ssh/generate-key', [SshController::class, 'generateKey'])->name('ssh.generate-key');
         Route::post('/ssh/import-key', [SshController::class, 'importKey'])->name('ssh.import-key');
         Route::post('/ssh/delete-key', [SshController::class, 'deleteKey'])->name('ssh.delete-key');
         Route::post('/ssh/toggle-shell', [SshController::class, 'toggleShell'])->name('ssh.toggle-shell');

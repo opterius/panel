@@ -40,6 +40,34 @@ class SshController extends Controller
         return view('ssh.index', compact('accounts', 'selectedAccount', 'keys', 'sshEnabled'));
     }
 
+    public function generateKey(Request $request)
+    {
+        $validated = $request->validate([
+            'account_id' => 'required|exists:accounts,id',
+            'key_type'   => 'required|in:rsa,ed25519',
+        ]);
+
+        $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        $response = AgentService::for($account->server)->post('/ssh/generate-key', [
+            'username' => $account->username,
+            'key_type' => $validated['key_type'],
+            'comment'  => $account->username . '@' . $account->server->name,
+        ]);
+
+        if ($response && $response->successful()) {
+            $data = $response->json();
+
+            // Return private key as a downloadable file
+            return response($data['private_key'])
+                ->header('Content-Type', 'application/x-pem-file')
+                ->header('Content-Disposition', 'attachment; filename="id_' . $validated['key_type'] . '_' . $account->username . '"');
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
+        return back()->with('error', 'Failed to generate key: ' . $error);
+    }
+
     public function importKey(Request $request)
     {
         $validated = $request->validate([
