@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('description')->nullable();
-            $table->json('php_versions')->default('["8.2","8.3","8.4"]');
+            $table->json('php_versions')->nullable();
             $table->string('default_php_version')->default('8.3');
             $table->unsignedBigInteger('disk_quota')->default(0); // MB, 0 = unlimited
             $table->unsignedBigInteger('bandwidth')->default(0); // MB/month, 0 = unlimited
