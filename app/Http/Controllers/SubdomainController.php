@@ -22,8 +22,11 @@ class SubdomainController extends Controller
         $domain->load('account.server');
 
         $validated = $request->validate([
-            'subdomain'     => 'required|string|max:63|alpha_dash',
-            'document_root' => 'nullable|string|max:500',
+            'subdomain'     => ['required', 'string', 'max:63', 'regex:/^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/'],
+            'document_root' => ['nullable', 'string', 'max:500', 'regex:/^[a-zA-Z0-9_\-\/\.]+$/'],
+        ], [
+            'subdomain.regex' => 'Subdomain can only contain letters, numbers, hyphens and underscores.',
+            'document_root.regex' => 'Document root contains invalid characters.',
         ]);
 
         $fullDomain = $validated['subdomain'] . '.' . $domain->domain;
@@ -33,8 +36,15 @@ class SubdomainController extends Controller
             return back()->with('error', 'Subdomain ' . $fullDomain . ' already exists.')->withInput();
         }
 
-        // Default document root: inside parent domain's public_html
-        $documentRoot = $validated['document_root'] ?: $domain->document_root . '/' . $validated['subdomain'];
+        // Default document root: inside parent domain's directory
+        $parentDir = dirname($domain->document_root);
+        $documentRoot = $validated['document_root'] ?: $parentDir . '/public_html/' . $validated['subdomain'];
+
+        // Ensure document root is within the account's home directory
+        $homeDir = $domain->account->home_directory;
+        if (!str_starts_with($documentRoot, $homeDir)) {
+            return back()->with('error', 'Document root must be within the account home directory.')->withInput();
+        }
 
         // Create subdomain record
         $subdomain = Domain::create([

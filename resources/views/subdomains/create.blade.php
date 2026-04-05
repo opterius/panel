@@ -18,7 +18,20 @@
           x-data="{
               subdomain: '{{ old('subdomain') }}',
               customPath: false,
-              documentRoot: ''
+              customSuffix: '',
+              get cleanSubdomain() {
+                  return this.subdomain.replace(/[^a-zA-Z0-9_-]/g, '');
+              },
+              get documentRoot() {
+                  const basePath = '{{ dirname($domain->document_root) }}/';
+                  if (this.customPath && this.customSuffix) {
+                      return basePath + this.customSuffix.replace(/[^a-zA-Z0-9_\-\/\.]/g, '');
+                  }
+                  return basePath + 'public_html/' + (this.cleanSubdomain || 'sub');
+              },
+              validateSubdomain() {
+                  this.subdomain = this.subdomain.replace(/[^a-zA-Z0-9_-]/g, '');
+              }
           }">
         @csrf
 
@@ -39,7 +52,7 @@
                 </div>
                 <div class="px-6 py-5">
                     <div class="flex items-center gap-2">
-                        <input type="text" name="subdomain" x-model="subdomain"
+                        <input type="text" name="subdomain" x-model="subdomain" @input="validateSubdomain()"
                             class="flex-1 rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="blog">
                         <span class="text-sm text-gray-500 font-medium">.{{ $domain->domain }}</span>
@@ -67,13 +80,7 @@
                     </div>
                 </div>
                 <div class="px-6 py-5 space-y-4">
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <div class="flex items-center space-x-2 text-sm">
-                            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
-                            <span class="font-mono text-gray-600" x-text="'{{ $domain->document_root }}/' + (subdomain || 'sub')">{{ $domain->document_root }}/sub</span>
-                        </div>
-                        <p class="text-xs text-gray-400 mt-1">Default: inside the parent domain's public_html folder.</p>
-                    </div>
+                    <input type="hidden" name="document_root" :value="documentRoot">
 
                     <label class="flex items-center space-x-3">
                         <input type="checkbox" x-model="customPath"
@@ -81,11 +88,22 @@
                         <span class="text-sm text-gray-700">Use a custom document root</span>
                     </label>
 
-                    <div x-show="customPath" x-collapse>
-                        <input type="text" name="document_root" x-model="documentRoot"
-                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
-                            placeholder="{{ $domain->document_root }}/blog">
-                        <p class="mt-1.5 text-xs text-gray-400">Must be within the account's home directory.</p>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Document Root</label>
+                        <div class="flex">
+                            <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-xs font-mono">
+                                {{ dirname($domain->document_root) }}/
+                            </span>
+                            <input type="text"
+                                :value="customPath ? customSuffix : 'public_html/' + (cleanSubdomain || 'sub')"
+                                @input="customSuffix = $event.target.value.replace(/[^a-zA-Z0-9_\-\/\.]/g, '')"
+                                :disabled="!customPath"
+                                class="flex-1 min-w-0 rounded-r-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-400"
+                                placeholder="public_html/blog">
+                        </div>
+                        <p class="mt-1.5 text-xs text-gray-400">
+                            Full path: <span class="font-mono" x-text="documentRoot"></span>
+                        </p>
                         @error('document_root')
                             <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -103,7 +121,7 @@
                     </div>
                     <div>
                         <span class="text-indigo-400 block text-xs mb-0.5">Document Root</span>
-                        <span class="font-medium font-mono text-xs" x-text="customPath && documentRoot ? documentRoot : '{{ $domain->document_root }}/' + (subdomain || 'sub')"></span>
+                        <span class="font-medium font-mono text-xs" x-text="documentRoot"></span>
                     </div>
                     <div>
                         <span class="text-indigo-400 block text-xs mb-0.5">PHP</span>
