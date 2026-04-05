@@ -15,6 +15,16 @@
         </div>
     @endif
 
+    <!-- Webmail Button -->
+    <div class="mb-6 flex justify-end">
+        <a href="{{ str_replace('SERVER_IP', request()->getHost(), config('opterius.webmail_url')) }}"
+           target="_blank"
+           class="inline-flex items-center px-4 py-2.5 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+            Open Webmail
+        </a>
+    </div>
+
     <!-- Create Email Account -->
     @if($domains->isNotEmpty())
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">

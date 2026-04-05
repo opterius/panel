@@ -45,6 +45,14 @@ return [
     'ns1' => env('OPTERIUS_NS1', 'ns1.opterius.com'),
     'ns2' => env('OPTERIUS_NS2', 'ns2.opterius.com'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Webmail
+    |--------------------------------------------------------------------------
+    */
+
+    'webmail_url' => env('OPTERIUS_WEBMAIL_URL', 'http://SERVER_IP:8080'),
+
     'version' => '1.0.0',
     'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
     'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),
