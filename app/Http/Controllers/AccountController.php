@@ -215,6 +215,14 @@ class AccountController extends Controller
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
 
+        $account->load('server', 'domains');
+
+        // Delete everything on the server (vhosts, files, system user, email, cron)
+        AgentService::for($account->server)->post('/account/delete', [
+            'username' => $account->username,
+            'domains'  => $account->domains->pluck('domain')->toArray(),
+        ]);
+
         ActivityLogger::log('account.deleted', 'account', $account->id, $account->username,
             "Deleted account {$account->username}", ['server_id' => $account->server_id]);
 

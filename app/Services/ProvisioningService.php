@@ -185,14 +185,11 @@ class ProvisioningService
     {
         $account->load('server', 'domains');
 
-        // Tell agent to delete each domain's vhost
-        foreach ($account->domains as $domain) {
-            AgentService::for($account->server)->post('/domains/delete', [
-                'domain'      => $domain->domain,
-                'username'    => $account->username,
-                'php_version' => $domain->php_version,
-            ]);
-        }
+        // Tell agent to fully delete the account (vhosts, FPM, files, user, email, cron)
+        AgentService::for($account->server)->post('/account/delete', [
+            'username' => $account->username,
+            'domains'  => $account->domains->pluck('domain')->toArray(),
+        ]);
 
         ActivityLogger::log('account.terminated', 'account', $account->id, $account->username,
             "Terminated account {$account->username}", ['server_id' => $account->server_id]);
