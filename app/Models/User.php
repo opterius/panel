@@ -39,6 +39,7 @@ class User extends Authenticatable
         'reseller_max_domains',
         'reseller_max_databases',
         'reseller_max_email',
+        'reseller_acl',
     ];
 
     /**
@@ -72,6 +73,59 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'reseller_acl' => 'array',
+        ];
+    }
+
+    /**
+     * All available reseller ACL permissions grouped by category.
+     */
+    public static function resellerAclDefinitions(): array
+    {
+        return [
+            'Account Management' => [
+                'account.create'    => 'Create accounts',
+                'account.suspend'   => 'Suspend / unsuspend accounts',
+                'account.terminate' => 'Terminate (delete) accounts',
+                'account.edit'      => 'Edit account details',
+                'account.password'  => 'Change account passwords',
+                'account.upgrade'   => 'Change account packages',
+            ],
+            'Domain & DNS' => [
+                'domain.subdomains' => 'Manage subdomains',
+                'domain.aliases'    => 'Manage domain aliases',
+                'domain.redirects'  => 'Manage URL redirects',
+                'dns.manage'        => 'Manage DNS zones and records',
+                'ssl.manage'        => 'Manage SSL certificates',
+            ],
+            'Email' => [
+                'email.accounts'      => 'Create / delete email accounts',
+                'email.forwarders'    => 'Manage email forwarders',
+                'email.autoresponder' => 'Manage autoresponders',
+            ],
+            'Files & Databases' => [
+                'files.filemanager' => 'Access file manager',
+                'files.ftp'        => 'Manage FTP accounts',
+                'files.ssh'        => 'Manage SSH access',
+                'db.manage'        => 'Create / delete databases',
+            ],
+            'Software' => [
+                'software.wordpress' => 'Install WordPress',
+                'software.laravel'   => 'Install Laravel',
+            ],
+            'Server Features' => [
+                'cron.manage'      => 'Manage cron jobs',
+                'php.switch'       => 'Change PHP version',
+                'backup.manage'    => 'Create / restore backups',
+                'migration.import' => 'Import cPanel backups',
+            ],
+            'Administration' => [
+                'packages.manage'    => 'Create / edit packages',
+                'packages.assign'    => 'Assign packages to accounts',
+                'activity.view'      => 'View activity log',
+                'api_keys.manage'    => 'Manage API keys',
+                'collaborators.manage' => 'Manage team access / collaborators',
+            ],
         ];
     }
 
@@ -138,6 +192,23 @@ class User extends Authenticatable
             'databases' => ['used' => $databases, 'limit' => $this->reseller_max_databases],
             'email'     => ['used' => $emails, 'limit' => $this->reseller_max_email],
         ];
+    }
+
+    /**
+     * Check if reseller has a specific ACL permission.
+     * Admins always have all permissions. Non-resellers always return false.
+     */
+    public function resellerCan(string $permission): bool
+    {
+        if ($this->isAdmin()) return true;
+        if (!$this->isReseller()) return false;
+
+        $acl = $this->reseller_acl ?? [];
+
+        // If ACL is empty (not configured yet), allow all (backwards compatibility)
+        if (empty($acl)) return true;
+
+        return in_array($permission, $acl);
     }
 
     /**

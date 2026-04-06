@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Package;
 use App\Services\ActivityLogger;
+
+// Note: Resellers need 'packages.manage' ACL to access this controller
 use Illuminate\Http\Request;
 
 class PackageController extends Controller

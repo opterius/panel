@@ -36,10 +36,13 @@ class ResellerController extends Controller
             'reseller_max_domains'   => 'required|integer|min:0',
             'reseller_max_databases' => 'required|integer|min:0',
             'reseller_max_email'     => 'required|integer|min:0',
+            'reseller_acl'           => 'nullable|array',
+            'reseller_acl.*'         => 'string',
         ]);
 
         $validated['role'] = 'reseller';
         $validated['password'] = Hash::make($validated['password']);
+        $validated['reseller_acl'] = $validated['reseller_acl'] ?? [];
 
         $reseller = User::create($validated);
 
@@ -81,6 +84,8 @@ class ResellerController extends Controller
             'reseller_max_domains'   => 'required|integer|min:0',
             'reseller_max_databases' => 'required|integer|min:0',
             'reseller_max_email'     => 'required|integer|min:0',
+            'reseller_acl'           => 'nullable|array',
+            'reseller_acl.*'         => 'string',
         ]);
 
         if (!empty($validated['password'])) {
@@ -88,6 +93,8 @@ class ResellerController extends Controller
         } else {
             unset($validated['password']);
         }
+
+        $validated['reseller_acl'] = $validated['reseller_acl'] ?? [];
 
         $reseller->update($validated);
 

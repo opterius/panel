@@ -54,8 +54,11 @@ class AccountController extends Controller
             return back()->with('error', "Account limit reached ({$currentAccounts}/{$maxAccounts}). Upgrade your license at opterius.com to create more accounts.")->withInput();
         }
 
-        // Check reseller account limit
+        // Check reseller ACL and account limit
         if (auth()->user()->isReseller()) {
+            if (!auth()->user()->resellerCan('account.create')) {
+                return back()->with('error', 'You do not have permission to create accounts.')->withInput();
+            }
             if (!auth()->user()->resellerCanCreate('accounts')) {
                 $usage = auth()->user()->resellerUsage();
                 return back()->with('error', "Reseller account limit reached ({$usage['accounts']['used']}/{$usage['accounts']['limit']}).")->withInput();
@@ -179,6 +182,10 @@ class AccountController extends Controller
 
     public function suspend(Request $request, Account $account)
     {
+        if (auth()->user()->isReseller() && !auth()->user()->resellerCan('account.suspend')) {
+            return back()->with('error', 'You do not have permission to suspend accounts.');
+        }
+
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
@@ -211,6 +218,10 @@ class AccountController extends Controller
 
     public function destroy(Request $request, Account $account)
     {
+        if (auth()->user()->isReseller() && !auth()->user()->resellerCan('account.terminate')) {
+            return back()->with('error', 'You do not have permission to delete accounts.');
+        }
+
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }

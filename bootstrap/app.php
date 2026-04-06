@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,
             'api_key' => \App\Http\Middleware\ApiKeyAuth::class,
+            'reseller_acl' => \App\Http\Middleware\ResellerAcl::class,
         ]);
 
         $middleware->web(append: [
