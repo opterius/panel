@@ -91,16 +91,44 @@
 
                                 <div class="flex items-center space-x-1">
                                     @if($service['status'] === 'active')
-                                        <form action="{{ route('admin.services.action') }}" method="POST">
-                                            @csrf
-                                            <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
-                                            <input type="hidden" name="service" value="{{ $service['name'] }}">
-                                            <input type="hidden" name="action" value="restart">
-                                            <button type="submit" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
+                                        {{-- Restart --}}
+                                        <div x-data="{ confirmRestart: false }">
+                                            <button type="button" @click="confirmRestart = true" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
                                                 Restart
                                             </button>
-                                        </form>
+                                            <template x-teleport="body">
+                                                <div x-show="confirmRestart" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true">
+                                                    <div x-show="confirmRestart" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" @click="confirmRestart = false"></div>
+                                                    <div class="fixed inset-0 flex items-center justify-center p-4">
+                                                        <div x-show="confirmRestart" x-transition @click.stop @keydown.escape.window="confirmRestart = false" class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                                                            <div class="p-6 pb-0">
+                                                                <div class="flex items-start space-x-4">
+                                                                    <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                                                                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                                                    </div>
+                                                                    <div>
+                                                                        <h3 class="text-lg font-semibold text-gray-900">Restart {{ $service['display_name'] }}</h3>
+                                                                        <p class="mt-1 text-sm text-gray-500">This will briefly interrupt the service. Active connections may be dropped.</p>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
+                                                                <button type="button" @click="confirmRestart = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                                <form action="{{ route('admin.services.action') }}" method="POST">
+                                                                    @csrf
+                                                                    <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
+                                                                    <input type="hidden" name="service" value="{{ $service['name'] }}">
+                                                                    <input type="hidden" name="action" value="restart">
+                                                                    <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">Restart</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </template>
+                                        </div>
 
+                                        {{-- Reload --}}
                                         <form action="{{ route('admin.services.action') }}" method="POST">
                                             @csrf
                                             <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
@@ -111,18 +139,43 @@
                                             </button>
                                         </form>
 
+                                        {{-- Stop --}}
                                         @if($service['name'] !== 'opterius-agent')
-                                            <form action="{{ route('admin.services.action') }}" method="POST"
-                                                  x-data="{ confirm: false }">
-                                                @csrf
-                                                <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
-                                                <input type="hidden" name="service" value="{{ $service['name'] }}">
-                                                <input type="hidden" name="action" value="stop">
-                                                <button type="submit" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition"
-                                                        onclick="return confirm('Stop {{ $service['display_name'] }}? This may affect hosted sites.')">
+                                            <div x-data="{ confirmStop: false }">
+                                                <button type="button" @click="confirmStop = true" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition">
                                                     Stop
                                                 </button>
-                                            </form>
+                                                <template x-teleport="body">
+                                                    <div x-show="confirmStop" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true">
+                                                        <div x-show="confirmStop" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" @click="confirmStop = false"></div>
+                                                        <div class="fixed inset-0 flex items-center justify-center p-4">
+                                                            <div x-show="confirmStop" x-transition @click.stop @keydown.escape.window="confirmStop = false" class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                                                                <div class="p-6 pb-0">
+                                                                    <div class="flex items-start space-x-4">
+                                                                        <div class="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center shrink-0">
+                                                                            <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h3 class="text-lg font-semibold text-gray-900">Stop {{ $service['display_name'] }}</h3>
+                                                                            <p class="mt-1 text-sm text-gray-500">This will stop the service. Hosted sites may become unavailable until the service is started again.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
+                                                                    <button type="button" @click="confirmStop = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                                    <form action="{{ route('admin.services.action') }}" method="POST">
+                                                                        @csrf
+                                                                        <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
+                                                                        <input type="hidden" name="service" value="{{ $service['name'] }}">
+                                                                        <input type="hidden" name="action" value="stop">
+                                                                        <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">Stop Service</button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         @endif
                                     @else
                                         <form action="{{ route('admin.services.action') }}" method="POST">
