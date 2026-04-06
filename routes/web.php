@@ -8,6 +8,7 @@ use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FileManagerController;
+use App\Http\Controllers\LaravelInstallerController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PhpController;
@@ -104,6 +105,11 @@ Route::middleware([
         Route::get('/wordpress/install', [WordPressController::class, 'create'])->name('wordpress.create');
         Route::post('/wordpress/install', [WordPressController::class, 'store'])->name('wordpress.store');
         Route::post('/wordpress/update', [WordPressController::class, 'update'])->name('wordpress.update');
+
+        // Laravel
+        Route::get('/laravel', [LaravelInstallerController::class, 'index'])->name('laravel.index');
+        Route::get('/laravel/install', [LaravelInstallerController::class, 'create'])->name('laravel.create');
+        Route::post('/laravel/install', [LaravelInstallerController::class, 'store'])->name('laravel.store');
 
         // Domains
         Route::resource('domains', DomainController::class)->only(['index', 'create', 'store', 'destroy']);
