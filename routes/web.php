@@ -29,6 +29,10 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+// Setup wizard (only works when no users exist)
+Route::get('/setup', [App\Http\Controllers\SetupController::class, 'index'])->name('setup.index');
+Route::post('/setup', [App\Http\Controllers\SetupController::class, 'store'])->name('setup.store');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
