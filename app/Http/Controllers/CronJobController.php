@@ -43,6 +43,11 @@ class CronJobController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'cron')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $schedule = implode(' ', [
             $validated['minute'],
             $validated['hour'],
@@ -79,6 +84,11 @@ class CronJobController extends Controller
     public function toggle(CronJob $cronJob)
     {
         $cronJob->load('account.server');
+
+        if (!$cronJob->account->userCan(auth()->user(), 'cron')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $newState = !$cronJob->enabled;
 
         $response = AgentService::for($cronJob->account->server)->post('/cron/toggle', [
@@ -108,6 +118,10 @@ class CronJobController extends Controller
         }
 
         $cronJob->load('account.server');
+
+        if (!$cronJob->account->userCan(auth()->user(), 'cron')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         ActivityLogger::log('cron.deleted', 'cron_job', $cronJob->id, $cronJob->command,
             "Deleted cron job: {$cronJob->schedule} {$cronJob->command}", ['server_id' => $cronJob->server_id, 'account_id' => $cronJob->account_id]);

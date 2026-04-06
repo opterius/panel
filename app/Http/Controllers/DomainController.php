@@ -88,6 +88,12 @@ class DomainController extends Controller
 
     public function destroy(Request $request, Domain $domain)
     {
+        $domain->load('account');
+
+        if (!$domain->account->userCan(auth()->user(), 'settings')) {
+            return back()->with('error', 'You do not have permission to delete domains on this account.');
+        }
+
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }

@@ -49,6 +49,10 @@ class SshController extends Controller
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
+        if (!$account->userCan(auth()->user(), 'ssh')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($account->server)->post('/ssh/generate-key', [
             'username' => $account->username,
             'key_type' => $validated['key_type'],
@@ -81,6 +85,10 @@ class SshController extends Controller
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
+        if (!$account->userCan(auth()->user(), 'ssh')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($account->server)->post('/ssh/import-key', [
             'username'    => $account->username,
             'public_key'  => $validated['public_key'],
@@ -109,6 +117,10 @@ class SshController extends Controller
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
+        if (!$account->userCan(auth()->user(), 'ssh')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($account->server)->post('/ssh/delete-key', [
             'username'    => $account->username,
             'fingerprint' => $validated['fingerprint'],
@@ -135,6 +147,10 @@ class SshController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'ssh')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         $response = AgentService::for($account->server)->post('/ssh/toggle-shell', [
             'username' => $account->username,

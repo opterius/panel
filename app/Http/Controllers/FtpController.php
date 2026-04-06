@@ -45,6 +45,11 @@ class FtpController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $directory = $validated['directory'] ?: $account->home_directory;
 
         $response = AgentService::for($account->server)->post('/ftp/create', [
@@ -72,6 +77,10 @@ class FtpController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         AgentService::for($account->server)->post('/ftp/delete', [
             'username' => $validated['username'],

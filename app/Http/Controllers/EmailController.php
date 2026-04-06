@@ -39,6 +39,11 @@ class EmailController extends Controller
         ]);
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+
+        if (!$domain->account->userCan(auth()->user(), 'email')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $email = $validated['username'] . '@' . $domain->domain;
 
         // Check uniqueness
@@ -79,6 +84,10 @@ class EmailController extends Controller
 
         $emailAccount->load('domain.account.server');
 
+        if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($emailAccount->domain->account->server)->post('/email/password', [
             'email'    => $emailAccount->email,
             'password' => $validated['password'],
@@ -108,6 +117,12 @@ class EmailController extends Controller
 
     public function updateRestrictions(Request $request, EmailAccount $emailAccount)
     {
+        $emailAccount->load('domain.account');
+
+        if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $validated = $request->validate([
             'can_send'           => 'boolean',
             'can_receive'        => 'boolean',
@@ -142,6 +157,10 @@ class EmailController extends Controller
         }
 
         $emailAccount->load('domain.account.server');
+
+        if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         ActivityLogger::log('email.deleted', 'email', $emailAccount->id, $emailAccount->email,
             "Deleted email account {$emailAccount->email}", ['domain_id' => $emailAccount->domain_id]);

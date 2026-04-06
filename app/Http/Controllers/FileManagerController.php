@@ -97,6 +97,10 @@ class FileManagerController extends Controller
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($account->server)->post('/files/write', [
             'username' => $account->username,
             'path'     => $validated['path'],
@@ -120,6 +124,11 @@ class FileManagerController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $file = $request->file('file');
 
         $response = AgentService::for($account->server)->post('/files/upload', [
@@ -153,6 +162,10 @@ class FileManagerController extends Controller
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($account->server)->post('/files/delete', [
             'username' => $account->username,
             'path'     => $validated['path'],
@@ -175,6 +188,10 @@ class FileManagerController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         $response = AgentService::for($account->server)->post('/files/rename', [
             'username' => $account->username,
@@ -199,6 +216,10 @@ class FileManagerController extends Controller
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($account->server)->post('/files/mkdir', [
             'username' => $account->username,
             'path'     => $validated['path'],
@@ -221,6 +242,10 @@ class FileManagerController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'files')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         $response = AgentService::for($account->server)->post('/files/chmod', [
             'username'    => $account->username,

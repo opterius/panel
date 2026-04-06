@@ -42,6 +42,11 @@ class DatabaseController extends Controller
         ]);
 
         $account = Account::with('server')->findOrFail($validated['account_id']);
+
+        if (!$account->userCan(auth()->user(), 'databases')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $host = $request->boolean('remote') ? '%' : 'localhost';
 
         $response = AgentService::for($account->server)->post('/databases/create', [
@@ -106,6 +111,10 @@ class DatabaseController extends Controller
 
         $database->load('account.server');
 
+        if (!$database->account->userCan(auth()->user(), 'databases')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($database->account->server)->post('/databases/user-password', [
             'username' => $database->db_username,
             'password' => $validated['db_password'],
@@ -148,6 +157,10 @@ class DatabaseController extends Controller
         }
 
         $database->load('account.server');
+
+        if (!$database->account->userCan(auth()->user(), 'databases')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         ActivityLogger::log('database.deleted', 'database', $database->id, $database->name,
             "Deleted database {$database->name}", ['server_id' => $database->server_id, 'account_id' => $database->account_id]);

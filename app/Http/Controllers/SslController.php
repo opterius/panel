@@ -37,6 +37,10 @@ class SslController extends Controller
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
+        if (!$domain->account->userCan(auth()->user(), 'ssl')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         // Use async endpoint — returns immediately
         $response = AgentService::for($domain->account->server)->post('/ssl/issue-async', [
             'domain'   => $domain->domain,
@@ -75,6 +79,10 @@ class SslController extends Controller
         ]);
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+
+        if (!$domain->account->userCan(auth()->user(), 'ssl')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         $response = AgentService::for($domain->account->server)->post('/ssl/upload', [
             'domain'      => $domain->domain,
@@ -131,6 +139,12 @@ class SslController extends Controller
     {
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+
+        $certificate->load('domain.account');
+
+        if (!$certificate->domain->account->userCan(auth()->user(), 'ssl')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
         }
 
         ActivityLogger::log('ssl.deleted', 'ssl_certificate', $certificate->id, null,

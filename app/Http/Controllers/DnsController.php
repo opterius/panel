@@ -37,6 +37,10 @@ class DnsController extends Controller
 
         $domain->load('account.server');
 
+        if (!$domain->account->userCan(auth()->user(), 'dns')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $response = AgentService::for($domain->account->server)->post('/dns/add-record', [
             'domain'   => $domain->domain,
             'name'     => $validated['name'],
@@ -61,6 +65,10 @@ class DnsController extends Controller
         ]);
 
         $domain->load('account.server');
+
+        if (!$domain->account->userCan(auth()->user(), 'dns')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         $response = AgentService::for($domain->account->server)->post('/dns/delete-record', [
             'domain' => $domain->domain,

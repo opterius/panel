@@ -22,6 +22,10 @@ class SubdomainController extends Controller
     {
         $domain->load('account.server');
 
+        if (!$domain->account->userCan(auth()->user(), 'settings')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         $validated = $request->validate([
             'subdomain'     => ['required', 'string', 'max:63', 'regex:/^[a-zA-Z0-9]([a-zA-Z0-9_-]*[a-zA-Z0-9])?$/'],
             'document_root' => ['nullable', 'string', 'max:500', 'regex:/^[a-zA-Z0-9_\-\/\.]+$/'],

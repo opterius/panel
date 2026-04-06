@@ -46,6 +46,10 @@ class ForwarderController extends Controller
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
+        if (!$domain->account->userCan(auth()->user(), 'email')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
+
         // Build full source email
         $source = $validated['source'];
         if (!str_contains($source, '@')) {
@@ -76,6 +80,10 @@ class ForwarderController extends Controller
         ]);
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+
+        if (!$domain->account->userCan(auth()->user(), 'email')) {
+            return back()->with('error', 'You do not have permission to perform this action.');
+        }
 
         AgentService::for($domain->account->server)->post('/forwarder/delete', [
             'source' => $validated['source'],
