@@ -78,6 +78,13 @@
             Email
         </x-sidebar-link>
 
+        <x-sidebar-link href="{{ route('user.forwarders.index') }}" :active="request()->routeIs('user.forwarders.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+            </x-slot>
+            Forwarders
+        </x-sidebar-link>
+
         <x-sidebar-link href="{{ route('user.filemanager.index') }}" :active="request()->routeIs('user.filemanager.*')">
             <x-slot name="icon">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
@@ -88,6 +95,13 @@
         <div class="pt-4 pb-2 px-3">
             <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Tools</span>
         </div>
+
+        <x-sidebar-link href="{{ route('user.ftp.index') }}" :active="request()->routeIs('user.ftp.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+            </x-slot>
+            FTP Accounts
+        </x-sidebar-link>
 
         <x-sidebar-link href="{{ route('user.ssh.index') }}" :active="request()->routeIs('user.ssh.*')">
             <x-slot name="icon">

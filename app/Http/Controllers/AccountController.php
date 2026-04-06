@@ -146,6 +146,34 @@ class AccountController extends Controller
         return view('accounts.show', compact('account', 'stats'));
     }
 
+    public function suspend(Request $request, Account $account)
+    {
+        $account->load('server', 'domains');
+        $action = $account->suspended ? 'unsuspend' : 'suspend';
+
+        $response = AgentService::for($account->server)->post('/account/suspend', [
+            'username' => $account->username,
+            'domains'  => $account->domains->pluck('domain')->toArray(),
+            'action'   => $action,
+        ]);
+
+        if ($response && $response->successful()) {
+            $account->update([
+                'suspended'      => !$account->suspended,
+                'suspended_at'   => $action === 'suspend' ? now() : null,
+                'suspend_reason' => $action === 'suspend' ? $request->input('reason', '') : null,
+            ]);
+            $account->domains()->update(['status' => $action === 'suspend' ? 'suspended' : 'active']);
+
+            ActivityLogger::log("account.{$action}ed", 'account', $account->id, $account->username,
+                ucfirst($action) . "ed account {$account->username}");
+
+            return redirect()->route('admin.accounts.show', $account)->with('success', "Account {$action}ed.");
+        }
+
+        return back()->with('error', "Failed to {$action} account.");
+    }
+
     public function destroy(Request $request, Account $account)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {

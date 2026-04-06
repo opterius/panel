@@ -237,6 +237,42 @@
         @endif
     </div>
 
+    <!-- Suspend -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border @if($account->suspended) border-amber-200 @else border-gray-200 @endif">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold @if($account->suspended) text-amber-600 @else text-gray-800 @endif">
+                    @if($account->suspended)
+                        Account Suspended
+                        @if($account->suspended_at) <span class="text-sm font-normal text-gray-400">since {{ $account->suspended_at->diffForHumans() }}</span> @endif
+                    @else
+                        Suspend Account
+                    @endif
+                </h3>
+                <p class="text-sm text-gray-500 mt-1">
+                    @if($account->suspended)
+                        All domains show a suspended page. Email and SSH are disabled.
+                    @else
+                        Suspend this account for non-payment or abuse. All domains will show a suspended page.
+                    @endif
+                </p>
+            </div>
+            <form action="{{ route('admin.accounts.suspend', $account) }}" method="POST">
+                @csrf
+                @if($account->suspended)
+                    <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition">
+                        Unsuspend
+                    </button>
+                @else
+                    <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-amber-600 bg-white border border-amber-300 rounded-lg hover:bg-amber-50 transition"
+                            onclick="return confirm('Suspend account {{ $account->username }}? All sites will be taken offline.')">
+                        Suspend
+                    </button>
+                @endif
+            </form>
+        </div>
+    </div>
+
     <!-- Danger Zone -->
     <div class="bg-white rounded-xl shadow-sm p-6 border border-red-100">
         <h3 class="text-base font-semibold text-red-600 mb-2">Danger Zone</h3>

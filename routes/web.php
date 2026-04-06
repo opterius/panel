@@ -12,6 +12,8 @@ use App\Http\Controllers\DomainController;
 use App\Http\Controllers\EmailController;
 use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FileManagerController;
+use App\Http\Controllers\ForwarderController;
+use App\Http\Controllers\FtpController;
 use App\Http\Controllers\LaravelInstallerController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\MonitorController;
@@ -60,6 +62,7 @@ Route::middleware([
 
         Route::resource('servers', ServerController::class)->except(['edit', 'update']);
         Route::resource('accounts', AccountController::class)->except(['edit', 'update']);
+        Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
         Route::resource('packages', PackageController::class)->except(['show']);
         Route::resource('resellers', ResellerController::class);
 
@@ -150,6 +153,11 @@ Route::middleware([
         Route::post('/wordpress/install', [WordPressController::class, 'store'])->name('wordpress.store');
         Route::post('/wordpress/update', [WordPressController::class, 'update'])->name('wordpress.update');
 
+        // FTP
+        Route::get('/ftp', [FtpController::class, 'index'])->name('ftp.index');
+        Route::post('/ftp', [FtpController::class, 'store'])->name('ftp.store');
+        Route::post('/ftp/delete', [FtpController::class, 'destroy'])->name('ftp.destroy');
+
         // Laravel
         Route::get('/laravel', [LaravelInstallerController::class, 'index'])->name('laravel.index');
         Route::get('/laravel/install', [LaravelInstallerController::class, 'create'])->name('laravel.create');
@@ -157,6 +165,11 @@ Route::middleware([
 
         // Domains
         Route::resource('domains', DomainController::class)->only(['index', 'create', 'store', 'destroy']);
+
+        // Email Forwarders
+        Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
+        Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');
+        Route::post('/forwarders/delete', [ForwarderController::class, 'destroy'])->name('forwarders.destroy');
 
         // Subdomains
         Route::get('/subdomains/{domain}/create', [SubdomainController::class, 'create'])->name('subdomains.create');
