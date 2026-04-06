@@ -33,6 +33,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'locale',
         'reseller_max_accounts',
         'reseller_max_disk',
         'reseller_max_bandwidth',
