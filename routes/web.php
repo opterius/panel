@@ -64,6 +64,7 @@ Route::middleware([
         Route::resource('servers', ServerController::class)->except(['edit', 'update']);
         Route::resource('accounts', AccountController::class)->except(['edit', 'update']);
         Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
+        Route::post('/accounts/{account}/update-owner', [AccountController::class, 'updateOwner'])->name('accounts.update-owner');
         Route::get('/accounts/{account}/collaborators', [CollaboratorController::class, 'index'])->name('collaborators.index');
         Route::post('/accounts/{account}/collaborators', [CollaboratorController::class, 'store'])->name('collaborators.store');
         Route::post('/accounts/{account}/collaborators/{user}/role', [CollaboratorController::class, 'updateRole'])->name('collaborators.update-role');

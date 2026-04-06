@@ -155,6 +155,28 @@ class AccountController extends Controller
         return view('accounts.show', compact('account', 'stats'));
     }
 
+    public function updateOwner(Request $request, Account $account)
+    {
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'email'    => 'required|email|unique:users,email,' . $account->user_id,
+            'password' => 'nullable|string|min:8',
+        ]);
+
+        $user = $account->user;
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        if (!empty($validated['password'])) {
+            $user->password = Hash::make($validated['password']);
+        }
+        $user->save();
+
+        ActivityLogger::log('account.owner_updated', 'account', $account->id, $account->username,
+            "Updated owner info for {$account->username}: {$validated['name']} ({$validated['email']})");
+
+        return redirect()->route('admin.accounts.show', $account)->with('success', 'Account owner updated.');
+    }
+
     public function suspend(Request $request, Account $account)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {

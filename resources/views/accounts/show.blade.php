@@ -155,6 +155,59 @@
         </div>
     </div>
 
+    <!-- Account Owner -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8" x-data="{ editing: false }">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold text-gray-800">Account Owner</h3>
+                <div class="mt-2 flex items-center space-x-3">
+                    <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
+                        <span class="text-sm font-bold text-indigo-600">{{ strtoupper(substr($account->user->name, 0, 2)) }}</span>
+                    </div>
+                    <div x-show="!editing">
+                        <div class="text-sm font-semibold text-gray-800">{{ $account->user->name }}</div>
+                        <div class="text-xs text-gray-500">{{ $account->user->email }}</div>
+                    </div>
+                </div>
+            </div>
+            <button type="button" @click="editing = !editing" x-show="!editing"
+                class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                Edit
+            </button>
+        </div>
+
+        <div x-show="editing" x-collapse class="mt-4">
+            <form action="{{ route('admin.accounts.update-owner', $account) }}" method="POST" class="space-y-4">
+                @csrf
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
+                        <input type="text" name="name" value="{{ $account->user->name }}"
+                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                        <input type="email" name="email" value="{{ $account->user->email }}"
+                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">New Password <span class="text-gray-400 font-normal">(leave empty to keep current)</span></label>
+                    <input type="password" name="password" placeholder="Leave empty to keep current"
+                        class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                        Save Changes
+                    </button>
+                    <button type="button" @click="editing = false" class="text-sm text-gray-500 hover:text-gray-700 transition">
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Team Access -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
         <div class="flex items-center justify-between">
