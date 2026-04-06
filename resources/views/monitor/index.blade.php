@@ -27,6 +27,18 @@
 
     @if($selectedServer)
         <div x-data="serverMonitor({{ $selectedServer->id }})" x-init="startPolling()">
+            <!-- Live Indicator -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center space-x-2">
+                    <span class="relative flex h-3 w-3">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                    </span>
+                    <span class="text-sm font-medium text-green-600">Live</span>
+                </div>
+                <span class="text-xs text-gray-400" x-text="'Updated ' + lastUpdate">--</span>
+            </div>
+
             <!-- Live Stats Cards -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
                 <div class="bg-white rounded-xl shadow-sm p-5">
@@ -102,11 +114,10 @@
 
             <!-- Top Processes -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-                <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+                <div class="px-6 py-5 border-b border-gray-100">
                     <h3 class="text-base font-semibold text-gray-800">Top Processes</h3>
-                    <span class="text-xs text-gray-400" x-text="'Updated ' + lastUpdate">--</span>
                 </div>
-                <div class="hidden sm:grid grid-cols-12 px-6 py-2 text-xs font-medium text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50">
+                <div class="hidden sm:grid grid-cols-12 px-6 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide border-b border-gray-200 bg-white">
                     <div class="col-span-2">User</div>
                     <div class="col-span-1">PID</div>
                     <div class="col-span-1">CPU%</div>
