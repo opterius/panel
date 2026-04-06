@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AliasController;
 use App\Http\Controllers\ApiKeyController;
 use App\Http\Controllers\AutoresponderController;
+use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
@@ -200,6 +202,16 @@ Route::middleware([
         // Autoresponders
         Route::get('/autoresponders', [AutoresponderController::class, 'index'])->name('autoresponders.index');
         Route::post('/autoresponders', [AutoresponderController::class, 'store'])->name('autoresponders.store');
+
+        // Domain Aliases
+        Route::get('/aliases', [AliasController::class, 'index'])->name('aliases.index');
+        Route::post('/aliases', [AliasController::class, 'store'])->name('aliases.store');
+        Route::delete('/aliases/{alias}', [AliasController::class, 'destroy'])->name('aliases.destroy');
+
+        // URL Redirects
+        Route::get('/redirects', [RedirectController::class, 'index'])->name('redirects.index');
+        Route::post('/redirects', [RedirectController::class, 'store'])->name('redirects.store');
+        Route::delete('/redirects/{redirect}', [RedirectController::class, 'destroy'])->name('redirects.destroy');
 
         // Subdomains
         Route::get('/subdomains/{domain}/create', [SubdomainController::class, 'create'])->name('subdomains.create');

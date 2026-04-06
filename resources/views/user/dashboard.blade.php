@@ -61,6 +61,14 @@
                         <svg class="w-9 h-9 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-green-700">SSL</span>
                     </a>
+                    <a href="{{ route('user.aliases.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-amber-50 transition">
+                        <svg class="w-9 h-9 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" /></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-amber-700">Aliases</span>
+                    </a>
+                    <a href="{{ route('user.redirects.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-pink-50 transition">
+                        <svg class="w-9 h-9 text-pink-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-pink-700">Redirects</span>
+                    </a>
                 </div>
             </div>
 

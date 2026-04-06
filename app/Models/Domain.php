@@ -42,4 +42,14 @@ class Domain extends Model
     {
         return $this->hasOne(SslCertificate::class);
     }
+
+    public function aliases(): HasMany
+    {
+        return $this->hasMany(DomainAlias::class);
+    }
+
+    public function redirects(): HasMany
+    {
+        return $this->hasMany(Redirect::class);
+    }
 }
