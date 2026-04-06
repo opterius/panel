@@ -42,7 +42,7 @@ class ServerController extends Controller
         ActivityLogger::log('server.added', 'server', $server->id, $server->name,
             "Added server {$server->name} ({$server->ip_address})", ['ip_address' => $server->ip_address]);
 
-        return redirect()->route('admin.servers.show', $server)->with('success', 'Server added successfully.');
+        return redirect()->route('admin.servers.show', $server)->with('success', __('servers.server_added'));
     }
 
     public function show(Server $server)
@@ -64,7 +64,7 @@ class ServerController extends Controller
     public function destroy(Request $request, Server $server)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         ActivityLogger::log('server.removed', 'server', $server->id, $server->name,
@@ -72,6 +72,6 @@ class ServerController extends Controller
 
         $server->delete();
 
-        return redirect()->route('admin.servers.index')->with('success', 'Server removed.');
+        return redirect()->route('admin.servers.index')->with('success', __('servers.server_deleted'));
     }
 }

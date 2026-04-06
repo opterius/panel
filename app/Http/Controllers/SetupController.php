@@ -67,6 +67,6 @@ class SetupController extends Controller
         // Log in the admin
         Auth::login($admin);
 
-        return redirect()->route('admin.dashboard')->with('success', 'Welcome to Opterius Panel! Your admin account has been created.');
+        return redirect()->route('admin.dashboard')->with('success', __('servers.setup_welcome'));
     }
 }

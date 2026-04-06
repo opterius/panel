@@ -51,17 +51,17 @@ class AccountController extends Controller
         $currentAccounts = Account::count();
 
         if ($currentAccounts >= $maxAccounts) {
-            return back()->with('error', "Account limit reached ({$currentAccounts}/{$maxAccounts}). Upgrade your license at opterius.com to create more accounts.")->withInput();
+            return back()->with('error', __('accounts.account_limit_reached', ['current' => $currentAccounts, 'max' => $maxAccounts]))->withInput();
         }
 
         // Check reseller ACL and account limit
         if (auth()->user()->isReseller()) {
             if (!auth()->user()->resellerCan('account.create')) {
-                return back()->with('error', 'You do not have permission to create accounts.')->withInput();
+                return back()->with('error', __('accounts.permission_denied_create'))->withInput();
             }
             if (!auth()->user()->resellerCanCreate('accounts')) {
                 $usage = auth()->user()->resellerUsage();
-                return back()->with('error', "Reseller account limit reached ({$usage['accounts']['used']}/{$usage['accounts']['limit']}).")->withInput();
+                return back()->with('error', __('accounts.reseller_account_limit_reached', ['used' => $usage['accounts']['used'], 'limit' => $usage['accounts']['limit']]))->withInput();
             }
         }
 
@@ -129,14 +129,14 @@ class AccountController extends Controller
             ActivityLogger::log('account.created', 'account', $account->id, $account->username,
                 "Created account {$account->username} with domain {$validated['domain']}", ['server_id' => $account->server_id]);
 
-            return redirect()->route('admin.accounts.show', $account)->with('success', 'Account created with domain ' . $validated['domain']);
+            return redirect()->route('admin.accounts.show', $account)->with('success', __('accounts.account_created', ['domain' => $validated['domain']]));
         }
 
         ActivityLogger::log('account.created', 'account', $account->id, $account->username,
             "Created account {$account->username} (server setup failed)", ['server_id' => $account->server_id]);
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('admin.accounts.show', $account)->with('warning', 'Account saved but server setup failed: ' . $error);
+        return redirect()->route('admin.accounts.show', $account)->with('warning', __('accounts.account_created_warning', ['error' => $error]));
     }
 
     public function show(Account $account)
@@ -177,17 +177,17 @@ class AccountController extends Controller
         ActivityLogger::log('account.owner_updated', 'account', $account->id, $account->username,
             "Updated owner info for {$account->username}: {$validated['name']} ({$validated['email']})");
 
-        return redirect()->route('admin.accounts.show', $account)->with('success', 'Account owner updated.');
+        return redirect()->route('admin.accounts.show', $account)->with('success', __('accounts.account_owner_updated'));
     }
 
     public function suspend(Request $request, Account $account)
     {
         if (auth()->user()->isReseller() && !auth()->user()->resellerCan('account.suspend')) {
-            return back()->with('error', 'You do not have permission to suspend accounts.');
+            return back()->with('error', __('accounts.permission_denied_suspend'));
         }
 
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         $account->load('server', 'domains');
@@ -210,20 +210,22 @@ class AccountController extends Controller
             ActivityLogger::log("account.{$action}ed", 'account', $account->id, $account->username,
                 ucfirst($action) . "ed account {$account->username}");
 
-            return redirect()->route('admin.accounts.show', $account)->with('success', "Account {$action}ed.");
+            $successKey = $action === 'suspend' ? 'accounts.account_suspended' : 'accounts.account_unsuspended';
+            return redirect()->route('admin.accounts.show', $account)->with('success', __($successKey));
         }
 
-        return back()->with('error', "Failed to {$action} account.");
+        $failKey = $action === 'suspend' ? 'accounts.failed_to_suspend' : 'accounts.failed_to_unsuspend';
+        return back()->with('error', __($failKey));
     }
 
     public function destroy(Request $request, Account $account)
     {
         if (auth()->user()->isReseller() && !auth()->user()->resellerCan('account.terminate')) {
-            return back()->with('error', 'You do not have permission to delete accounts.');
+            return back()->with('error', __('accounts.permission_denied_delete'));
         }
 
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         $account->load('server', 'domains');
@@ -239,6 +241,6 @@ class AccountController extends Controller
 
         $account->delete();
 
-        return redirect()->route('admin.accounts.index')->with('success', 'Account deleted.');
+        return redirect()->route('admin.accounts.index')->with('success', __('accounts.account_deleted'));
     }
 }

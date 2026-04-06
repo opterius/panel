@@ -57,7 +57,7 @@ class SecurityController extends Controller
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Scan failed: ' . $error);
+        return back()->with('error', __('servers.scan_failed', ['error' => $error]));
     }
 
     public function firewallAdd(Request $request)
@@ -78,7 +78,7 @@ class SecurityController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return redirect()->route('admin.security.index', ['server_id' => $server->id])->with('success', 'Firewall rule added.');
+            return redirect()->route('admin.security.index', ['server_id' => $server->id])->with('success', __('servers.firewall_rule_added'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
@@ -98,7 +98,7 @@ class SecurityController extends Controller
             'number' => $validated['number'],
         ]);
 
-        return redirect()->route('admin.security.index', ['server_id' => $server->id])->with('success', 'Firewall rule removed.');
+        return redirect()->route('admin.security.index', ['server_id' => $server->id])->with('success', __('servers.firewall_rule_removed'));
     }
 
     public function ipBlock(Request $request)
@@ -117,7 +117,7 @@ class SecurityController extends Controller
         ]);
 
         return redirect()->route('admin.security.index', ['server_id' => $server->id])
-            ->with('success', 'IP ' . $validated['ip'] . ' ' . $validated['action'] . 'ed.');
+            ->with('success', __('servers.ip_actioned', ['ip' => $validated['ip'], 'actioned' => $validated['action'] . 'ed']));
     }
 
     public function fail2banUnban(Request $request)
@@ -136,6 +136,6 @@ class SecurityController extends Controller
         ]);
 
         return redirect()->route('admin.security.index', ['server_id' => $server->id])
-            ->with('success', $validated['ip'] . ' unbanned from ' . $validated['jail']);
+            ->with('success', __('servers.ip_unbanned', ['ip' => $validated['ip'], 'jail' => $validated['jail']]));
     }
 }

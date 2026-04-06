@@ -4,7 +4,7 @@
             <a href="{{ route('admin.migrations.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">Migration Preview</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('migrations.migration_preview') }}</h2>
         </div>
     </x-slot>
 
@@ -19,23 +19,23 @@
             {{-- Account Summary --}}
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-base font-semibold text-gray-800">Detected Account</h3>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('migrations.detected_account') }}</h3>
                 </div>
                 <div class="px-6 py-5 grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <div>
-                        <span class="text-xs text-gray-400 block">Username</span>
+                        <span class="text-xs text-gray-400 block">{{ __('migrations.username') }}</span>
                         <span class="text-sm font-semibold text-gray-800 font-mono">{{ $m['username'] ?? '—' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-gray-400 block">Main Domain</span>
+                        <span class="text-xs text-gray-400 block">{{ __('migrations.domain') }}</span>
                         <span class="text-sm font-semibold text-gray-800">{{ $m['main_domain'] ?? '—' }}</span>
                     </div>
                     <div>
-                        <span class="text-xs text-gray-400 block">Disk Usage</span>
+                        <span class="text-xs text-gray-400 block">{{ __('migrations.disk_usage') }}</span>
                         <span class="text-sm font-semibold text-gray-800">{{ number_format($m['disk_usage_mb'] ?? 0, 1) }} MB</span>
                     </div>
                     <div>
-                        <span class="text-xs text-gray-400 block">Server</span>
+                        <span class="text-xs text-gray-400 block">{{ __('migrations.server') }}</span>
                         <span class="text-sm font-semibold text-gray-800">{{ $migration->server->name }}</span>
                     </div>
                 </div>
@@ -44,7 +44,7 @@
             {{-- Configuration --}}
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-base font-semibold text-gray-800">Import Settings</h3>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('migrations.import_settings') }}</h3>
                 </div>
                 <div class="px-6 py-5 space-y-5">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -76,7 +76,7 @@
             {{-- What to Import --}}
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-base font-semibold text-gray-800">Components to Import</h3>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('migrations.components_to_import') }}</h3>
                 </div>
                 <div class="px-6 py-5 space-y-4">
 
@@ -86,7 +86,7 @@
                             <input type="checkbox" name="import_files" value="1" checked
                                 class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             <div>
-                                <span class="text-sm font-medium text-gray-800">Files</span>
+                                <span class="text-sm font-medium text-gray-800">{{ __('migrations.files') }}</span>
                                 <span class="text-xs text-gray-500 block">{{ number_format($m['disk_usage_mb'] ?? 0, 1) }} MB</span>
                             </div>
                         </div>
@@ -99,7 +99,7 @@
                             <input type="checkbox" name="import_databases" value="1" checked
                                 class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             <div>
-                                <span class="text-sm font-medium text-gray-800">Databases</span>
+                                <span class="text-sm font-medium text-gray-800">{{ __('migrations.databases') }}</span>
                                 <span class="text-xs text-gray-500 block">{{ count($m['databases'] ?? []) }} database(s)</span>
                             </div>
                         </div>
@@ -125,7 +125,7 @@
                             <input type="checkbox" name="import_email" value="1" checked
                                 class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             <div>
-                                <span class="text-sm font-medium text-gray-800">Email Accounts</span>
+                                <span class="text-sm font-medium text-gray-800">{{ __('migrations.email_accounts') }}</span>
                                 <span class="text-xs text-gray-500 block">{{ count($m['email_accounts'] ?? []) }} account(s)</span>
                             </div>
                         </div>
@@ -138,7 +138,7 @@
                             <input type="checkbox" name="import_dns" value="1" checked
                                 class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             <div>
-                                <span class="text-sm font-medium text-gray-800">DNS Zones</span>
+                                <span class="text-sm font-medium text-gray-800">{{ __('migrations.dns_zones') }}</span>
                                 <span class="text-xs text-gray-500 block">{{ count($m['dns_zones'] ?? []) }} zone(s)</span>
                             </div>
                         </div>
@@ -151,7 +151,7 @@
                             <input type="checkbox" name="import_ssl" value="1" checked
                                 class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             <div>
-                                <span class="text-sm font-medium text-gray-800">SSL Certificates</span>
+                                <span class="text-sm font-medium text-gray-800">{{ __('migrations.ssl_certificates') }}</span>
                                 <span class="text-xs text-gray-500 block">{{ count($m['ssl_certs'] ?? []) }} certificate(s)</span>
                             </div>
                         </div>
@@ -164,7 +164,7 @@
                             <input type="checkbox" name="import_cron" value="1" checked
                                 class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
                             <div>
-                                <span class="text-sm font-medium text-gray-800">Cron Jobs</span>
+                                <span class="text-sm font-medium text-gray-800">{{ __('migrations.cron_jobs') }}</span>
                                 <span class="text-xs text-gray-500 block">{{ count($m['cron_jobs'] ?? []) }} job(s)</span>
                             </div>
                         </div>
@@ -180,10 +180,10 @@
                     class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg x-show="!loading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     <svg x-show="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                    <span x-text="loading ? 'Starting migration...' : 'Start Migration'">Start Migration</span>
+                    <span x-text="loading ? '{{ __('migrations.starting_migration') }}' : '{{ __('migrations.start_migration') }}'">{{ __('migrations.start_migration') }}</span>
                 </button>
                 <a href="{{ route('admin.migrations.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                    Cancel
+                    {{ __('common.cancel') }}
                 </a>
             </div>
         </div>

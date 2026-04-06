@@ -81,11 +81,11 @@ class BackupController extends Controller
                 "Created {$validated['type']} backup for {$account->username} ({$data['size_mb']} MB)");
 
             return redirect()->route('admin.backups.index', ['server_id' => $server->id])
-                ->with('success', "Backup created for {$account->username} ({$data['size_mb']} MB, {$data['duration']})");
+                ->with('success', __('backups.backup_created', ['username' => $account->username, 'size' => $data['size_mb'], 'duration' => $data['duration']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
-        return back()->with('error', 'Backup failed: ' . $error);
+        return back()->with('error', __('backups.backup_failed', ['error' => $error]));
     }
 
     public function restore(Request $request, Backup $backup)
@@ -104,11 +104,11 @@ class BackupController extends Controller
                 "Restored backup {$backup->filename}: " . implode(', ', $restored));
 
             return redirect()->route('admin.backups.index', ['server_id' => $backup->server_id])
-                ->with('success', "Restored: " . implode(', ', $restored));
+                ->with('success', __('backups.restore_successful', ['items' => implode(', ', $restored)]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
-        return back()->with('error', 'Restore failed: ' . $error);
+        return back()->with('error', __('backups.restore_failed', ['error' => $error]));
     }
 
     public function download(Backup $backup)
@@ -131,6 +131,6 @@ class BackupController extends Controller
         $backup->delete();
 
         return redirect()->route('admin.backups.index', ['server_id' => $backup->server_id])
-            ->with('success', 'Backup deleted.');
+            ->with('success', __('backups.backup_deleted'));
     }
 }

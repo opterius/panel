@@ -56,7 +56,7 @@ class MigrationController extends Controller
         if (!$result['success']) {
             $migration->update(['status' => 'failed', 'error' => $result['error']]);
             return redirect()->route('admin.migrations.index')
-                ->with('error', 'Failed to parse backup: ' . $result['error']);
+                ->with('error', __('migrations.failed_to_parse_backup', ['error' => $result['error']]));
         }
 
         $manifest = $result['manifest'];
@@ -117,7 +117,7 @@ class MigrationController extends Controller
         ProcessCpanelMigration::dispatch($migration);
 
         return redirect()->route('admin.migrations.show', $migration)
-            ->with('success', 'Migration started. This may take several minutes.');
+            ->with('success', __('migrations.migration_started'));
     }
 
     public function show(CpanelMigration $migration)
@@ -146,6 +146,6 @@ class MigrationController extends Controller
         $migration->delete();
 
         return redirect()->route('admin.migrations.index')
-            ->with('success', 'Migration record deleted.');
+            ->with('success', __('migrations.migration_record_deleted'));
     }
 }

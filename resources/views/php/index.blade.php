@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">PHP Management</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('php.php_versions') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -18,13 +18,13 @@
     <!-- Server Selector -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Select Server</h3>
-            <p class="text-sm text-gray-500 mt-1">Manage PHP versions and settings per server.</p>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('php.select_server') }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ __('php.select_server_hint') }}</p>
         </div>
         <div class="px-6 py-5">
             <form method="GET" action="{{ route('admin.php.index') }}" class="flex items-end gap-4">
                 <div class="flex-1">
-                    <label for="server_id" class="block text-sm font-medium text-gray-700 mb-1.5">Server</label>
+                    <label for="server_id" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.server') }}</label>
                     <select name="server_id" id="server_id"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         @foreach($servers as $server)
@@ -35,7 +35,7 @@
                     </select>
                 </div>
                 <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                    Manage
+                    {{ __('common.manage') }}
                 </button>
             </form>
         </div>
@@ -45,13 +45,13 @@
         <!-- Installed PHP Versions -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">PHP Versions</h3>
-                <p class="text-sm text-gray-500 mt-1">Installed PHP versions on {{ $selectedServer->name }}.</p>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('php.php_versions') }}</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ __('php.installed_on', ['server' => $selectedServer->name]) }}</p>
             </div>
 
             @if(empty($versions))
                 <div class="px-6 py-12 text-center">
-                    <p class="text-sm text-gray-500">Could not retrieve PHP versions. Make sure the agent is running.</p>
+                    <p class="text-sm text-gray-500">{{ __('php.cannot_retrieve_versions') }}</p>
                 </div>
             @else
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 p-6">
@@ -70,17 +70,17 @@
                             </div>
                             <div class="text-xs mt-1">
                                 @if($ver['installed'] && $ver['active'])
-                                    <span class="text-green-600 font-medium">Installed & Running</span>
+                                    <span class="text-green-600 font-medium">{{ __('php.installed_and_running') }}</span>
                                 @elseif($ver['installed'])
-                                    <span class="text-yellow-600 font-medium">Installed (FPM stopped)</span>
+                                    <span class="text-yellow-600 font-medium">{{ __('php.installed_fpm_stopped') }}</span>
                                 @else
-                                    <span class="text-gray-400">Not installed</span>
+                                    <span class="text-gray-400">{{ __('php.not_installed') }}</span>
                                 @endif
                             </div>
                             @if(!$ver['installed'])
                                 <div x-data="{ confirmInstall: false }" class="mt-3">
                                     <button type="button" @click="confirmInstall = true" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium transition">
-                                        Install
+                                        {{ __('php.install_php') }}
                                     </button>
                                     <template x-teleport="body">
                                         <div x-show="confirmInstall" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true">
@@ -93,18 +93,18 @@
                                                                 <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                                                             </div>
                                                             <div>
-                                                                <h3 class="text-lg font-semibold text-gray-900">Install PHP {{ $ver['version'] }}</h3>
-                                                                <p class="mt-1 text-sm text-gray-500">This will install PHP {{ $ver['version'] }} on the server. The process may take a few minutes.</p>
+                                                                <h3 class="text-lg font-semibold text-gray-900">{{ __('php.install_php') }} {{ $ver['version'] }}</h3>
+                                                                <p class="mt-1 text-sm text-gray-500">{{ __('php.install_php_confirm', ['version' => $ver['version']]) }}</p>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                                        <button type="button" @click="confirmInstall = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                        <button type="button" @click="confirmInstall = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">{{ __('common.cancel') }}</button>
                                                         <form action="{{ route('admin.php.install') }}" method="POST">
                                                             @csrf
                                                             <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
                                                             <input type="hidden" name="version" value="{{ $ver['version'] }}">
-                                                            <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">Install</button>
+                                                            <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">{{ __('php.install_php') }}</button>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -126,8 +126,8 @@
         @if(!empty($installedVersionsList))
             <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
                 <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-base font-semibold text-gray-800">PHP Extensions</h3>
-                    <p class="text-sm text-gray-500 mt-1">Manage extensions per PHP version. Select a version to view and toggle extensions.</p>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('php.php_extensions') }}</h3>
+                    <p class="text-sm text-gray-500 mt-1">{{ __('php.php_extensions_hint') }}</p>
                 </div>
                 <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
                     <div class="flex flex-wrap gap-2">
@@ -161,7 +161,7 @@
                                         @if($ext['installed']) text-red-600 hover:bg-red-100
                                         @else text-green-600 hover:bg-green-100
                                         @endif">
-                                        {{ $ext['installed'] ? 'Disable' : 'Enable' }}
+                                        {{ $ext['installed'] ? __('common.disable') : __('common.enable') }}
                                     </button>
                                 </form>
                             </div>
@@ -169,7 +169,7 @@
                     </div>
                 @else
                     <div class="px-6 py-8 text-center text-sm text-gray-400">
-                        Select a PHP version above to view its extensions.
+                        {{ __('php.select_version_to_view_extensions') }}
                     </div>
                 @endif
             </div>
@@ -179,8 +179,8 @@
         @if($domains->isNotEmpty())
             <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
                 <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-base font-semibold text-gray-800">Domain PHP Version</h3>
-                    <p class="text-sm text-gray-500 mt-1">Switch PHP version per domain.</p>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('php.domain_php_version') }}</h3>
+                    <p class="text-sm text-gray-500 mt-1">{{ __('php.domain_php_version_hint') }}</p>
                 </div>
                 <div class="divide-y divide-gray-100">
                     @php
@@ -209,11 +209,11 @@
                                         @endforeach
                                     </select>
                                     <button type="submit" class="inline-flex items-center px-3 py-2 text-sm font-medium text-indigo-600 bg-white border border-indigo-300 rounded-lg hover:bg-indigo-50 transition">
-                                        Switch
+                                        {{ __('php.switch_version') }}
                                     </button>
                                 </form>
 
-                                <button @click="showConfig = !showConfig" class="text-gray-400 hover:text-gray-600 transition" title="PHP Settings">
+                                <button @click="showConfig = !showConfig" class="text-gray-400 hover:text-gray-600 transition" title="{{ __('php.php_configuration') }}">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
                                 </button>
                             </div>
@@ -228,13 +228,13 @@
             <!-- PHP Config per Domain -->
             <div class="bg-white rounded-xl shadow-sm overflow-hidden" x-data="{ selectedDomain: '' }">
                 <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-base font-semibold text-gray-800">PHP Configuration</h3>
-                    <p class="text-sm text-gray-500 mt-1">Edit php.ini values per domain (memory_limit, upload size, etc).</p>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('php.php_configuration') }}</h3>
+                    <p class="text-sm text-gray-500 mt-1">{{ __('php.php_configuration_hint') }}</p>
                 </div>
                 <form action="{{ route('admin.php.config') }}" method="POST" class="px-6 py-5 space-y-5">
                     @csrf
                     <div>
-                        <label for="config_domain_id" class="block text-sm font-medium text-gray-700 mb-1.5">Domain</label>
+                        <label for="config_domain_id" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.domain') }}</label>
                         <select name="domain_id" id="config_domain_id"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @foreach($domains as $domain)
@@ -244,36 +244,36 @@
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">memory_limit</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.memory_limit') }}</label>
                             <input type="text" name="memory_limit" value="256M" placeholder="e.g. 256M"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">upload_max_filesize</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.upload_max_filesize') }}</label>
                             <input type="text" name="upload_max_filesize" value="64M" placeholder="e.g. 64M"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">post_max_size</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.post_max_size') }}</label>
                             <input type="text" name="post_max_size" value="64M" placeholder="e.g. 64M"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">max_execution_time</label>
-                            <input type="number" name="max_execution_time" value="30" placeholder="seconds"
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.max_execution_time') }}</label>
+                            <input type="number" name="max_execution_time" value="30" placeholder="{{ __('common.seconds') }}"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">display_errors</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.display_errors') }}</label>
                             <select name="display_errors"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                <option value="Off">Off (Production)</option>
-                                <option value="On">On (Development)</option>
+                                <option value="Off">{{ __('php.off_production') }}</option>
+                                <option value="On">{{ __('php.on_development') }}</option>
                             </select>
                         </div>
                     </div>
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                        Save Configuration
+                        {{ __('php.save_configuration') }}
                     </button>
                 </form>
             </div>

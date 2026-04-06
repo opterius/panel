@@ -23,7 +23,7 @@ class SubdomainController extends Controller
         $domain->load('account.server');
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('domains.no_permission'));
         }
 
         $validated = $request->validate([
@@ -38,7 +38,7 @@ class SubdomainController extends Controller
 
         // Check uniqueness
         if (Domain::where('domain', $fullDomain)->exists()) {
-            return back()->with('error', 'Subdomain ' . $fullDomain . ' already exists.')->withInput();
+            return back()->with('error', __('domains.subdomain_already_exists', ['domain' => $fullDomain]))->withInput();
         }
 
         // Default document root: inside parent domain's directory
@@ -48,7 +48,7 @@ class SubdomainController extends Controller
         // Ensure document root is within the account's home directory
         $homeDir = $domain->account->home_directory;
         if (!str_starts_with($documentRoot, $homeDir)) {
-            return back()->with('error', 'Document root must be within the account home directory.')->withInput();
+            return back()->with('error', __('domains.document_root_outside_home'))->withInput();
         }
 
         // Create subdomain record
@@ -85,12 +85,12 @@ class SubdomainController extends Controller
             ActivityLogger::log('subdomain.created', 'domain', $subdomain->id, $subdomain->domain,
                 "Created subdomain {$fullDomain}", ['server_id' => $domain->server_id, 'parent_domain_id' => $domain->id]);
 
-            return redirect()->route('user.domains.index')->with('success', 'Subdomain ' . $fullDomain . ' created.');
+            return redirect()->route('user.domains.index')->with('success', __('domains.subdomain_created', ['domain' => $fullDomain]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
         $subdomain->update(['status' => 'error']);
 
-        return redirect()->route('user.domains.index')->with('warning', 'Subdomain saved but server setup failed: ' . $error);
+        return redirect()->route('user.domains.index')->with('warning', __('domains.subdomain_setup_failed', ['error' => $error]));
     }
 }

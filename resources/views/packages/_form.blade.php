@@ -12,27 +12,27 @@
                         <span class="text-sm font-bold text-indigo-600">1</span>
                     </div>
                     <div>
-                        <h3 class="text-base font-semibold text-gray-800">Package Details</h3>
-                        <p class="text-sm text-gray-500">Name and description for this package.</p>
+                        <h3 class="text-base font-semibold text-gray-800">{{ __('packages.package_name') }}</h3>
+                        <p class="text-sm text-gray-500">{{ __('packages.packages_define_limits') }}</p>
                     </div>
                 </div>
             </div>
             <div class="px-6 py-5 space-y-5">
                 <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">Package Name</label>
+                    <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('packages.package_name') }}</label>
                     <input type="text" name="name" id="name"
                            value="{{ old('name', $package?->name) }}"
-                           placeholder="e.g. Basic, Developer, Agency"
+                           placeholder="{{ __('packages.package_name_placeholder') }}"
                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                     @error('name')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
                 <div>
-                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1.5">Description <span class="text-gray-400 font-normal">(optional)</span></label>
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('packages.description') }} <span class="text-gray-400 font-normal">({{ __('common.optional') }})</span></label>
                     <input type="text" name="description" id="description"
                            value="{{ old('description', $package?->description) }}"
-                           placeholder="e.g. For personal projects"
+                           placeholder="{{ __('packages.description_placeholder') }}"
                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                     @error('description')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
@@ -42,7 +42,7 @@
                     <input type="checkbox" name="is_default" id="is_default" value="1"
                            class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                            @checked(old('is_default', $package?->is_default))>
-                    <label for="is_default" class="text-sm text-gray-700">Set as default package <span class="text-gray-400">(pre-selected when creating accounts)</span></label>
+                    <label for="is_default" class="text-sm text-gray-700">{{ __('packages.set_as_default') }} <span class="text-gray-400">({{ __('packages.default_hint') }})</span></label>
                 </div>
             </div>
         </div>
@@ -55,8 +55,8 @@
                         <span class="text-sm font-bold text-indigo-600">2</span>
                     </div>
                     <div>
-                        <h3 class="text-base font-semibold text-gray-800">PHP & Storage</h3>
-                        <p class="text-sm text-gray-500">Default PHP version and disk quota for accounts on this package.</p>
+                        <h3 class="text-base font-semibold text-gray-800">{{ __('packages.php_and_storage') }}</h3>
+                        <p class="text-sm text-gray-500">{{ __('packages.php_storage_hint') }}</p>
                     </div>
                 </div>
             </div>
@@ -80,8 +80,8 @@
                 }
             }">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Allowed PHP Versions</label>
-                    <p class="text-xs text-gray-400 mb-3">Select which PHP versions accounts on this package can use.</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('packages.allowed_php_versions') }}</label>
+                    <p class="text-xs text-gray-400 mb-3">{{ __('packages.allowed_php_versions_hint') }}</p>
                     <div class="grid grid-cols-4 gap-3">
                         @foreach($availableVersions as $version)
                             <label class="relative cursor-pointer" @click.prevent="toggle('{{ $version }}')">
@@ -104,8 +104,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Default PHP Version</label>
-                    <p class="text-xs text-gray-400 mb-3">Used when creating new domains for accounts on this package.</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('packages.default_php_version') }}</label>
+                    <p class="text-xs text-gray-400 mb-3">{{ __('packages.default_php_version_hint') }}</p>
                     <div class="grid grid-cols-4 gap-3">
                         @foreach($availableVersions as $version)
                             <label class="relative cursor-pointer"
@@ -128,7 +128,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <x-quota-picker
                         name="disk_quota"
-                        label="Disk Quota"
+                        :label="__('packages.disk_quota_mb')"
                         :value="$package?->disk_quota ?? 0"
                         :presets="[
                             ['mb' => 512, 'label' => '512 MB'],
@@ -141,7 +141,7 @@
 
                     <x-quota-picker
                         name="bandwidth"
-                        label="Bandwidth / month"
+                        :label="__('packages.bandwidth_per_month')"
                         :value="$package?->bandwidth ?? 0"
                         :presets="[
                             ['mb' => 10240, 'label' => '10 GB'],
@@ -163,16 +163,16 @@
                         <span class="text-sm font-bold text-indigo-600">3</span>
                     </div>
                     <div>
-                        <h3 class="text-base font-semibold text-gray-800">Resource Limits</h3>
-                        <p class="text-sm text-gray-500">Set to 0 for unlimited.</p>
+                        <h3 class="text-base font-semibold text-gray-800">{{ __('packages.resource_limits') }}</h3>
+                        <p class="text-sm text-gray-500">{{ __('packages.set_zero_unlimited') }}</p>
                     </div>
                 </div>
             </div>
             <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <x-limit-picker name="max_domains" label="Addon Domains" :value="$package?->max_domains ?? 0" />
-                <x-limit-picker name="max_subdomains" label="Subdomains" :value="$package?->max_subdomains ?? 0" />
-                <x-limit-picker name="max_databases" label="Databases" :value="$package?->max_databases ?? 0" />
-                <x-limit-picker name="max_email_accounts" label="Email Accounts" :value="$package?->max_email_accounts ?? 0" />
+                <x-limit-picker name="max_domains" :label="__('packages.max_addon_domains')" :value="$package?->max_domains ?? 0" />
+                <x-limit-picker name="max_subdomains" :label="__('packages.max_subdomains')" :value="$package?->max_subdomains ?? 0" />
+                <x-limit-picker name="max_databases" :label="__('packages.max_databases')" :value="$package?->max_databases ?? 0" />
+                <x-limit-picker name="max_email_accounts" :label="__('packages.max_email_accounts')" :value="$package?->max_email_accounts ?? 0" />
             </div>
         </div>
 
@@ -184,33 +184,33 @@
                         <span class="text-sm font-bold text-indigo-600">4</span>
                     </div>
                     <div>
-                        <h3 class="text-base font-semibold text-gray-800">PHP Resources</h3>
-                        <p class="text-sm text-gray-500">Control CPU and memory usage per account via PHP-FPM limits.</p>
+                        <h3 class="text-base font-semibold text-gray-800">{{ __('packages.php_resources') }}</h3>
+                        <p class="text-sm text-gray-500">{{ __('packages.php_resources_hint') }}</p>
                     </div>
                 </div>
             </div>
             <div class="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">PHP Workers per Domain</label>
-                    <p class="text-xs text-gray-400 mb-2">Max concurrent PHP processes (pm.max_children). Controls CPU usage indirectly.</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('packages.php_workers') }}</label>
+                    <p class="text-xs text-gray-400 mb-2">{{ __('packages.php_workers_hint') }}</p>
                     <div class="flex flex-wrap gap-2" x-data="{ workers: '{{ old('max_php_workers', $package?->max_php_workers ?? 5) }}' }">
                         @foreach([2, 3, 5, 10, 15, 25] as $w)
                             <button type="button" @click="workers = '{{ $w }}'"
                                 class="px-3 py-1.5 text-xs font-medium rounded-lg border transition"
                                 :class="workers == '{{ $w }}' ? 'border-indigo-500 bg-indigo-50 text-indigo-700' : 'border-gray-200 text-gray-600 hover:bg-gray-50'">
-                                {{ $w }} workers
+                                {{ $w }} {{ __('packages.workers') }}
                             </button>
                         @endforeach
                         <input type="hidden" name="max_php_workers" :value="workers">
                     </div>
-                    <p class="mt-2 text-xs text-gray-400">Recommended: 2-5 for shared hosting, 10-25 for dedicated.</p>
+                    <p class="mt-2 text-xs text-gray-400">{{ __('packages.php_workers_recommended') }}</p>
                     @error('max_php_workers')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Memory per PHP Process</label>
-                    <p class="text-xs text-gray-400 mb-2">PHP memory_limit per process. Controls max RAM usage.</p>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('packages.memory_per_process') }}</label>
+                    <p class="text-xs text-gray-400 mb-2">{{ __('packages.memory_per_process_hint') }}</p>
                     <div class="flex flex-wrap gap-2" x-data="{ memory: '{{ old('memory_per_process', $package?->memory_per_process ?? 256) }}' }">
                         @foreach([64, 128, 256, 512, 1024, 2048] as $m)
                             <button type="button" @click="memory = '{{ $m }}'"
@@ -222,7 +222,7 @@
                         <input type="hidden" name="memory_per_process" :value="memory">
                     </div>
                     <p class="mt-2 text-xs text-gray-400">
-                        Max RAM per domain: <span class="font-semibold" x-data x-text="'workers x memory'"></span>
+                        {{ __('packages.max_ram_per_domain') }}: <span class="font-semibold" x-data x-text="'{{ __('packages.workers') }} x {{ __('packages.memory') }}'"></span>
                     </p>
                     @error('memory_per_process')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
@@ -239,8 +239,8 @@
                         <span class="text-sm font-bold text-indigo-600">5</span>
                     </div>
                     <div>
-                        <h3 class="text-base font-semibold text-gray-800">Features</h3>
-                        <p class="text-sm text-gray-500">Enable or disable specific features for accounts on this package.</p>
+                        <h3 class="text-base font-semibold text-gray-800">{{ __('packages.features') }}</h3>
+                        <p class="text-sm text-gray-500">{{ __('packages.features_hint') }}</p>
                     </div>
                 </div>
             </div>
@@ -249,19 +249,19 @@
                     <input type="checkbox" name="ssl_enabled" id="ssl_enabled" value="1"
                            class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                            @checked(old('ssl_enabled', $package?->ssl_enabled ?? true))>
-                    <label for="ssl_enabled" class="text-sm text-gray-700">SSL Certificates (Let's Encrypt)</label>
+                    <label for="ssl_enabled" class="text-sm text-gray-700">{{ __('packages.ssl_enabled') }}</label>
                 </div>
                 <div class="flex items-center space-x-3">
                     <input type="checkbox" name="cron_jobs_enabled" id="cron_jobs_enabled" value="1"
                            class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                            @checked(old('cron_jobs_enabled', $package?->cron_jobs_enabled ?? true))>
-                    <label for="cron_jobs_enabled" class="text-sm text-gray-700">Cron Jobs</label>
+                    <label for="cron_jobs_enabled" class="text-sm text-gray-700">{{ __('cron.cron_jobs') }}</label>
                 </div>
                 <div class="flex items-center space-x-3">
                     <input type="checkbox" name="php_switch_enabled" id="php_switch_enabled" value="1"
                            class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                            @checked(old('php_switch_enabled', $package?->php_switch_enabled ?? false))>
-                    <label for="php_switch_enabled" class="text-sm text-gray-700">Allow PHP version switching <span class="text-gray-400">(let domain owner change PHP version)</span></label>
+                    <label for="php_switch_enabled" class="text-sm text-gray-700">{{ __('packages.php_switch_enabled') }} <span class="text-gray-400">({{ __('packages.php_switch_hint') }})</span></label>
                 </div>
             </div>
         </div>
@@ -270,11 +270,11 @@
         <div class="flex items-center space-x-3">
             <button type="submit"
                     class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                {{ $package ? 'Save Changes' : 'Create Package' }}
+                {{ $package ? __('common.save') : __('packages.new_package') }}
             </button>
             <a href="{{ route('admin.packages.index') }}"
                class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                Cancel
+                {{ __('common.cancel') }}
             </a>
         </div>
 

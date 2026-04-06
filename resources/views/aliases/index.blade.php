@@ -1,6 +1,6 @@
 <x-user-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">Domain Aliases</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('aliases.domain_aliases') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -11,7 +11,7 @@
     @endif
 
     <div class="mb-6">
-        <p class="text-sm text-gray-500">Domain aliases point additional domains to the same website content.</p>
+        <p class="text-sm text-gray-500">{{ __('aliases.domain_aliases_description') }}</p>
     </div>
 
     @foreach($domains as $domain)
@@ -36,7 +36,7 @@
                                 </span>
                             </div>
                             <form action="{{ route('user.aliases.destroy', $alias) }}" method="POST"
-                                  onsubmit="return confirm('Remove this alias?')">
+                                  onsubmit="return confirm('{{ __('aliases.remove_this_alias') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-gray-400 hover:text-red-600 transition">
@@ -54,13 +54,13 @@
                     @csrf
                     <input type="hidden" name="domain_id" value="{{ $domain->id }}">
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Alias Domain</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('aliases.alias_domain') }}</label>
                         <input type="text" name="alias_domain"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="e.g. example.net">
                     </div>
                     <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                        Add Alias
+                        {{ __('aliases.add_alias') }}
                     </button>
                 </form>
             </div>

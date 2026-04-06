@@ -19,19 +19,19 @@
     <!-- Server Overview -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-sm font-medium text-gray-500">Domains</div>
+            <div class="text-sm font-medium text-gray-500">{{ __('servers.domains') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">{{ $server->domains->count() }}</div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-sm font-medium text-gray-500">Accounts</div>
+            <div class="text-sm font-medium text-gray-500">{{ __('servers.accounts') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">{{ $server->accounts->count() }}</div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-sm font-medium text-gray-500">Databases</div>
+            <div class="text-sm font-medium text-gray-500">{{ __('servers.databases') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">{{ $server->databases->count() }}</div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-sm font-medium text-gray-500">Cron Jobs</div>
+            <div class="text-sm font-medium text-gray-500">{{ __('servers.cron_jobs') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">{{ $server->cronJobs->count() }}</div>
         </div>
     </div>
@@ -39,53 +39,53 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Server Details -->
         <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-base font-semibold text-gray-800 mb-5">Server Details</h3>
+            <h3 class="text-base font-semibold text-gray-800 mb-5">{{ __('servers.server_details') }}</h3>
 
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Name</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('servers.server_name') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800">{{ $server->name }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">IP Address</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('servers.ip_address') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800 font-mono">{{ $server->ip_address }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Hostname</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('servers.hostname') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800">{{ $server->hostname ?? '—' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Operating System</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('servers.operating_system') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800">{{ $server->os ? $server->os . ' ' . $server->os_version : '—' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Agent URL</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('servers.agent_url') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800 font-mono">{{ $server->agent_url ?? '—' }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Last Ping</dt>
-                    <dd class="mt-1 text-sm text-gray-800">{{ $server->last_ping_at ? $server->last_ping_at->diffForHumans() : 'Never' }}</dd>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('servers.last_ping') }}</dt>
+                    <dd class="mt-1 text-sm text-gray-800">{{ $server->last_ping_at ? $server->last_ping_at->diffForHumans() : __('common.never') }}</dd>
                 </div>
             </dl>
         </div>
 
         <!-- Agent Install -->
         <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-base font-semibold text-gray-800 mb-3">Install Agent</h3>
-            <p class="text-sm text-gray-500 mb-4">Run this command on your server to install and connect the Opterius agent:</p>
+            <h3 class="text-base font-semibold text-gray-800 mb-3">{{ __('servers.install_agent') }}</h3>
+            <p class="text-sm text-gray-500 mb-4">{{ __('servers.install_agent_description') }}</p>
 
             <div class="relative">
                 <pre class="bg-gray-900 text-green-400 rounded-lg p-4 text-xs font-mono overflow-x-auto">curl -sL https://get.opterius.com/agent | bash -s -- --token={{ $server->agent_token }}</pre>
             </div>
 
-            <p class="text-xs text-gray-400 mt-3">The agent runs on port 7443 and communicates securely with this panel.</p>
+            <p class="text-xs text-gray-400 mt-3">{{ __('servers.install_agent_note') }}</p>
         </div>
     </div>
 
     <!-- Danger Zone -->
     <div class="bg-white rounded-xl shadow-sm p-6 border border-red-100">
-        <h3 class="text-base font-semibold text-red-600 mb-2">Danger Zone</h3>
-        <p class="text-sm text-gray-500 mb-4">Removing a server will disconnect it from Opterius. This does not delete anything on the server itself.</p>
+        <h3 class="text-base font-semibold text-red-600 mb-2">{{ __('common.danger_zone') }}</h3>
+        <p class="text-sm text-gray-500 mb-4">{{ __('servers.remove_server_description') }}</p>
 
         @if($errors->has('password'))
             <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -95,12 +95,12 @@
 
         <x-delete-modal
             :action="route('admin.servers.destroy', $server)"
-            title="Remove Server"
-            message="This will disconnect the server from Opterius. All associated domains, databases, and accounts will be removed from the panel. Nothing on the server itself will be deleted."
+            :title="__('servers.remove_server')"
+            :message="__('servers.remove_server_message')"
             :confirm-password="true">
             <x-slot name="trigger">
                 <button type="button" class="inline-flex items-center px-4 py-2.5 bg-white text-red-600 text-sm font-medium border border-red-300 rounded-lg hover:bg-red-50 transition">
-                    Remove Server
+                    {{ __('servers.remove_server') }}
                 </button>
             </x-slot>
         </x-delete-modal>

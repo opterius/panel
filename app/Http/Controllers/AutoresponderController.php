@@ -62,7 +62,7 @@ class AutoresponderController extends Controller
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'email')) {
-            return back()->with('error', 'You do not have permission to manage autoresponders.');
+            return back()->with('error', __('emails.no_permission_autoresponders'));
         }
 
         $enabled = $request->boolean('enabled');
@@ -79,8 +79,9 @@ class AutoresponderController extends Controller
             ActivityLogger::log("autoresponder.{$action}", 'domain', $domain->id, $validated['email'],
                 ucfirst($action) . " autoresponder for {$validated['email']}");
 
+            $successKey = $enabled ? 'emails.autoresponder_enabled' : 'emails.autoresponder_disabled';
             return redirect()->route('user.autoresponders.index', ['domain_id' => $domain->id])
-                ->with('success', "Autoresponder {$action} for {$validated['email']}.");
+                ->with('success', __($successKey, ['email' => $validated['email']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';

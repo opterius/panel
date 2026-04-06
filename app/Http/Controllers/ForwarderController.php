@@ -47,7 +47,7 @@ class ForwarderController extends Controller
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'email')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('emails.no_permission'));
         }
 
         // Build full source email
@@ -65,7 +65,7 @@ class ForwarderController extends Controller
         if ($response && $response->successful()) {
             ActivityLogger::log('forwarder.created', 'domain', $domain->id, $source,
                 "Created forwarder {$source} → {$validated['destination']}");
-            return redirect()->route('user.forwarders.index', ['domain_id' => $domain->id])->with('success', "Forwarder created: {$source} → {$validated['destination']}");
+            return redirect()->route('user.forwarders.index', ['domain_id' => $domain->id])->with('success', __('emails.forwarder_created', ['source' => $source, 'destination' => $validated['destination']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
@@ -82,7 +82,7 @@ class ForwarderController extends Controller
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'email')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('emails.no_permission'));
         }
 
         AgentService::for($domain->account->server)->post('/forwarder/delete', [
@@ -92,6 +92,6 @@ class ForwarderController extends Controller
         ActivityLogger::log('forwarder.deleted', 'domain', $domain->id, $validated['source'],
             "Deleted forwarder {$validated['source']}");
 
-        return redirect()->route('user.forwarders.index', ['domain_id' => $domain->id])->with('success', 'Forwarder deleted.');
+        return redirect()->route('user.forwarders.index', ['domain_id' => $domain->id])->with('success', __('emails.forwarder_deleted'));
     }
 }

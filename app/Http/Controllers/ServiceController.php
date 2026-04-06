@@ -48,10 +48,10 @@ class ServiceController extends Controller
 
             return redirect()
                 ->route('admin.services.index', ['server_id' => $server->id])
-                ->with('success', ucfirst($validated['action']) . ' ' . $validated['service'] . ' successful.');
+                ->with('success', __('servers.service_action_success', ['action' => ucfirst($validated['action']), 'service' => $validated['service']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to ' . $validated['action'] . ' ' . $validated['service'] . ': ' . $error);
+        return back()->with('error', __('servers.service_action_failed', ['action' => $validated['action'], 'service' => $validated['service'], 'error' => $error]));
     }
 }

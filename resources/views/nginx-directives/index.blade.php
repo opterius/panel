@@ -1,6 +1,6 @@
 <x-user-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">Custom Nginx Directives</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('nginx.custom_directives') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -11,7 +11,7 @@
     @endif
 
     <div class="mb-6">
-        <p class="text-sm text-gray-500">Add custom Nginx configuration per domain (headers, proxy_pass, rewrites, etc.)</p>
+        <p class="text-sm text-gray-500">{{ __('nginx.custom_directives_description') }}</p>
     </div>
 
     @foreach($domains as $domain)
@@ -21,9 +21,9 @@
                     <div class="text-sm font-semibold text-gray-800">{{ $domain->domain }}</div>
                     <div class="text-xs text-gray-500">
                         @if($domain->nginxDirective)
-                            <span class="text-green-600">Custom directives active</span>
+                            <span class="text-green-600">{{ __('nginx.directives_active') }}</span>
                         @else
-                            No custom directives
+                            {{ __('nginx.no_custom_directives') }}
                         @endif
                     </div>
                 </div>
@@ -36,7 +36,7 @@
                     <input type="hidden" name="domain_id" value="{{ $domain->id }}">
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Nginx Directives</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('nginx.directives_label') }}</label>
                         <textarea name="directives" rows="8"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="# Example: Add security headers
@@ -48,19 +48,19 @@ location /api {
     proxy_pass http://localhost:3000;
     proxy_set_header Host $host;
 }">{{ $domain->nginxDirective?->directives }}</textarea>
-                        <p class="mt-1.5 text-xs text-gray-400">These directives are included inside the server block. Use valid Nginx syntax.</p>
+                        <p class="mt-1.5 text-xs text-gray-400">{{ __('nginx.directives_syntax_hint') }}</p>
                     </div>
 
                     <div class="flex items-center space-x-3">
                         <button type="submit" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                            Save & Reload
+                            {{ __('nginx.save_and_reload') }}
                         </button>
                         @if($domain->nginxDirective)
                             <form action="{{ route('user.nginx-directives.destroy', $domain) }}" method="POST" class="inline">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-200 rounded-lg hover:bg-red-50 transition">
-                                    Remove
+                                    {{ __('common.remove') }}
                                 </button>
                             </form>
                         @endif

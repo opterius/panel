@@ -23,40 +23,40 @@
     <!-- Stats Cards -->
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-xs font-medium text-gray-400 uppercase">Domains</div>
+            <div class="text-xs font-medium text-gray-400 uppercase">{{ __('domains.domains') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">{{ $account->domains->count() }}</div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-xs font-medium text-gray-400 uppercase">Databases</div>
+            <div class="text-xs font-medium text-gray-400 uppercase">{{ __('accounts.databases') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">{{ $account->databases->count() }}</div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-xs font-medium text-gray-400 uppercase">Cron Jobs</div>
+            <div class="text-xs font-medium text-gray-400 uppercase">{{ __('accounts.cron_jobs') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">{{ $account->cronJobs->count() }}</div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-xs font-medium text-gray-400 uppercase">Disk Used</div>
+            <div class="text-xs font-medium text-gray-400 uppercase">{{ __('accounts.disk_used') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">
                 @if($stats)
-                    {{ number_format($stats['disk_usage']['total_mb'] ?? 0, 1) }} <span class="text-sm font-normal text-gray-400">MB</span>
+                    {{ number_format($stats['disk_usage']['total_mb'] ?? 0, 1) }} <span class="text-sm font-normal text-gray-400">{{ __('common.mb') }}</span>
                 @else
                     --
                 @endif
             </div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-xs font-medium text-gray-400 uppercase">Bandwidth</div>
+            <div class="text-xs font-medium text-gray-400 uppercase">{{ __('accounts.bandwidth') }}</div>
             <div class="mt-1 text-2xl font-bold text-gray-900">
                 @if($stats)
-                    {{ number_format($stats['bandwidth']['total_mb'] ?? 0, 1) }} <span class="text-sm font-normal text-gray-400">MB</span>
+                    {{ number_format($stats['bandwidth']['total_mb'] ?? 0, 1) }} <span class="text-sm font-normal text-gray-400">{{ __('common.mb') }}</span>
                 @else
                     --
                 @endif
             </div>
         </div>
         <div class="bg-white rounded-xl shadow-sm p-5">
-            <div class="text-xs font-medium text-gray-400 uppercase">Disk Quota</div>
-            <div class="mt-1 text-2xl font-bold text-gray-900">{{ $account->disk_quota > 0 ? ($account->disk_quota >= 1024 ? round($account->disk_quota / 1024, 1) . ' GB' : $account->disk_quota . ' MB') : 'Unlimited' }}</div>
+            <div class="text-xs font-medium text-gray-400 uppercase">{{ __('accounts.disk_quota') }}</div>
+            <div class="mt-1 text-2xl font-bold text-gray-900">{{ $account->disk_quota > 0 ? ($account->disk_quota >= 1024 ? round($account->disk_quota / 1024, 1) . ' GB' : $account->disk_quota . ' MB') : __('common.unlimited') }}</div>
         </div>
     </div>
 
@@ -64,7 +64,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
         <!-- Disk Breakdown -->
         <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-base font-semibold text-gray-800 mb-5">Disk Usage Breakdown</h3>
+            <h3 class="text-base font-semibold text-gray-800 mb-5">{{ __('accounts.disk_usage_breakdown') }}</h3>
 
             @if($stats)
                 @php
@@ -77,8 +77,8 @@
                 <div class="space-y-4">
                     <div>
                         <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">Home Directory</span>
-                            <span class="font-medium text-gray-800">{{ number_format($stats['disk_usage']['home_mb'] ?? 0, 1) }} MB</span>
+                            <span class="text-gray-600">{{ __('accounts.home_directory') }}</span>
+                            <span class="font-medium text-gray-800">{{ number_format($stats['disk_usage']['home_mb'] ?? 0, 1) }} {{ __('common.mb') }}</span>
                         </div>
                         <div class="w-full bg-gray-100 rounded-full h-2">
                             <div class="bg-indigo-500 h-2 rounded-full" style="width: {{ min($homePct, 100) }}%"></div>
@@ -86,8 +86,8 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">Email</span>
-                            <span class="font-medium text-gray-800">{{ number_format($stats['disk_usage']['email_mb'] ?? 0, 1) }} MB</span>
+                            <span class="text-gray-600">{{ __('common.email_label') }}</span>
+                            <span class="font-medium text-gray-800">{{ number_format($stats['disk_usage']['email_mb'] ?? 0, 1) }} {{ __('common.mb') }}</span>
                         </div>
                         <div class="w-full bg-gray-100 rounded-full h-2">
                             <div class="bg-orange-500 h-2 rounded-full" style="width: {{ min($emailPct, 100) }}%"></div>
@@ -95,8 +95,8 @@
                     </div>
                     <div>
                         <div class="flex justify-between text-sm mb-1">
-                            <span class="text-gray-600">Databases</span>
-                            <span class="font-medium text-gray-800">{{ number_format($stats['database_size_mb'] ?? 0, 1) }} MB</span>
+                            <span class="text-gray-600">{{ __('accounts.databases') }}</span>
+                            <span class="font-medium text-gray-800">{{ number_format($stats['database_size_mb'] ?? 0, 1) }} {{ __('common.mb') }}</span>
                         </div>
                         <div class="w-full bg-gray-100 rounded-full h-2">
                             <div class="bg-purple-500 h-2 rounded-full" style="width: {{ min($dbPct, 100) }}%"></div>
@@ -104,50 +104,50 @@
                     </div>
                     <div class="pt-3 border-t border-gray-100">
                         <div class="flex justify-between text-sm">
-                            <span class="text-gray-600">Files (inodes)</span>
+                            <span class="text-gray-600">{{ __('accounts.files_inodes') }}</span>
                             <span class="font-medium text-gray-800">{{ number_format($stats['inode_count'] ?? 0) }}</span>
                         </div>
                     </div>
                 </div>
             @else
-                <p class="text-sm text-gray-400">Stats unavailable. Check agent connection.</p>
+                <p class="text-sm text-gray-400">{{ __('accounts.stats_unavailable') }}</p>
             @endif
         </div>
 
         <!-- Account Details -->
         <div class="lg:col-span-2 bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-base font-semibold text-gray-800 mb-5">Account Details</h3>
+            <h3 class="text-base font-semibold text-gray-800 mb-5">{{ __('accounts.account_details') }}</h3>
 
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Username</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('accounts.username') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800 font-mono">{{ $account->username }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Server</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('accounts.server') }}</dt>
                     <dd class="mt-1 text-sm">
                         <a href="{{ route('admin.servers.show', $account->server) }}" class="text-indigo-600 hover:text-indigo-700">{{ $account->server->name }}</a>
                     </dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Home Directory</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('accounts.home_directory') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800 font-mono">{{ $account->home_directory }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Created</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('common.created_at') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800">{{ $account->created_at->format('M d, Y') }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">PHP Version</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('accounts.php_version') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800">PHP {{ $account->php_version }}</dd>
                 </div>
                 <div>
-                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">SSH Access</dt>
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('accounts.ssh_access') }}</dt>
                     <dd class="mt-1 text-sm">
                         @if($account->ssh_enabled)
-                            <span class="text-green-600 font-medium">Enabled</span>
+                            <span class="text-green-600 font-medium">{{ __('common.enabled') }}</span>
                         @else
-                            <span class="text-gray-400">Disabled</span>
+                            <span class="text-gray-400">{{ __('common.disabled') }}</span>
                         @endif
                     </dd>
                 </div>
@@ -159,7 +159,7 @@
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8" x-data="{ editing: false }">
         <div class="flex items-center justify-between">
             <div>
-                <h3 class="text-base font-semibold text-gray-800">Account Owner</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('accounts.account_owner') }}</h3>
                 <div class="mt-2 flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
                         <span class="text-sm font-bold text-indigo-600">{{ strtoupper(substr($account->user->name, 0, 2)) }}</span>
@@ -172,7 +172,7 @@
             </div>
             <button type="button" @click="editing = !editing" x-show="!editing"
                 class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
-                Edit
+                {{ __('common.edit') }}
             </button>
         </div>
 
@@ -181,27 +181,27 @@
                 @csrf
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.name') }}</label>
                         <input type="text" name="name" value="{{ $account->user->name }}"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.email') }}</label>
                         <input type="email" name="email" value="{{ $account->user->email }}"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">New Password <span class="text-gray-400 font-normal">(leave empty to keep current)</span></label>
-                    <input type="password" name="password" placeholder="Leave empty to keep current"
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('accounts.new_password') }} <span class="text-gray-400 font-normal">{{ __('accounts.leave_empty_to_keep') }}</span></label>
+                    <input type="password" name="password" placeholder="{{ __('accounts.leave_empty_placeholder') }}"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                 </div>
                 <div class="flex items-center space-x-3">
                     <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
-                        Save Changes
+                        {{ __('accounts.save_changes') }}
                     </button>
                     <button type="button" @click="editing = false" class="text-sm text-gray-500 hover:text-gray-700 transition">
-                        Cancel
+                        {{ __('common.cancel') }}
                     </button>
                 </div>
             </form>
@@ -212,15 +212,15 @@
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
         <div class="flex items-center justify-between">
             <div>
-                <h3 class="text-base font-semibold text-gray-800">Team Access</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('accounts.team_access') }}</h3>
                 <p class="text-sm text-gray-500 mt-1">
-                    {{ $account->collaborators()->count() }} collaborator{{ $account->collaborators()->count() !== 1 ? 's' : '' }}
-                    &middot; Owner: {{ $account->user->email }}
+                    {{ $account->collaborators()->count() }} {{ __('accounts.collaborator') }}{{ $account->collaborators()->count() !== 1 ? 's' : '' }}
+                    &middot; {{ __('accounts.owner_label') }} {{ $account->user->email }}
                 </p>
             </div>
             <a href="{{ route('admin.collaborators.index', $account) }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 bg-white border border-indigo-300 rounded-lg hover:bg-indigo-50 transition">
                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
-                Manage Team
+                {{ __('accounts.manage_team') }}
             </a>
         </div>
     </div>
@@ -229,16 +229,16 @@
     @if($stats && !empty($stats['bandwidth']['domains']))
         <div class="bg-white rounded-xl shadow-sm mb-8">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Bandwidth per Domain</h3>
-                <p class="text-sm text-gray-500 mt-1">Traffic from Nginx access logs.</p>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('accounts.bandwidth_per_domain') }}</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ __('accounts.traffic_from_nginx') }}</p>
             </div>
             <div class="divide-y divide-gray-100">
                 @foreach($stats['bandwidth']['domains'] as $domain => $bw)
                     <div class="flex items-center justify-between px-6 py-3">
                         <div class="text-sm font-medium text-gray-800">{{ $domain }}</div>
                         <div class="flex items-center space-x-6 text-sm text-gray-500">
-                            <span>{{ number_format($bw['request_count'] ?? 0) }} requests</span>
-                            <span class="font-medium text-gray-800">{{ number_format($bw['bytes_mb'] ?? 0, 1) }} MB</span>
+                            <span>{{ number_format($bw['request_count'] ?? 0) }} {{ __('accounts.requests') }}</span>
+                            <span class="font-medium text-gray-800">{{ number_format($bw['bytes_mb'] ?? 0, 1) }} {{ __('common.mb') }}</span>
                         </div>
                     </div>
                 @endforeach
@@ -249,12 +249,12 @@
     <!-- Domains Table -->
     <div class="bg-white rounded-xl shadow-sm mb-8">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Domains</h3>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('accounts.all_domains') }}</h3>
         </div>
 
         @if($account->domains->isEmpty())
             <div class="px-6 py-10 text-center text-sm text-gray-400">
-                No domains added to this account yet.
+                {{ __('accounts.no_domains_added') }}
             </div>
         @else
             <div class="divide-y divide-gray-100">
@@ -281,12 +281,12 @@
     <!-- Databases Table -->
     <div class="bg-white rounded-xl shadow-sm mb-8">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Databases</h3>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('accounts.databases') }}</h3>
         </div>
 
         @if($account->databases->isEmpty())
             <div class="px-6 py-10 text-center text-sm text-gray-400">
-                No databases created for this account yet.
+                {{ __('accounts.no_databases_created') }}
             </div>
         @else
             <div class="divide-y divide-gray-100">
@@ -314,41 +314,41 @@
             <div>
                 <h3 class="text-base font-semibold @if($account->suspended) text-amber-600 @else text-gray-800 @endif">
                     @if($account->suspended)
-                        Account Suspended
+                        {{ __('accounts.account_suspended_heading') }}
                         @if($account->suspended_at) <span class="text-sm font-normal text-gray-400">since {{ $account->suspended_at->diffForHumans() }}</span> @endif
                     @else
-                        Suspend Account
+                        {{ __('accounts.suspend_account') }}
                     @endif
                 </h3>
                 <p class="text-sm text-gray-500 mt-1">
                     @if($account->suspended)
-                        All domains show a suspended page. Email and SSH are disabled.
+                        {{ __('accounts.all_domains_show_suspended_page') }}
                     @else
-                        Suspend this account for non-payment or abuse. All domains will show a suspended page.
+                        {{ __('accounts.suspend_description') }}
                     @endif
                 </p>
             </div>
             @if($account->suspended)
                 <x-delete-modal
                     :action="route('admin.accounts.suspend', $account)"
-                    title="Unsuspend Account"
-                    message="This will restore all domains, email, and SSH access for {{ $account->username }}."
+                    title="{{ __('accounts.unsuspend_account') }}"
+                    message="{{ __('accounts.restore_domains_email_ssh', ['username' => $account->username]) }}"
                     :confirm-password="true">
                     <x-slot name="trigger">
                         <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition">
-                            Unsuspend
+                            {{ __('accounts.unsuspend') }}
                         </button>
                     </x-slot>
                 </x-delete-modal>
             @else
                 <x-delete-modal
                     :action="route('admin.accounts.suspend', $account)"
-                    title="Suspend Account"
-                    message="This will take all domains offline, disable email and SSH for {{ $account->username }}. Suspended sites will show a 'Account Suspended' page."
+                    title="{{ __('accounts.suspend_account') }}"
+                    message="{{ __('accounts.takes_all_domains_offline', ['username' => $account->username]) }}"
                     :confirm-password="true">
                     <x-slot name="trigger">
                         <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-amber-600 bg-white border border-amber-300 rounded-lg hover:bg-amber-50 transition">
-                            Suspend
+                            {{ __('accounts.suspend') }}
                         </button>
                     </x-slot>
                 </x-delete-modal>
@@ -358,8 +358,8 @@
 
     <!-- Danger Zone -->
     <div class="bg-white rounded-xl shadow-sm p-6 border border-red-100">
-        <h3 class="text-base font-semibold text-red-600 mb-2">Danger Zone</h3>
-        <p class="text-sm text-gray-500 mb-4">Deleting this account will remove all associated domains, databases, and cron jobs.</p>
+        <h3 class="text-base font-semibold text-red-600 mb-2">{{ __('common.danger_zone') }}</h3>
+        <p class="text-sm text-gray-500 mb-4">{{ __('accounts.deleting_removes_domains_databases') }}</p>
 
         @if($errors->has('password'))
             <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
@@ -369,12 +369,12 @@
 
         <x-delete-modal
             :action="route('admin.accounts.destroy', $account)"
-            title="Delete Account"
-            message="This will permanently delete the account '{{ $account->username }}' and all associated domains, databases, and cron jobs."
+            title="{{ __('accounts.delete_account') }}"
+            message="{{ __('accounts.permanently_delete_account', ['username' => $account->username]) }}"
             :confirm-password="true">
             <x-slot name="trigger">
                 <button type="button" class="inline-flex items-center px-4 py-2.5 bg-white text-red-600 text-sm font-medium border border-red-300 rounded-lg hover:bg-red-50 transition">
-                    Delete Account
+                    {{ __('accounts.delete_account') }}
                 </button>
             </x-slot>
         </x-delete-modal>

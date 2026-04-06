@@ -50,7 +50,7 @@ class SshController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'ssh')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ssh.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/ssh/generate-key', [
@@ -72,7 +72,7 @@ class SshController extends Controller
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to generate key: ' . $error);
+        return back()->with('error', __('ssh.failed_to_generate_key', ['error' => $error]));
     }
 
     public function importKey(Request $request)
@@ -86,7 +86,7 @@ class SshController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'ssh')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ssh.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/ssh/import-key', [
@@ -101,11 +101,11 @@ class SshController extends Controller
 
             return redirect()
                 ->route('user.ssh.index', ['account_id' => $account->id])
-                ->with('success', 'SSH key imported successfully.');
+                ->with('success', __('ssh.key_imported'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to import key: ' . $error)->withInput();
+        return back()->with('error', __('ssh.failed_to_import_key', ['error' => $error]))->withInput();
     }
 
     public function deleteKey(Request $request)
@@ -118,7 +118,7 @@ class SshController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'ssh')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ssh.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/ssh/delete-key', [
@@ -132,11 +132,11 @@ class SshController extends Controller
 
             return redirect()
                 ->route('user.ssh.index', ['account_id' => $account->id])
-                ->with('success', 'SSH key removed.');
+                ->with('success', __('ssh.key_removed'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to delete key: ' . $error);
+        return back()->with('error', __('ssh.failed_to_delete_key', ['error' => $error]));
     }
 
     public function toggleShell(Request $request)
@@ -149,7 +149,7 @@ class SshController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'ssh')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ssh.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/ssh/toggle-shell', [
@@ -164,12 +164,13 @@ class SshController extends Controller
             ActivityLogger::log('ssh.shell_toggled', 'account', $account->id, $account->username,
                 "SSH shell {$state} for {$account->username}", ['enabled' => (bool) $validated['enabled'], 'server_id' => $account->server_id]);
 
+            $successKey = $validated['enabled'] ? 'ssh.ssh_access_enabled' : 'ssh.ssh_access_disabled';
             return redirect()
                 ->route('user.ssh.index', ['account_id' => $account->id])
-                ->with('success', "SSH access $state for {$account->username}.");
+                ->with('success', __($successKey, ['username' => $account->username]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to toggle SSH: ' . $error);
+        return back()->with('error', __('ssh.failed_to_toggle_ssh', ['error' => $error]));
     }
 }

@@ -62,7 +62,7 @@ class FileManagerController extends Controller
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to read file: ' . $error);
+        return back()->with('error', __('servers.file_read_failed', ['error' => $error]));
     }
 
     public function read(Request $request)
@@ -98,7 +98,7 @@ class FileManagerController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('servers.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/files/write', [
@@ -108,11 +108,11 @@ class FileManagerController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return back()->with('success', 'File saved.');
+            return back()->with('success', __('servers.file_saved'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to save: ' . $error);
+        return back()->with('error', __('servers.file_save_failed', ['error' => $error]));
     }
 
     public function upload(Request $request)
@@ -126,7 +126,7 @@ class FileManagerController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('servers.no_permission'));
         }
 
         $file = $request->file('file');
@@ -146,7 +146,7 @@ class FileManagerController extends Controller
             ]);
 
         if ($response->successful()) {
-            return back()->with('success', 'File uploaded: ' . $file->getClientOriginalName());
+            return back()->with('success', __('servers.file_uploaded', ['filename' => $file->getClientOriginalName()]));
         }
 
         $error = $response->json('error', 'Upload failed');
@@ -163,7 +163,7 @@ class FileManagerController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('servers.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/files/delete', [
@@ -172,11 +172,11 @@ class FileManagerController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return back()->with('success', 'Deleted successfully.');
+            return back()->with('success', __('servers.file_deleted'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to delete: ' . $error);
+        return back()->with('error', __('servers.file_delete_failed', ['error' => $error]));
     }
 
     public function rename(Request $request)
@@ -190,7 +190,7 @@ class FileManagerController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('servers.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/files/rename', [
@@ -200,11 +200,11 @@ class FileManagerController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return back()->with('success', 'Renamed successfully.');
+            return back()->with('success', __('servers.file_renamed'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to rename: ' . $error);
+        return back()->with('error', __('servers.file_rename_failed', ['error' => $error]));
     }
 
     public function mkdir(Request $request)
@@ -217,7 +217,7 @@ class FileManagerController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('servers.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/files/mkdir', [
@@ -226,11 +226,11 @@ class FileManagerController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return back()->with('success', 'Folder created.');
+            return back()->with('success', __('servers.folder_created'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to create folder: ' . $error);
+        return back()->with('error', __('servers.folder_create_failed', ['error' => $error]));
     }
 
     public function chmod(Request $request)
@@ -244,7 +244,7 @@ class FileManagerController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('servers.no_permission'));
         }
 
         $response = AgentService::for($account->server)->post('/files/chmod', [
@@ -254,11 +254,11 @@ class FileManagerController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return back()->with('success', 'Permissions updated.');
+            return back()->with('success', __('servers.permissions_updated'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to change permissions: ' . $error);
+        return back()->with('error', __('servers.permissions_update_failed', ['error' => $error]));
     }
 
     public function archive(Request $request)
@@ -277,10 +277,10 @@ class FileManagerController extends Controller
 
         if ($response && $response->successful()) {
             $action = $response->json('action', 'done');
-            return back()->with('success', ucfirst($action) . ' successfully.');
+            return back()->with('success', __('servers.archive_success', ['action' => ucfirst($action)]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Archive operation failed: ' . $error);
+        return back()->with('error', __('servers.archive_failed', ['error' => $error]));
     }
 }

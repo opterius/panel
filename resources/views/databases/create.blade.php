@@ -4,7 +4,7 @@
             <a href="{{ route('user.databases.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">Create Database</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('databases.create_database') }}</h2>
         </div>
     </x-slot>
 
@@ -12,17 +12,17 @@
         <div class="max-w-2xl">
             <div class="bg-white rounded-xl shadow-sm p-6 text-center py-16">
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                <h3 class="mt-4 text-base font-medium text-gray-700">No accounts available</h3>
+                <h3 class="mt-4 text-base font-medium text-gray-700">{{ __('databases.no_accounts_available') }}</h3>
                 <p class="mt-2 text-sm text-gray-500">
                     @if(auth()->user()->isAdmin() || auth()->user()->isReseller())
-                        You need to create an account before adding a database.
+                        {{ __('databases.need_account_admin') }}
                     @else
-                        Contact your hosting provider to set up an account for you.
+                        {{ __('databases.contact_hosting_provider') }}
                     @endif
                 </p>
                 @if(auth()->user()->isAdmin() || auth()->user()->isReseller())
                     <a href="{{ route('admin.accounts.create') }}" class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                        Create Account
+                        {{ __('accounts.create_account') }}
                     </a>
                 @endif
             </div>
@@ -46,13 +46,13 @@
                                 <span class="text-sm font-bold text-indigo-600">1</span>
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold text-gray-800">Account</h3>
-                                <p class="text-sm text-gray-500">Select the hosting account for this database.</p>
+                                <h3 class="text-base font-semibold text-gray-800">{{ __('databases.account') }}</h3>
+                                <p class="text-sm text-gray-500">{{ __('databases.select_hosting_account') }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="px-6 py-5">
-                        <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">Account</label>
+                        <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.account') }}</label>
                         <select name="account_id" id="account_id"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @foreach($accounts as $account)
@@ -75,17 +75,17 @@
                                 <span class="text-sm font-bold text-indigo-600">2</span>
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold text-gray-800">Database Details</h3>
-                                <p class="text-sm text-gray-500">Name for the new MySQL database.</p>
+                                <h3 class="text-base font-semibold text-gray-800">{{ __('databases.database_details') }}</h3>
+                                <p class="text-sm text-gray-500">{{ __('databases.name_for_new_mysql') }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="px-6 py-5">
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">Database Name</label>
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.database_name') }}</label>
                         <input type="text" name="name" id="name" x-model="dbName"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="e.g. myapp_production">
-                        <p class="mt-1.5 text-xs text-gray-400">Alphanumeric characters and underscores only.</p>
+                        <p class="mt-1.5 text-xs text-gray-400">{{ __('databases.alphanumeric_underscores') }}</p>
                         @error('name')
                             <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -100,14 +100,14 @@
                                 <span class="text-sm font-bold text-indigo-600">3</span>
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold text-gray-800">Database User</h3>
-                                <p class="text-sm text-gray-500">A user will be created and granted full access to this database.</p>
+                                <h3 class="text-base font-semibold text-gray-800">{{ __('databases.db_user') }}</h3>
+                                <p class="text-sm text-gray-500">{{ __('databases.user_granted_full_access') }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="px-6 py-5 space-y-5">
                         <div>
-                            <label for="db_username" class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                            <label for="db_username" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.db_username') }}</label>
                             <input type="text" name="db_username" id="db_username" x-model="dbUser"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 placeholder="e.g. myapp_user">
@@ -116,7 +116,7 @@
                             @enderror
                         </div>
                         <div>
-                            <label for="db_password" class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                            <label for="db_password" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.db_password') }}</label>
                             <input type="password" name="db_password" id="db_password"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 placeholder="Minimum 8 characters">
@@ -128,28 +128,28 @@
                             <label class="flex items-center space-x-3">
                                 <input type="checkbox" name="remote" value="1" x-model="remote"
                                     class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500">
-                                <span class="text-sm text-gray-700">Allow remote connections</span>
+                                <span class="text-sm text-gray-700">{{ __('databases.allow_remote_connections') }}</span>
                             </label>
-                            <p class="mt-1 text-xs text-gray-400 ml-7">If enabled, the user can connect from any IP address.</p>
+                            <p class="mt-1 text-xs text-gray-400 ml-7">{{ __('databases.remote_from_any_ip') }}</p>
                         </div>
                     </div>
                 </div>
 
                 {{-- Summary --}}
                 <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5">
-                    <h4 class="text-sm font-semibold text-indigo-800 mb-3">Summary</h4>
+                    <h4 class="text-sm font-semibold text-indigo-800 mb-3">{{ __('databases.summary') }}</h4>
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm text-indigo-700">
                         <div>
-                            <span class="text-indigo-400 block text-xs mb-0.5">Database</span>
+                            <span class="text-indigo-400 block text-xs mb-0.5">{{ __('databases.database') }}</span>
                             <span class="font-medium font-mono" x-text="dbName || '—'">—</span>
                         </div>
                         <div>
-                            <span class="text-indigo-400 block text-xs mb-0.5">User</span>
+                            <span class="text-indigo-400 block text-xs mb-0.5">{{ __('databases.db_user') }}</span>
                             <span class="font-medium font-mono" x-text="dbUser || '—'">—</span>
                         </div>
                         <div>
-                            <span class="text-indigo-400 block text-xs mb-0.5">Access</span>
-                            <span class="font-medium" x-text="remote ? 'Remote (%)' : 'Local only'">Local only</span>
+                            <span class="text-indigo-400 block text-xs mb-0.5">{{ __('databases.access') }}</span>
+                            <span class="font-medium" x-text="remote ? '{{ __('databases.remote_percent') }}' : '{{ __('databases.local_only') }}'">{{ __('databases.local_only') }}</span>
                         </div>
                     </div>
                 </div>
@@ -158,10 +158,10 @@
                 <div class="flex items-center space-x-3">
                     <button type="submit" class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                        Create Database
+                        {{ __('databases.create_database') }}
                     </button>
                     <a href="{{ route('user.databases.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                        Cancel
+                        {{ __('common.cancel') }}
                     </a>
                 </div>
 

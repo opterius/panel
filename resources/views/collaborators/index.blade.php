@@ -4,7 +4,7 @@
             <a href="{{ route('admin.accounts.show', $account) }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">Team Access — {{ $account->username }}</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('collaborators.team_access') }} — {{ $account->username }}</h2>
         </div>
     </x-slot>
 
@@ -18,7 +18,7 @@
     <!-- Account Owner -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Account Owner</h3>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('collaborators.account_owner') }}</h3>
         </div>
         <div class="flex items-center space-x-4 px-6 py-4">
             <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
@@ -28,15 +28,15 @@
                 <div class="text-sm font-semibold text-gray-800">{{ $account->user->name }}</div>
                 <div class="text-xs text-gray-500">{{ $account->user->email }}</div>
             </div>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">Owner</span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700">{{ __('collaborators.owner') }}</span>
         </div>
     </div>
 
     <!-- Add Collaborator -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Add Collaborator</h3>
-            <p class="text-sm text-gray-500 mt-1">Invite a user to access this hosting account. If the email doesn't exist, a new user will be created.</p>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('collaborators.add_collaborator') }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ __('collaborators.invite_user_to_access') }}</p>
         </div>
         <form action="{{ route('admin.collaborators.store', $account) }}" method="POST" class="px-6 py-5"
               x-data="{ existingUser: true }">
@@ -44,25 +44,25 @@
             <div class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
                     <div class="sm:col-span-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.email') }}</label>
                         <input type="email" name="email" value="{{ old('email') }}" required
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="user@email.com">
                     </div>
                     <div class="sm:col-span-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Name <span class="text-gray-400">(new users)</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.name') }} <span class="text-gray-400">({{ __('collaborators.new_users') }})</span></label>
                         <input type="text" name="name" value="{{ old('name') }}"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="John Doe">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Password <span class="text-gray-400">(new)</span></label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.password') }} <span class="text-gray-400">({{ __('collaborators.new_users') }})</span></label>
                         <input type="password" name="password"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="If new user">
                     </div>
                     <div class="sm:col-span-2">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Role</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('collaborators.role') }}</label>
                         <select name="role"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @foreach($roles as $value => $label)
@@ -72,7 +72,7 @@
                     </div>
                     <div class="sm:col-span-1 flex items-end">
                         <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                            Add
+                            {{ __('common.add') }}
                         </button>
                     </div>
                 </div>
@@ -83,21 +83,21 @@
     <!-- Role Permissions Reference -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Role Permissions</h3>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('collaborators.role_permissions') }}</h3>
         </div>
         <div class="overflow-x-auto">
             <table class="w-full text-sm">
                 <thead>
                     <tr class="bg-white border-b border-gray-200">
-                        <th class="text-left px-6 py-2.5 text-xs font-medium text-gray-500 uppercase">Role</th>
-                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">Files</th>
-                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">DBs</th>
-                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">Email</th>
+                        <th class="text-left px-6 py-2.5 text-xs font-medium text-gray-500 uppercase">{{ __('collaborators.role') }}</th>
+                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">{{ __('collaborators.files') }}</th>
+                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">{{ __('collaborators.dbs') }}</th>
+                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">{{ __('common.email') }}</th>
                         <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">SSH</th>
                         <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">Cron</th>
                         <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">SSL</th>
-                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">DNS</th>
-                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">Settings</th>
+                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">{{ __('dns.dns') }}</th>
+                        <th class="text-center px-3 py-2.5 text-xs font-medium text-gray-500 uppercase">{{ __('common.settings') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-50">
@@ -126,17 +126,17 @@
             </table>
         </div>
         <div class="px-6 py-3 border-t border-gray-100">
-            <p class="text-xs text-gray-400">Viewer role can see everything but cannot make changes.</p>
+            <p class="text-xs text-gray-400">{{ __('collaborators.viewer_description') }}</p>
         </div>
     </div>
 
     <!-- Current Collaborators -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Collaborators</h3>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('collaborators.collaborators') }}</h3>
         </div>
         @if($account->collaborators->isEmpty())
-            <div class="px-6 py-12 text-center text-sm text-gray-400">No collaborators added yet. Only the account owner has access.</div>
+            <div class="px-6 py-12 text-center text-sm text-gray-400">{{ __('collaborators.no_collaborators_added') }}</div>
         @else
             <div class="divide-y divide-gray-100">
                 @foreach($account->collaborators as $collab)
@@ -161,7 +161,7 @@
                                 </select>
                             </form>
                             <form action="{{ route('admin.collaborators.destroy', [$account, $collab]) }}" method="POST"
-                                  onsubmit="return confirm('Remove {{ $collab->email }} from this account?')">
+                                  onsubmit="return confirm('{{ __('collaborators.remove_collaborator_confirm', ['email' => $collab->email]) }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-gray-400 hover:text-red-600 transition">

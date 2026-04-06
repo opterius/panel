@@ -33,7 +33,7 @@ class NginxDirectiveController extends Controller
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {
-            return back()->with('error', 'You do not have permission to manage Nginx directives.');
+            return back()->with('error', __('nginx.no_permission'));
         }
 
         $directive = NginxDirective::updateOrCreate(
@@ -47,7 +47,7 @@ class NginxDirectiveController extends Controller
         ActivityLogger::log('nginx.updated', 'domain', $domain->id, $domain->domain,
             "Updated custom Nginx directives for {$domain->domain}");
 
-        return back()->with('success', 'Nginx directives updated. Config reloaded.');
+        return back()->with('success', __('nginx.directives_updated'));
     }
 
     public function destroy(Domain $domain)
@@ -55,13 +55,13 @@ class NginxDirectiveController extends Controller
         $domain->load('account.server');
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {
-            return back()->with('error', 'Permission denied.');
+            return back()->with('error', __('nginx.permission_denied'));
         }
 
         NginxDirective::where('domain_id', $domain->id)->delete();
         $this->syncDirectives($domain);
 
-        return back()->with('success', 'Custom directives removed.');
+        return back()->with('success', __('nginx.directives_removed'));
     }
 
     private function syncDirectives(Domain $domain): void

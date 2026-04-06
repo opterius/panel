@@ -36,18 +36,18 @@ class UpdateController extends Controller
     {
         $server = Server::first();
         if (!$server) {
-            return back()->with('error', 'No server configured.');
+            return back()->with('error', __('servers.no_server_configured'));
         }
 
         $response = AgentService::for($server)->post('/update/run', []);
 
         if ($response && $response->successful()) {
             $output = $response->json('output', '');
-            return redirect()->route('admin.updates.index')->with('success', 'Update completed successfully.');
+            return redirect()->route('admin.updates.index')->with('success', __('servers.update_completed'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
         $output = $response ? $response->json('output', '') : '';
-        return back()->with('error', 'Update failed: ' . $error)->with('output', $output);
+        return back()->with('error', __('servers.update_failed', ['error' => $error]))->with('output', $output);
     }
 }

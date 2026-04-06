@@ -53,19 +53,19 @@ class UserPhpController extends Controller
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {
-            return back()->with('error', 'You do not have permission to change PHP version.');
+            return back()->with('error', __('php.no_permission'));
         }
 
         // Check if package allows PHP switching
         if ($domain->account->package && !$domain->account->package->php_switch_enabled) {
-            return back()->with('error', 'PHP version switching is not enabled for your package.');
+            return back()->with('error', __('php.php_switch_not_enabled'));
         }
 
         // Check version is allowed by package
         if ($domain->account->package) {
             $allowedVersions = $domain->account->package->php_versions ?? [];
             if (!empty($allowedVersions) && !in_array($validated['new_version'], $allowedVersions)) {
-                return back()->with('error', 'PHP ' . $validated['new_version'] . ' is not available in your package.');
+                return back()->with('error', __('php.php_version_not_in_package', ['version' => $validated['new_version']]));
             }
         }
 
@@ -85,10 +85,10 @@ class UserPhpController extends Controller
                 "Switched PHP {$oldVersion} → {$validated['new_version']} for {$domain->domain}");
 
             return redirect()->route('user.php.index')
-                ->with('success', $domain->domain . ' switched from PHP ' . $oldVersion . ' to PHP ' . $validated['new_version']);
+                ->with('success', __('php.php_switched', ['domain' => $domain->domain, 'old_version' => $oldVersion, 'new_version' => $validated['new_version']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'PHP switch failed: ' . $error);
+        return back()->with('error', __('php.failed_to_switch_php', ['error' => $error]));
     }
 }

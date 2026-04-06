@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">IP Address Management</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('ip_addresses.ip_addresses') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -15,14 +15,14 @@
         <div class="px-6 py-5">
             <form method="GET" class="flex items-end gap-4">
                 <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Server</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('servers.server') }}</label>
                     <select name="server_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         @foreach($servers as $server)
                             <option value="{{ $server->id }}" @selected($selectedServer && $selectedServer->id === $server->id)>{{ $server->name }} ({{ $server->ip_address }})</option>
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">Manage</button>
+                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">{{ __('ip_addresses.manage') }}</button>
             </form>
         </div>
     </div>
@@ -31,28 +31,28 @@
         <!-- Add IP -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-4 border-b border-gray-100">
-                <h3 class="text-sm font-semibold text-gray-800">Add IP Address</h3>
+                <h3 class="text-sm font-semibold text-gray-800">{{ __('ip_addresses.add_ip_address') }}</h3>
             </div>
             <div class="px-6 py-4">
                 <form action="{{ route('admin.ip-addresses.store') }}" method="POST" class="flex items-end gap-3">
                     @csrf
                     <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
                     <div class="w-48">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">IP Address</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('ip_addresses.ip_address') }}</label>
                         <input type="text" name="ip_address" class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500" placeholder="192.168.1.100">
                     </div>
                     <div class="w-36">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('ip_addresses.ip_type') }}</label>
                         <select name="type" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="shared">Shared</option>
-                            <option value="dedicated">Dedicated</option>
+                            <option value="shared">{{ __('common.shared') }}</option>
+                            <option value="dedicated">{{ __('common.dedicated') }}</option>
                         </select>
                     </div>
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Note</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('common.note') }}</label>
                         <input type="text" name="note" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Optional">
                     </div>
-                    <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">Add</button>
+                    <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">{{ __('common.add') }}</button>
                 </form>
             </div>
         </div>
@@ -60,17 +60,17 @@
         <!-- IP List -->
         @if($ipAddresses->isEmpty())
             <div class="bg-white rounded-xl shadow-sm px-6 py-12 text-center">
-                <p class="text-sm text-gray-500">No IP addresses registered for this server. Add the server's primary IP and any additional IPs above.</p>
+                <p class="text-sm text-gray-500">{{ __('ip_addresses.no_ip_addresses') }}</p>
             </div>
         @else
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <table class="w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">IP Address</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Assigned To</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Note</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('ip_addresses.ip_address') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('ip_addresses.ip_type') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('ip_addresses.assigned_to') }}</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('common.note') }}</th>
                             <th class="px-6 py-3 w-24"></th>
                         </tr>
                     </thead>
@@ -90,19 +90,19 @@
                                             @csrf
                                             @method('PUT')
                                             <select name="account_id" class="rounded-lg border-gray-300 shadow-sm text-xs focus:border-indigo-500 focus:ring-indigo-500" onchange="this.form.submit()">
-                                                <option value="">— Unassigned —</option>
+                                                <option value="">{{ __('ip_addresses.unassigned') }}</option>
                                                 @foreach(\App\Models\Account::where('server_id', $selectedServer->id)->get() as $account)
                                                     <option value="{{ $account->id }}" @selected($ip->account_id === $account->id)>{{ $account->username }}</option>
                                                 @endforeach
                                             </select>
                                         </form>
                                     @else
-                                        <span class="text-xs text-gray-400">All accounts</span>
+                                        <span class="text-xs text-gray-400">{{ __('ip_addresses.all_accounts') }}</span>
                                     @endif
                                 </td>
                                 <td class="px-6 py-4 text-sm text-gray-500">{{ $ip->note ?? '—' }}</td>
                                 <td class="px-6 py-4 text-right">
-                                    <form action="{{ route('admin.ip-addresses.destroy', $ip) }}" method="POST" class="inline" onsubmit="return confirm('Remove this IP?')">
+                                    <form action="{{ route('admin.ip-addresses.destroy', $ip) }}" method="POST" class="inline" onsubmit="return confirm('{{ __('ip_addresses.remove_ip_confirm') }}')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-gray-400 hover:text-red-600 transition">

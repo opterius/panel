@@ -55,7 +55,7 @@ class AlertController extends Controller
 
         return redirect()
             ->route('admin.alerts.index', ['server_id' => $validated['server_id']])
-            ->with('success', 'Alert rule created.');
+            ->with('success', __('servers.alert_rule_created'));
     }
 
     public function toggle(AlertRule $alertRule)
@@ -64,7 +64,7 @@ class AlertController extends Controller
 
         return redirect()
             ->route('admin.alerts.index', ['server_id' => $alertRule->server_id])
-            ->with('success', 'Alert ' . ($alertRule->enabled ? 'enabled' : 'disabled') . '.');
+            ->with('success', __('servers.alert_toggled', ['state' => $alertRule->enabled ? 'enabled' : 'disabled']));
     }
 
     public function destroy(AlertRule $alertRule)
@@ -74,6 +74,6 @@ class AlertController extends Controller
 
         return redirect()
             ->route('admin.alerts.index', ['server_id' => $serverId])
-            ->with('success', 'Alert rule deleted.');
+            ->with('success', __('servers.alert_rule_deleted'));
     }
 }

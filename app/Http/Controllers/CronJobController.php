@@ -45,7 +45,7 @@ class CronJobController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'cron')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('cron.no_permission'));
         }
 
         $schedule = implode(' ', [
@@ -74,11 +74,11 @@ class CronJobController extends Controller
             ActivityLogger::log('cron.created', 'cron_job', $cronJob->id, $cronJob->command,
                 "Created cron job: {$schedule} {$validated['command']}", ['server_id' => $account->server_id, 'account_id' => $account->id]);
 
-            return redirect()->route('user.cronjobs.index')->with('success', 'Cron job created successfully.');
+            return redirect()->route('user.cronjobs.index')->with('success', __('cron.cron_job_created'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to create cron job: ' . $error)->withInput();
+        return back()->with('error', __('cron.failed_to_create_cron', ['error' => $error]))->withInput();
     }
 
     public function toggle(CronJob $cronJob)
@@ -86,7 +86,7 @@ class CronJobController extends Controller
         $cronJob->load('account.server');
 
         if (!$cronJob->account->userCan(auth()->user(), 'cron')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('cron.no_permission'));
         }
 
         $newState = !$cronJob->enabled;
@@ -104,23 +104,24 @@ class CronJobController extends Controller
             ActivityLogger::log('cron.toggled', 'cron_job', $cronJob->id, $cronJob->command,
                 "Cron job {$state}: {$cronJob->command}", ['enabled' => $newState]);
 
-            return redirect()->route('user.cronjobs.index')->with('success', "Cron job $state.");
+            $successKey = $newState ? 'cron.cron_job_enabled' : 'cron.cron_job_disabled';
+            return redirect()->route('user.cronjobs.index')->with('success', __($successKey));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to toggle cron job: ' . $error);
+        return back()->with('error', __('cron.failed_to_toggle_cron', ['error' => $error]));
     }
 
     public function destroy(Request $request, CronJob $cronJob)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         $cronJob->load('account.server');
 
         if (!$cronJob->account->userCan(auth()->user(), 'cron')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('cron.no_permission'));
         }
 
         ActivityLogger::log('cron.deleted', 'cron_job', $cronJob->id, $cronJob->command,
@@ -133,6 +134,6 @@ class CronJobController extends Controller
 
         $cronJob->delete();
 
-        return redirect()->route('user.cronjobs.index')->with('success', 'Cron job deleted.');
+        return redirect()->route('user.cronjobs.index')->with('success', __('cron.cron_job_deleted'));
     }
 }

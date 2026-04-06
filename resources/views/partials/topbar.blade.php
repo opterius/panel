@@ -13,7 +13,7 @@
                 @csrf
                 <button type="submit" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-amber-700 bg-amber-100 border border-amber-300 rounded-lg hover:bg-amber-200 transition">
                     <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17l-5-5m0 0l5-5m-5 5h12" /></svg>
-                    Return to Admin
+                    {{ __('common.return_to_admin') }}
                 </button>
             </form>
         @endif

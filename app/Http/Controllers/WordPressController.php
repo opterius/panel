@@ -77,7 +77,7 @@ class WordPressController extends Controller
 
         if (!$response || !$response->successful()) {
             $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-            return back()->with('error', 'Failed to create database: ' . $error)->withInput();
+            return back()->with('error', __('servers.failed_to_create_db', ['error' => $error]))->withInput();
         }
 
         // 2. Create database user
@@ -91,7 +91,7 @@ class WordPressController extends Controller
         if (!$response || !$response->successful()) {
             AgentService::for($domain->account->server)->post('/databases/delete', ['name' => $dbName]);
             $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-            return back()->with('error', 'Failed to create database user: ' . $error)->withInput();
+            return back()->with('error', __('servers.failed_to_create_db_user', ['error' => $error]))->withInput();
         }
 
         // 3. Install WordPress
@@ -113,12 +113,12 @@ class WordPressController extends Controller
         if ($response && $response->successful()) {
             $data = $response->json();
             return redirect()->route('user.wordpress.index')->with('success',
-                'WordPress ' . ($data['version'] ?? '') . ' installed on ' . $domain->domain . '. Admin: ' . ($data['admin_url'] ?? '')
+                __('servers.wordpress_installed', ['version' => $data['version'] ?? '', 'domain' => $domain->domain, 'admin_url' => $data['admin_url'] ?? ''])
             );
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'WordPress installation failed: ' . $error)->withInput();
+        return back()->with('error', __('servers.wordpress_install_failed', ['error' => $error]))->withInput();
     }
 
     public function update(Request $request)
@@ -138,10 +138,10 @@ class WordPressController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return redirect()->route('user.wordpress.index')->with('success', 'WordPress updated on ' . $domain->domain);
+            return redirect()->route('user.wordpress.index')->with('success', __('servers.wordpress_updated', ['domain' => $domain->domain]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Update failed: ' . $error);
+        return back()->with('error', __('servers.wordpress_update_failed', ['error' => $error]));
     }
 }

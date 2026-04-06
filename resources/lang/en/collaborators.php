@@ -1,0 +1,32 @@
+<?php
+
+return [
+    'collaborators'                 => 'Collaborators',
+    'team_access'                   => 'Team Access',
+    'account_owner'                 => 'Account Owner',
+    'add_collaborator'              => 'Add Collaborator',
+    'invite_user_to_access'         => "Invite a user to access this hosting account. If the email doesn't exist, a new user will be created.",
+    'role'                          => 'Role',
+    'role_permissions'              => 'Role Permissions',
+    'new_users'                     => 'New users',
+    'owner'                         => 'Owner',
+    'remove_collaborator_confirm'   => 'Remove :email from this account?',
+    'admin_role'                    => 'Admin',
+    'developer'                     => 'Developer',
+    'designer'                      => 'Designer',
+    'email_manager'                 => 'Email Manager',
+    'viewer'                        => 'Viewer',
+    'viewer_description'            => 'Viewer role can see everything but cannot make changes.',
+    'no_collaborators_added'        => 'No collaborators added yet. Only the account owner has access.',
+    'files'                         => 'Files',
+    'dbs'                           => 'DBs',
+    // Flash messages
+    'collaborator_added'            => 'Collaborator added.',
+    'collaborator_removed'          => 'Collaborator removed.',
+    'failed_to_add_collaborator'    => 'Failed to add collaborator: :error',
+    'user_not_found_provide_password' => 'User not found. Provide a name and password to create a new user.',
+    'already_a_collaborator'        => ':email is already a collaborator on this account.',
+    'collaborator_added_as_role'    => ':email added as :role.',
+    'role_updated_for'              => 'Role updated for :email.',
+    'collaborator_removed_from'     => ':email removed from this account.',
+];

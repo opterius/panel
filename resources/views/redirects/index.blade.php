@@ -1,6 +1,6 @@
 <x-user-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">URL Redirects</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('redirects.redirects') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -11,7 +11,7 @@
     @endif
 
     <div class="mb-6">
-        <p class="text-sm text-gray-500">Redirect URLs to different destinations. Useful for moved pages or shortened links.</p>
+        <p class="text-sm text-gray-500">{{ __('redirects.manage_url_redirects') }}</p>
     </div>
 
     @foreach($domains as $domain)
@@ -36,7 +36,7 @@
                                 <span class="text-sm text-gray-500 truncate max-w-xs">{{ $redirect->destination_url }}</span>
                             </div>
                             <form action="{{ route('user.redirects.destroy', $redirect) }}" method="POST"
-                                  onsubmit="return confirm('Remove this redirect?')">
+                                  onsubmit="return confirm('{{ __('redirects.remove_this_redirect') }}')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="text-gray-400 hover:text-red-600 transition">
@@ -54,26 +54,26 @@
                     @csrf
                     <input type="hidden" name="domain_id" value="{{ $domain->id }}">
                     <div class="w-40">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Source Path</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('redirects.source_path') }}</label>
                         <input type="text" name="source_path"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="/old-page">
                     </div>
                     <div class="flex-1">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Destination URL</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('redirects.destination_url') }}</label>
                         <input type="text" name="destination_url"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="https://example.com/new-page">
                     </div>
                     <div class="w-24">
-                        <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+                        <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('redirects.redirect_type') }}</label>
                         <select name="type" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             <option value="301">301</option>
                             <option value="302">302</option>
                         </select>
                     </div>
                     <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                        Add
+                        {{ __('common.add') }}
                     </button>
                 </form>
             </div>

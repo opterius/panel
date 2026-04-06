@@ -4,7 +4,7 @@
             <a href="{{ route('admin.migrations.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">Migration: {{ $migration->main_domain }}</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('migrations.migration') }}: {{ $migration->main_domain }}</h2>
         </div>
     </x-slot>
 
@@ -20,7 +20,7 @@
         {{-- Progress Bar --}}
         <div class="bg-white rounded-xl shadow-sm p-6">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="text-sm font-semibold text-gray-800">Migration Progress</h3>
+                <h3 class="text-sm font-semibold text-gray-800">{{ __('migrations.migration_progress') }}</h3>
                 <span class="text-sm font-medium" :class="{ 'text-blue-600': status === 'running', 'text-green-600': status === 'completed', 'text-amber-600': status === 'partial', 'text-red-600': status === 'failed' }"
                     x-text="status.charAt(0).toUpperCase() + status.slice(1)"></span>
             </div>
@@ -36,19 +36,19 @@
 
             <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                 <div>
-                    <span class="text-xs text-gray-400 block">Domain</span>
+                    <span class="text-xs text-gray-400 block">{{ __('migrations.domain') }}</span>
                     <span class="font-medium text-gray-800">{{ $migration->main_domain }}</span>
                 </div>
                 <div>
-                    <span class="text-xs text-gray-400 block">Username</span>
+                    <span class="text-xs text-gray-400 block">{{ __('migrations.username') }}</span>
                     <span class="font-medium text-gray-800 font-mono">{{ $migration->target_username }}</span>
                 </div>
                 <div>
-                    <span class="text-xs text-gray-400 block">Server</span>
+                    <span class="text-xs text-gray-400 block">{{ __('migrations.server') }}</span>
                     <span class="font-medium text-gray-800">{{ $migration->server->name }}</span>
                 </div>
                 <div>
-                    <span class="text-xs text-gray-400 block">Started</span>
+                    <span class="text-xs text-gray-400 block">{{ __('migrations.date') }}</span>
                     <span class="font-medium text-gray-800">{{ $migration->started_at?->diffForHumans() ?? '—' }}</span>
                 </div>
             </div>
@@ -58,7 +58,7 @@
         <template x-if="result">
             <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                 <div class="px-6 py-5 border-b border-gray-100">
-                    <h3 class="text-base font-semibold text-gray-800">Results</h3>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('migrations.results') }}</h3>
                 </div>
                 <div class="divide-y divide-gray-100">
                     @php
@@ -108,12 +108,12 @@
                 @if($migration->account_id)
                     <a href="{{ route('admin.accounts.show', $migration->account_id) }}"
                        class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                        View Account
+                        {{ __('migrations.view_account') }}
                     </a>
                 @endif
                 <a href="{{ route('admin.migrations.index') }}"
                    class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                    Back to Migrations
+                    {{ __('migrations.back_to_migrations') }}
                 </a>
             </div>
         </template>

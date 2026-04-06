@@ -44,7 +44,7 @@ class DatabaseController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'databases')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('databases.no_permission'));
         }
 
         $host = $request->boolean('remote') ? '%' : 'localhost';
@@ -55,7 +55,7 @@ class DatabaseController extends Controller
 
         if (!$response || !$response->successful()) {
             $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-            return back()->with('error', 'Failed to create database: ' . $error)->withInput();
+            return back()->with('error', __('databases.failed_to_create_database', ['error' => $error]))->withInput();
         }
 
         $response = AgentService::for($account->server)->post('/databases/user-create', [
@@ -70,7 +70,7 @@ class DatabaseController extends Controller
                 'name' => $validated['name'],
             ]);
             $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-            return back()->with('error', 'Failed to create database user: ' . $error)->withInput();
+            return back()->with('error', __('databases.failed_to_create_user', ['error' => $error]))->withInput();
         }
 
         $database = Database::create([
@@ -84,7 +84,7 @@ class DatabaseController extends Controller
         ActivityLogger::log('database.created', 'database', $database->id, $database->name,
             "Created database {$database->name}", ['server_id' => $account->server_id, 'account_id' => $account->id]);
 
-        return redirect()->route('user.databases.show', $database)->with('success', 'Database ' . $database->name . ' created successfully.');
+        return redirect()->route('user.databases.show', $database)->with('success', __('databases.database_created', ['name' => $database->name]));
     }
 
     public function show(Database $database)
@@ -112,7 +112,7 @@ class DatabaseController extends Controller
         $database->load('account.server');
 
         if (!$database->account->userCan(auth()->user(), 'databases')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('databases.no_permission'));
         }
 
         $response = AgentService::for($database->account->server)->post('/databases/user-password', [
@@ -125,11 +125,11 @@ class DatabaseController extends Controller
             ActivityLogger::log('database.password_changed', 'database', $database->id, $database->name,
                 "Changed password for database user {$database->db_username}", ['db_username' => $database->db_username]);
 
-            return redirect()->route('user.databases.show', $database)->with('success', 'Password changed for ' . $database->db_username);
+            return redirect()->route('user.databases.show', $database)->with('success', __('databases.password_changed', ['username' => $database->db_username]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to change password: ' . $error);
+        return back()->with('error', __('databases.failed_to_change_password', ['error' => $error]));
     }
 
     public function repair(Request $request, Database $database)
@@ -143,23 +143,23 @@ class DatabaseController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return redirect()->route('user.databases.show', $database)->with('success', 'Database ' . $action . ' completed.');
+            return redirect()->route('user.databases.show', $database)->with('success', __('databases.repair_completed', ['action' => $action]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', ucfirst($action) . ' failed: ' . $error);
+        return back()->with('error', __('databases.action_failed', ['action' => ucfirst($action), 'error' => $error]));
     }
 
     public function destroy(Request $request, Database $database)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         $database->load('account.server');
 
         if (!$database->account->userCan(auth()->user(), 'databases')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('databases.no_permission'));
         }
 
         ActivityLogger::log('database.deleted', 'database', $database->id, $database->name,
@@ -182,6 +182,6 @@ class DatabaseController extends Controller
 
         $database->delete();
 
-        return redirect()->route('user.databases.index')->with('success', 'Database ' . $database->name . ' deleted.');
+        return redirect()->route('user.databases.index')->with('success', __('databases.database_deleted', ['name' => $database->name]));
     }
 }

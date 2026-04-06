@@ -4,7 +4,7 @@
             <a href="{{ route('user.cronjobs.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">Add Cron Job</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('cron.add_cron_job') }}</h2>
         </div>
     </x-slot>
 
@@ -18,8 +18,8 @@
         <div class="max-w-2xl">
             <div class="bg-white rounded-xl shadow-sm p-6 text-center py-16">
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                <h3 class="mt-4 text-base font-medium text-gray-700">No accounts available</h3>
-                <p class="mt-2 text-sm text-gray-500">You need to create an account before adding a cron job.</p>
+                <h3 class="mt-4 text-base font-medium text-gray-700">{{ __('cron.no_accounts_available') }}</h3>
+                <p class="mt-2 text-sm text-gray-500">{{ __('cron.no_accounts_hint') }}</p>
             </div>
         </div>
     @else
@@ -58,8 +58,8 @@
                                 <span class="text-sm font-bold text-indigo-600">1</span>
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold text-gray-800">Account</h3>
-                                <p class="text-sm text-gray-500">The cron job runs as this system user.</p>
+                                <h3 class="text-base font-semibold text-gray-800">{{ __('cron.account') }}</h3>
+                                <p class="text-sm text-gray-500">{{ __('cron.account_hint') }}</p>
                             </div>
                         </div>
                     </div>
@@ -86,25 +86,25 @@
                                 <span class="text-sm font-bold text-indigo-600">2</span>
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold text-gray-800">Schedule</h3>
-                                <p class="text-sm text-gray-500">How often should this job run?</p>
+                                <h3 class="text-base font-semibold text-gray-800">{{ __('cron.schedule') }}</h3>
+                                <p class="text-sm text-gray-500">{{ __('cron.schedule_hint') }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="px-6 py-5 space-y-5">
                         {{-- Presets --}}
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Quick presets</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('cron.quick_presets') }}</label>
                             <div class="flex flex-wrap gap-2">
                                 @foreach([
-                                    'every_minute' => 'Every minute',
-                                    'every_5min' => 'Every 5 min',
-                                    'every_15min' => 'Every 15 min',
-                                    'every_30min' => 'Every 30 min',
-                                    'hourly' => 'Hourly',
-                                    'daily' => 'Daily',
-                                    'weekly' => 'Weekly',
-                                    'monthly' => 'Monthly',
+                                    'every_minute' => __('cron.every_minute'),
+                                    'every_5min'   => __('cron.every_5min'),
+                                    'every_15min'  => __('cron.every_15min'),
+                                    'every_30min'  => __('cron.every_30min'),
+                                    'hourly'       => __('cron.hourly'),
+                                    'daily'        => __('cron.daily'),
+                                    'weekly'       => __('cron.weekly'),
+                                    'monthly'      => __('cron.monthly'),
                                 ] as $key => $label)
                                     <button type="button" @click="setPreset('{{ $key }}')"
                                         class="px-3 py-1.5 text-xs font-medium rounded-lg border transition"
@@ -117,30 +117,30 @@
 
                         {{-- Custom fields --}}
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Cron expression</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('cron.cron_expression') }}</label>
                             <div class="grid grid-cols-5 gap-3">
                                 <div>
-                                    <label class="block text-xs text-gray-500 mb-1 text-center">Minute</label>
+                                    <label class="block text-xs text-gray-500 mb-1 text-center">{{ __('cron.minute') }}</label>
                                     <input type="text" name="minute" x-model="minute" @input="preset='custom'"
                                         class="w-full text-center rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-gray-500 mb-1 text-center">Hour</label>
+                                    <label class="block text-xs text-gray-500 mb-1 text-center">{{ __('cron.hour') }}</label>
                                     <input type="text" name="hour" x-model="hour" @input="preset='custom'"
                                         class="w-full text-center rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-gray-500 mb-1 text-center">Day</label>
+                                    <label class="block text-xs text-gray-500 mb-1 text-center">{{ __('cron.day') }}</label>
                                     <input type="text" name="day" x-model="day" @input="preset='custom'"
                                         class="w-full text-center rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-gray-500 mb-1 text-center">Month</label>
+                                    <label class="block text-xs text-gray-500 mb-1 text-center">{{ __('cron.month') }}</label>
                                     <input type="text" name="month" x-model="month" @input="preset='custom'"
                                         class="w-full text-center rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs text-gray-500 mb-1 text-center">Weekday</label>
+                                    <label class="block text-xs text-gray-500 mb-1 text-center">{{ __('cron.weekday') }}</label>
                                     <input type="text" name="weekday" x-model="weekday" @input="preset='custom'"
                                         class="w-full text-center rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
@@ -158,8 +158,8 @@
                                 <span class="text-sm font-bold text-indigo-600">3</span>
                             </div>
                             <div>
-                                <h3 class="text-base font-semibold text-gray-800">Command</h3>
-                                <p class="text-sm text-gray-500">The command to execute.</p>
+                                <h3 class="text-base font-semibold text-gray-800">{{ __('cron.command') }}</h3>
+                                <p class="text-sm text-gray-500">{{ __('cron.command_hint') }}</p>
                             </div>
                         </div>
                     </div>
@@ -167,7 +167,7 @@
                         <input type="text" name="command" x-model="command"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="e.g. /usr/bin/php /home/user/domain.com/public_html/artisan schedule:run">
-                        <p class="mt-1.5 text-xs text-gray-400">Use full paths for commands and scripts.</p>
+                        <p class="mt-1.5 text-xs text-gray-400">{{ __('cron.command_full_paths_hint') }}</p>
                         @error('command')
                             <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -178,10 +178,10 @@
                 <div class="flex items-center space-x-3">
                     <button type="submit" class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                        Add Cron Job
+                        {{ __('cron.add_cron_job') }}
                     </button>
                     <a href="{{ route('user.cronjobs.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                        Cancel
+                        {{ __('common.cancel') }}
                     </a>
                 </div>
             </div>

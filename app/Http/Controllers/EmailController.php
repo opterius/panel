@@ -41,14 +41,14 @@ class EmailController extends Controller
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'email')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('emails.no_permission'));
         }
 
         $email = $validated['username'] . '@' . $domain->domain;
 
         // Check uniqueness
         if (EmailAccount::where('email', $email)->exists()) {
-            return back()->with('error', 'Email account ' . $email . ' already exists.')->withInput();
+            return back()->with('error', __('emails.email_already_exists', ['email' => $email]))->withInput();
         }
 
         $response = AgentService::for($domain->account->server)->post('/email/create', [
@@ -69,11 +69,11 @@ class EmailController extends Controller
             ActivityLogger::log('email.created', 'email', $emailAccount->id, $emailAccount->email,
                 "Created email account {$email}", ['domain_id' => $domain->id]);
 
-            return redirect()->route('user.emails.index')->with('success', 'Email account ' . $email . ' created.');
+            return redirect()->route('user.emails.index')->with('success', __('emails.email_account_created', ['email' => $email]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to create email: ' . $error)->withInput();
+        return back()->with('error', __('emails.failed_to_create_email', ['error' => $error]))->withInput();
     }
 
     public function changePassword(Request $request, EmailAccount $emailAccount)
@@ -85,7 +85,7 @@ class EmailController extends Controller
         $emailAccount->load('domain.account.server');
 
         if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('emails.no_permission'));
         }
 
         $response = AgentService::for($emailAccount->domain->account->server)->post('/email/password', [
@@ -97,11 +97,11 @@ class EmailController extends Controller
             ActivityLogger::log('email.password_changed', 'email', $emailAccount->id, $emailAccount->email,
                 "Changed password for email {$emailAccount->email}");
 
-            return redirect()->route('user.emails.index')->with('success', 'Password changed for ' . $emailAccount->email);
+            return redirect()->route('user.emails.index')->with('success', __('emails.password_changed', ['email' => $emailAccount->email]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to change password: ' . $error);
+        return back()->with('error', __('emails.failed_to_change_password', ['error' => $error]));
     }
 
     public function updateQuota(Request $request, EmailAccount $emailAccount)
@@ -112,7 +112,7 @@ class EmailController extends Controller
 
         $emailAccount->update(['quota' => $validated['quota']]);
 
-        return redirect()->route('user.emails.index')->with('success', 'Quota updated for ' . $emailAccount->email);
+        return redirect()->route('user.emails.index')->with('success', __('emails.quota_updated', ['email' => $emailAccount->email]));
     }
 
     public function updateRestrictions(Request $request, EmailAccount $emailAccount)
@@ -120,7 +120,7 @@ class EmailController extends Controller
         $emailAccount->load('domain.account');
 
         if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('emails.no_permission'));
         }
 
         $validated = $request->validate([
@@ -147,19 +147,19 @@ class EmailController extends Controller
                 'can_receive' => $request->boolean('can_receive'),
             ]);
 
-        return redirect()->route('user.emails.index')->with('success', 'Restrictions updated for ' . $emailAccount->email);
+        return redirect()->route('user.emails.index')->with('success', __('emails.restrictions_updated', ['email' => $emailAccount->email]));
     }
 
     public function destroy(Request $request, EmailAccount $emailAccount)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         $emailAccount->load('domain.account.server');
 
         if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('emails.no_permission'));
         }
 
         ActivityLogger::log('email.deleted', 'email', $emailAccount->id, $emailAccount->email,
@@ -172,6 +172,6 @@ class EmailController extends Controller
 
         $emailAccount->delete();
 
-        return redirect()->route('user.emails.index')->with('success', 'Email account ' . $emailAccount->email . ' deleted.');
+        return redirect()->route('user.emails.index')->with('success', __('emails.email_account_deleted', ['email' => $emailAccount->email]));
     }
 }

@@ -41,7 +41,7 @@ class IpAddressController extends Controller
             ->exists();
 
         if ($exists) {
-            return back()->with('error', 'IP address already registered on this server.')->withInput();
+            return back()->with('error', __('ip_addresses.ip_already_registered'))->withInput();
         }
 
         IpAddress::create($validated);
@@ -49,7 +49,7 @@ class IpAddressController extends Controller
         ActivityLogger::log('ip.created', 'server', $validated['server_id'], $validated['ip_address'],
             "Added IP {$validated['ip_address']} ({$validated['type']})");
 
-        return back()->with('success', "IP {$validated['ip_address']} added.");
+        return back()->with('success', __('ip_addresses.ip_added', ['ip' => $validated['ip_address']]));
     }
 
     public function assign(Request $request, IpAddress $ipAddress)
@@ -66,7 +66,7 @@ class IpAddressController extends Controller
 
         ActivityLogger::log('ip.assigned', 'server', $ipAddress->server_id, $ipAddress->ip_address, $label);
 
-        return back()->with('success', "IP {$ipAddress->ip_address}: {$label}.");
+        return back()->with('success', __('ip_addresses.ip_assigned', ['ip' => $ipAddress->ip_address, 'label' => $label]));
     }
 
     public function destroy(IpAddress $ipAddress)
@@ -76,6 +76,6 @@ class IpAddressController extends Controller
 
         $ipAddress->delete();
 
-        return back()->with('success', "IP {$ipAddress->ip_address} removed.");
+        return back()->with('success', __('ip_addresses.ip_removed', ['ip' => $ipAddress->ip_address]));
     }
 }

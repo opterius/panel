@@ -4,7 +4,7 @@
             <a href="{{ route('admin.migrations.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">Import cPanel Backup</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('migrations.import_cpanel_backup') }}</h2>
         </div>
     </x-slot>
 
@@ -25,8 +25,8 @@
                             <span class="text-sm font-bold text-indigo-600">1</span>
                         </div>
                         <div>
-                            <h3 class="text-base font-semibold text-gray-800">Target Server</h3>
-                            <p class="text-sm text-gray-500">Select the server where this account will be created.</p>
+                            <h3 class="text-base font-semibold text-gray-800">{{ __('migrations.target_server') }}</h3>
+                            <p class="text-sm text-gray-500">{{ __('migrations.select_server_description') }}</p>
                         </div>
                     </div>
                 </div>
@@ -50,8 +50,8 @@
                             <span class="text-sm font-bold text-indigo-600">2</span>
                         </div>
                         <div>
-                            <h3 class="text-base font-semibold text-gray-800">Backup File</h3>
-                            <p class="text-sm text-gray-500">Path to the cPanel full backup on the server.</p>
+                            <h3 class="text-base font-semibold text-gray-800">{{ __('migrations.backup_file') }}</h3>
+                            <p class="text-sm text-gray-500">{{ __('migrations.backup_path_description') }}</p>
                         </div>
                     </div>
                 </div>
@@ -59,7 +59,7 @@
                     <input type="text" name="source_path" value="{{ old('source_path') }}"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
                         placeholder="/var/backups/cpanel/backup-4.6.2025_07-45-22_username.tar.gz">
-                    <p class="mt-2 text-xs text-gray-400">Upload the cPanel backup to the server first (via SCP/SFTP), then enter the full path here.</p>
+                    <p class="mt-2 text-xs text-gray-400">{{ __('migrations.backup_path_hint') }}</p>
                     @error('source_path')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                     @enderror
@@ -71,7 +71,7 @@
                 <div class="flex items-start space-x-3">
                     <svg class="w-5 h-5 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     <div class="text-sm text-gray-600">
-                        <p class="font-medium text-gray-700 mb-1">How to get a cPanel backup:</p>
+                        <p class="font-medium text-gray-700 mb-1">{{ __('migrations.how_to_get_backup') }}</p>
                         <ol class="list-decimal list-inside space-y-1 text-xs text-gray-500">
                             <li>Log into WHM on the source server</li>
                             <li>Go to Backup &gt; Download a Full Backup / cpmove file</li>
@@ -87,10 +87,10 @@
                     class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg x-show="!loading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
                     <svg x-show="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                    <span x-text="loading ? 'Parsing backup...' : 'Parse Backup'">Parse Backup</span>
+                    <span x-text="loading ? '{{ __('migrations.parsing_backup') }}' : '{{ __('migrations.parse_backup') }}'">{{ __('migrations.parse_backup') }}</span>
                 </button>
                 <a href="{{ route('admin.migrations.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                    Cancel
+                    {{ __('common.cancel') }}
                 </a>
             </div>
         </div>

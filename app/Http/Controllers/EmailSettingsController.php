@@ -34,6 +34,6 @@ class EmailSettingsController extends Controller
         Setting::set('email_max_attachment_mb', $validated['email_max_attachment_mb'], 'email');
         Setting::set('email_max_accounts_per_domain', $validated['email_max_accounts_per_domain'], 'email');
 
-        return redirect()->route('admin.email-settings.index')->with('success', 'Email settings updated.');
+        return redirect()->route('admin.email-settings.index')->with('success', __('emails.settings_updated'));
     }
 }

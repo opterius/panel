@@ -47,7 +47,7 @@ class FtpController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ftp.no_permission'));
         }
 
         $directory = $validated['directory'] ?: $account->home_directory;
@@ -62,11 +62,11 @@ class FtpController extends Controller
         if ($response && $response->successful()) {
             ActivityLogger::log('ftp.created', 'account', $account->id, $validated['username'],
                 "Created FTP account {$validated['username']}");
-            return redirect()->route('user.ftp.index', ['account_id' => $account->id])->with('success', 'FTP account created.');
+            return redirect()->route('user.ftp.index', ['account_id' => $account->id])->with('success', __('ftp.ftp_account_created'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
-        return back()->with('error', 'Failed: ' . $error)->withInput();
+        return back()->with('error', __('ftp.failed_to_create_ftp', ['error' => $error]))->withInput();
     }
 
     public function destroy(Request $request)
@@ -79,7 +79,7 @@ class FtpController extends Controller
         $account = Account::with('server')->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'files')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ftp.no_permission'));
         }
 
         AgentService::for($account->server)->post('/ftp/delete', [
@@ -89,6 +89,6 @@ class FtpController extends Controller
         ActivityLogger::log('ftp.deleted', 'account', $account->id, $validated['username'],
             "Deleted FTP account {$validated['username']}");
 
-        return redirect()->route('user.ftp.index', ['account_id' => $account->id])->with('success', 'FTP account deleted.');
+        return redirect()->route('user.ftp.index', ['account_id' => $account->id])->with('success', __('ftp.ftp_account_deleted'));
     }
 }

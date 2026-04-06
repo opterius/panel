@@ -40,7 +40,7 @@ class CollaboratorController extends Controller
 
         if (!$user) {
             if (empty($validated['password'])) {
-                return back()->with('error', 'User not found. Provide a name and password to create a new user.')->withInput();
+                return back()->with('error', __('collaborators.user_not_found_provide_password'))->withInput();
             }
 
             $user = User::create([
@@ -53,7 +53,7 @@ class CollaboratorController extends Controller
 
         // Check if already a collaborator
         if ($account->collaborators()->where('user_id', $user->id)->exists()) {
-            return back()->with('error', $user->email . ' is already a collaborator on this account.')->withInput();
+            return back()->with('error', __('collaborators.already_a_collaborator', ['email' => $user->email]))->withInput();
         }
 
         $account->collaborators()->attach($user->id, ['role' => $validated['role']]);
@@ -62,7 +62,7 @@ class CollaboratorController extends Controller
             "Added {$user->email} as {$validated['role']} to {$account->username}");
 
         return redirect()->route('admin.collaborators.index', $account)
-            ->with('success', "{$user->email} added as {$validated['role']}.");
+            ->with('success', __('collaborators.collaborator_added_as_role', ['email' => $user->email, 'role' => $validated['role']]));
     }
 
     public function updateRole(Request $request, Account $account, User $user)
@@ -77,7 +77,7 @@ class CollaboratorController extends Controller
             "Changed {$user->email} role to {$validated['role']} on {$account->username}");
 
         return redirect()->route('admin.collaborators.index', $account)
-            ->with('success', "Role updated for {$user->email}.");
+            ->with('success', __('collaborators.role_updated_for', ['email' => $user->email]));
     }
 
     public function destroy(Account $account, User $user)
@@ -88,6 +88,6 @@ class CollaboratorController extends Controller
             "Removed {$user->email} from {$account->username}");
 
         return redirect()->route('admin.collaborators.index', $account)
-            ->with('success', "{$user->email} removed from this account.");
+            ->with('success', __('collaborators.collaborator_removed_from', ['email' => $user->email]));
     }
 }

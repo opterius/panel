@@ -73,7 +73,7 @@ class PackageController extends Controller
         ActivityLogger::log('package.created', 'package', $package->id, $package->name,
             "Created package {$package->name}");
 
-        return redirect()->route('admin.packages.index')->with('success', 'Package created successfully.');
+        return redirect()->route('admin.packages.index')->with('success', __('packages.package_created'));
     }
 
     public function edit(Package $package)
@@ -121,13 +121,13 @@ class PackageController extends Controller
         ActivityLogger::log('package.updated', 'package', $package->id, $package->name,
             "Updated package {$package->name}");
 
-        return redirect()->route('admin.packages.index')->with('success', 'Package updated successfully.');
+        return redirect()->route('admin.packages.index')->with('success', __('packages.package_updated'));
     }
 
     public function destroy(Package $package)
     {
         if ($package->accounts()->exists()) {
-            return back()->with('error', 'Cannot delete a package that has accounts assigned to it.');
+            return back()->with('error', __('packages.cannot_delete_package_in_use'));
         }
 
         ActivityLogger::log('package.deleted', 'package', $package->id, $package->name,
@@ -135,6 +135,6 @@ class PackageController extends Controller
 
         $package->delete();
 
-        return redirect()->route('admin.packages.index')->with('success', 'Package deleted.');
+        return redirect()->route('admin.packages.index')->with('success', __('packages.package_deleted'));
     }
 }

@@ -38,7 +38,7 @@ class DnsController extends Controller
         $domain->load('account.server');
 
         if (!$domain->account->userCan(auth()->user(), 'dns')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('dns.no_permission'));
         }
 
         $response = AgentService::for($domain->account->server)->post('/dns/add-record', [
@@ -51,11 +51,11 @@ class DnsController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return redirect()->route('user.dns.index', $domain)->with('success', $validated['type'] . ' record added.');
+            return redirect()->route('user.dns.index', $domain)->with('success', __('dns.record_added', ['type' => $validated['type']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to add record: ' . $error)->withInput();
+        return back()->with('error', __('dns.failed_to_add_record', ['error' => $error]))->withInput();
     }
 
     public function deleteRecord(Request $request, Domain $domain)
@@ -67,7 +67,7 @@ class DnsController extends Controller
         $domain->load('account.server');
 
         if (!$domain->account->userCan(auth()->user(), 'dns')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('dns.no_permission'));
         }
 
         $response = AgentService::for($domain->account->server)->post('/dns/delete-record', [
@@ -76,10 +76,10 @@ class DnsController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            return redirect()->route('user.dns.index', $domain)->with('success', 'Record deleted.');
+            return redirect()->route('user.dns.index', $domain)->with('success', __('dns.record_deleted'));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Failed to delete record: ' . $error);
+        return back()->with('error', __('dns.failed_to_delete_record', ['error' => $error]));
     }
 }

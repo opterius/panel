@@ -73,7 +73,7 @@ class ApiKeyController extends Controller
     public function destroy(Request $request, ApiKey $apiKey)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         ActivityLogger::log('api_key.revoked', 'api_key', $apiKey->id, $apiKey->name,
@@ -81,6 +81,6 @@ class ApiKeyController extends Controller
 
         $apiKey->delete();
 
-        return redirect()->route('admin.api-keys.index')->with('success', "API key '{$apiKey->name}' revoked.");
+        return redirect()->route('admin.api-keys.index')->with('success', __('api.api_key_revoked', ['name' => $apiKey->name]));
     }
 }

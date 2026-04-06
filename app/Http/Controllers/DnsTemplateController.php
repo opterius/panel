@@ -46,7 +46,7 @@ class DnsTemplateController extends Controller
         ActivityLogger::log('dns_template.created', 'dns_template', $template->id, $template->name,
             "Created DNS template '{$template->name}'");
 
-        return redirect()->route('admin.dns-templates.index')->with('success', "DNS template '{$template->name}' created.");
+        return redirect()->route('admin.dns-templates.index')->with('success', __('servers.dns_template_created', ['name' => $template->name]));
     }
 
     public function edit(DnsTemplate $dnsTemplate)
@@ -77,12 +77,12 @@ class DnsTemplateController extends Controller
             'records'    => $validated['records'],
         ]);
 
-        return redirect()->route('admin.dns-templates.index')->with('success', 'DNS template updated.');
+        return redirect()->route('admin.dns-templates.index')->with('success', __('servers.dns_template_updated'));
     }
 
     public function destroy(DnsTemplate $dnsTemplate)
     {
         $dnsTemplate->delete();
-        return redirect()->route('admin.dns-templates.index')->with('success', 'DNS template deleted.');
+        return redirect()->route('admin.dns-templates.index')->with('success', __('servers.dns_template_deleted'));
     }
 }

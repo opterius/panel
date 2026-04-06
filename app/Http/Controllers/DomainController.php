@@ -27,16 +27,16 @@ class DomainController extends Controller
         $domain->load('account');
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {
-            return back()->with('error', 'You do not have permission to delete domains on this account.');
+            return back()->with('error', __('domains.no_permission_delete'));
         }
 
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         // Only allow deleting subdomains, not the main domain (main domain is deleted with account)
         if (!$domain->isSubdomain()) {
-            return back()->with('error', 'The main domain cannot be deleted. Delete the account instead.');
+            return back()->with('error', __('domains.main_domain_cannot_be_deleted'));
         }
 
         $domain->load('account.server');
@@ -53,6 +53,6 @@ class DomainController extends Controller
 
         $domain->delete();
 
-        return redirect()->route('user.domains.index')->with('success', 'Subdomain ' . $domain->domain . ' removed.');
+        return redirect()->route('user.domains.index')->with('success', __('domains.subdomain_deleted', ['domain' => $domain->domain]));
     }
 }

@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">Packages</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('packages.packages') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -16,13 +16,13 @@
     @endif
 
     <div class="flex justify-between items-center mb-6">
-        <p class="text-sm text-gray-500">Define resource limits and PHP versions for hosting accounts.</p>
+        <p class="text-sm text-gray-500">{{ __('packages.packages_define_limits') }}</p>
         <a href="{{ route('admin.packages.create') }}"
            class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
-            New Package
+            {{ __('packages.new_package') }}
         </a>
     </div>
 
@@ -31,11 +31,11 @@
             <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10"/>
             </svg>
-            <h3 class="mt-4 text-base font-medium text-gray-700">No packages yet</h3>
-            <p class="mt-2 text-sm text-gray-500">Create packages to quickly assign PHP version, disk quota, and limits when creating accounts.</p>
+            <h3 class="mt-4 text-base font-medium text-gray-700">{{ __('packages.no_packages_yet') }}</h3>
+            <p class="mt-2 text-sm text-gray-500">{{ __('packages.packages_define_limits') }}</p>
             <a href="{{ route('admin.packages.create') }}"
                class="mt-6 inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                Create First Package
+                {{ __('packages.create_first_package') }}
             </a>
         </div>
     @else
@@ -46,7 +46,7 @@
                         <div class="flex items-center space-x-2">
                             <h3 class="font-semibold text-gray-800">{{ $package->name }}</h3>
                             @if($package->is_default)
-                                <span class="px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full">Default</span>
+                                <span class="px-2 py-0.5 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full">{{ __('common.default') }}</span>
                             @endif
                         </div>
                         <span class="text-xs text-gray-400">{{ $package->accounts_count }} {{ Str::plural('account', $package->accounts_count) }}</span>
@@ -58,40 +58,40 @@
 
                     <div class="px-5 py-4 grid grid-cols-2 gap-3 flex-1">
                         <div class="bg-gray-50 rounded-lg px-3 py-2.5">
-                            <div class="text-xs text-gray-400 mb-0.5">PHP Versions</div>
+                            <div class="text-xs text-gray-400 mb-0.5">{{ __('packages.php_version') }}</div>
                             <div class="text-sm font-semibold text-gray-700">
                                 {{ implode(', ', $package->php_versions ?? []) }}
-                                <span class="text-xs text-gray-400 font-normal">(default: {{ $package->default_php_version }})</span>
+                                <span class="text-xs text-gray-400 font-normal">({{ __('common.default') }}: {{ $package->default_php_version }})</span>
                             </div>
                         </div>
                         <div class="bg-gray-50 rounded-lg px-3 py-2.5">
-                            <div class="text-xs text-gray-400 mb-0.5">Disk Quota</div>
+                            <div class="text-xs text-gray-400 mb-0.5">{{ __('packages.disk_quota_mb') }}</div>
                             <div class="text-sm font-semibold text-gray-700">{{ $package->diskQuotaLabel() }}</div>
                         </div>
                         <div class="bg-gray-50 rounded-lg px-3 py-2.5">
-                            <div class="text-xs text-gray-400 mb-0.5">Bandwidth</div>
+                            <div class="text-xs text-gray-400 mb-0.5">{{ __('packages.bandwidth_limit_mb') }}</div>
                             <div class="text-sm font-semibold text-gray-700">{{ $package->bandwidthLabel() }}</div>
                         </div>
                         <div class="bg-gray-50 rounded-lg px-3 py-2.5">
-                            <div class="text-xs text-gray-400 mb-0.5">Subdomains</div>
+                            <div class="text-xs text-gray-400 mb-0.5">{{ __('packages.max_subdomains') }}</div>
                             <div class="text-sm font-semibold text-gray-700">{{ $package->limitLabel($package->max_subdomains) }}</div>
                         </div>
                         <div class="bg-gray-50 rounded-lg px-3 py-2.5">
-                            <div class="text-xs text-gray-400 mb-0.5">Databases</div>
+                            <div class="text-xs text-gray-400 mb-0.5">{{ __('packages.max_databases') }}</div>
                             <div class="text-sm font-semibold text-gray-700">{{ $package->limitLabel($package->max_databases) }}</div>
                         </div>
                         <div class="bg-gray-50 rounded-lg px-3 py-2.5">
-                            <div class="text-xs text-gray-400 mb-0.5">Email Accounts</div>
+                            <div class="text-xs text-gray-400 mb-0.5">{{ __('packages.max_email_accounts') }}</div>
                             <div class="text-sm font-semibold text-gray-700">{{ $package->limitLabel($package->max_email_accounts) }}</div>
                         </div>
                         <div class="bg-gray-50 rounded-lg px-3 py-2.5 col-span-2">
-                            <div class="text-xs text-gray-400 mb-0.5">Features</div>
+                            <div class="text-xs text-gray-400 mb-0.5">{{ __('packages.features') }}</div>
                             <div class="text-sm font-semibold text-gray-700 flex gap-3">
                                 @if($package->ssl_enabled)
                                     <span class="text-green-600">SSL</span>
                                 @endif
                                 @if($package->cron_jobs_enabled)
-                                    <span class="text-green-600">Cron</span>
+                                    <span class="text-green-600">{{ __('common.cron') }}</span>
                                 @endif
                             </div>
                         </div>
@@ -100,20 +100,20 @@
                     <div class="px-5 py-3 border-t border-gray-100 flex items-center justify-between">
                         <a href="{{ route('admin.packages.edit', $package) }}"
                            class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">
-                            Edit
+                            {{ __('common.edit') }}
                         </a>
                         @if($package->accounts_count === 0)
                             <x-delete-modal
                                 :action="route('admin.packages.destroy', $package)"
-                                title="Delete Package"
-                                message="This will permanently delete the '{{ $package->name }}' package. This cannot be undone."
+                                :title="__('packages.delete_package')"
+                                :message="__('packages.delete_package_confirm', ['name' => $package->name])"
                                 :confirm-password="false">
                                 <x-slot name="trigger">
-                                    <button type="button" class="text-sm text-red-500 hover:text-red-700 font-medium transition">Delete</button>
+                                    <button type="button" class="text-sm text-red-500 hover:text-red-700 font-medium transition">{{ __('common.delete') }}</button>
                                 </x-slot>
                             </x-delete-modal>
                         @else
-                            <span class="text-xs text-gray-400">In use</span>
+                            <span class="text-xs text-gray-400">{{ __('packages.in_use') }}</span>
                         @endif
                     </div>
                 </div>

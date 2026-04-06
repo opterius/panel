@@ -38,7 +38,7 @@ class SslController extends Controller
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'ssl')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ssl.no_permission'));
         }
 
         // Use async endpoint — returns immediately
@@ -62,12 +62,11 @@ class SslController extends Controller
             ActivityLogger::log('ssl.issued', 'ssl_certificate', null, $domain->domain,
                 "SSL issuance started for {$domain->domain}", ['domain_id' => $domain->id]);
 
-            return redirect()->route('user.ssl.index')->with('success',
-                'SSL certificate is being issued for ' . $domain->domain . '. This takes 1-2 minutes. Refresh the page to check the status.');
+            return redirect()->route('user.ssl.index')->with('success', __('ssl.ssl_certificate_issued', ['domain' => $domain->domain]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('user.ssl.index')->with('error', 'SSL issuance failed: ' . $error);
+        return redirect()->route('user.ssl.index')->with('error', __('ssl.ssl_issuance_failed', ['error' => $error]));
     }
 
     public function upload(Request $request)
@@ -81,7 +80,7 @@ class SslController extends Controller
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'ssl')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ssl.no_permission'));
         }
 
         $response = AgentService::for($domain->account->server)->post('/ssl/upload', [
@@ -104,11 +103,11 @@ class SslController extends Controller
             ActivityLogger::log('ssl.uploaded', 'ssl_certificate', $ssl->id, $domain->domain,
                 "Uploaded custom SSL for {$domain->domain}", ['domain_id' => $domain->id]);
 
-            return redirect()->route('user.ssl.index')->with('success', 'Custom SSL certificate installed for ' . $domain->domain);
+            return redirect()->route('user.ssl.index')->with('success', __('ssl.custom_ssl_installed', ['domain' => $domain->domain]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('user.ssl.index')->with('error', 'SSL upload failed: ' . $error);
+        return redirect()->route('user.ssl.index')->with('error', __('ssl.ssl_upload_failed', ['error' => $error]));
     }
 
     public function renew(SslCertificate $certificate)
@@ -128,23 +127,23 @@ class SslController extends Controller
             ActivityLogger::log('ssl.renewed', 'ssl_certificate', $certificate->id, $certificate->domain->domain,
                 "Renewed SSL certificate for {$certificate->domain->domain}", ['domain_id' => $certificate->domain_id]);
 
-            return redirect()->route('user.ssl.index')->with('success', 'SSL certificate renewed for ' . $certificate->domain->domain);
+            return redirect()->route('user.ssl.index')->with('success', __('ssl.ssl_renewed', ['domain' => $certificate->domain->domain]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return redirect()->route('user.ssl.index')->with('error', 'SSL renewal failed: ' . $error);
+        return redirect()->route('user.ssl.index')->with('error', __('ssl.ssl_renewal_failed', ['error' => $error]));
     }
 
     public function destroy(Request $request, SslCertificate $certificate)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         $certificate->load('domain.account');
 
         if (!$certificate->domain->account->userCan(auth()->user(), 'ssl')) {
-            return back()->with('error', 'You do not have permission to perform this action.');
+            return back()->with('error', __('ssl.no_permission'));
         }
 
         ActivityLogger::log('ssl.deleted', 'ssl_certificate', $certificate->id, null,
@@ -152,7 +151,7 @@ class SslController extends Controller
 
         $certificate->delete();
 
-        return redirect()->route('user.ssl.index')->with('success', 'SSL certificate record removed.');
+        return redirect()->route('user.ssl.index')->with('success', __('ssl.ssl_record_removed'));
     }
 
     /**

@@ -65,16 +65,16 @@ class PhpController extends Controller
             'enable'    => (bool) $validated['enable'],
         ]);
 
-        $action = $validated['enable'] ? 'enabled' : 'disabled';
-
         if ($response && $response->successful()) {
+            $successKey = $validated['enable'] ? 'php.extension_enabled' : 'php.extension_disabled';
             return redirect()
                 ->route('admin.php.index', ['server_id' => $server->id, 'php_version' => $validated['version']])
-                ->with('success', ucfirst($validated['extension']) . ' ' . $action . ' for PHP ' . $validated['version']);
+                ->with('success', __($successKey, ['extension' => ucfirst($validated['extension']), 'version' => $validated['version']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'Failed to ' . $action . ' extension: ' . $error);
+        $failKey = $validated['enable'] ? 'php.failed_to_enable_extension' : 'php.failed_to_disable_extension';
+        return back()->with('error', __($failKey, ['error' => $error]));
     }
 
     public function install(Request $request)
@@ -93,11 +93,11 @@ class PhpController extends Controller
         if ($response && $response->successful()) {
             return redirect()
                 ->route('admin.php.index', ['server_id' => $server->id])
-                ->with('success', 'PHP ' . $validated['version'] . ' installed successfully.');
+                ->with('success', __('php.php_installed', ['version' => $validated['version']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'PHP installation failed: ' . $error);
+        return back()->with('error', __('php.failed_to_install_php', ['error' => $error]));
     }
 
     public function switchVersion(Request $request)
@@ -122,11 +122,11 @@ class PhpController extends Controller
 
             return redirect()
                 ->route('admin.php.index', ['server_id' => $domain->server_id])
-                ->with('success', $domain->domain . ' switched from PHP ' . $oldVersion . ' to PHP ' . $validated['new_version']);
+                ->with('success', __('php.php_switched', ['domain' => $domain->domain, 'old_version' => $oldVersion, 'new_version' => $validated['new_version']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'PHP switch failed: ' . $error);
+        return back()->with('error', __('php.failed_to_switch_php', ['error' => $error]));
     }
 
     public function config(Request $request)
@@ -150,7 +150,7 @@ class PhpController extends Controller
         }
 
         if (empty($values)) {
-            return back()->with('error', 'No configuration values provided.');
+            return back()->with('error', __('php.no_config_provided'));
         }
 
         $response = AgentService::for($domain->account->server)->post('/php/config', [
@@ -162,10 +162,10 @@ class PhpController extends Controller
         if ($response && $response->successful()) {
             return redirect()
                 ->route('admin.php.index', ['server_id' => $domain->server_id])
-                ->with('success', 'PHP configuration updated for ' . $domain->domain);
+                ->with('success', __('php.php_config_updated', ['domain' => $domain->domain]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        return back()->with('error', 'PHP config update failed: ' . $error);
+        return back()->with('error', __('php.failed_to_update_php_config', ['error' => $error]));
     }
 }

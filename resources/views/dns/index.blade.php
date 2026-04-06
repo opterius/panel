@@ -4,7 +4,7 @@
             <a href="{{ route('user.domains.index') }}" class="text-gray-400 hover:text-gray-600 transition">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">DNS Zone: {{ $domain->domain }}</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('dns.dns_zone') }}: {{ $domain->domain }}</h2>
         </div>
     </x-slot>
 
@@ -23,24 +23,24 @@
     <!-- DNS Records Table -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">DNS Records</h3>
-            <p class="text-sm text-gray-500 mt-1">Manage DNS records for {{ $domain->domain }}.</p>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('dns.dns_records') }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ __('dns.manage_dns_records_for', ['domain' => $domain->domain]) }}</p>
         </div>
 
         @if(empty($records))
             <div class="px-6 py-12 text-center">
                 <svg class="mx-auto w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                <p class="mt-3 text-sm text-gray-500">No DNS zone found. Create a zone first or check if PowerDNS is installed.</p>
+                <p class="mt-3 text-sm text-gray-500">{{ __('dns.no_dns_zone_found') }}</p>
             </div>
         @else
             <!-- Table header -->
             <div class="hidden sm:grid grid-cols-12 px-6 py-2 text-xs font-medium text-gray-400 uppercase tracking-wide border-b border-gray-100 bg-gray-50">
-                <div class="col-span-1">Type</div>
-                <div class="col-span-4">Name</div>
-                <div class="col-span-4">Content</div>
-                <div class="col-span-1">TTL</div>
-                <div class="col-span-1">Priority</div>
-                <div class="col-span-1 text-right">Action</div>
+                <div class="col-span-1">{{ __('dns.record_type') }}</div>
+                <div class="col-span-4">{{ __('dns.record_name') }}</div>
+                <div class="col-span-4">{{ __('dns.record_content') }}</div>
+                <div class="col-span-1">{{ __('dns.record_ttl') }}</div>
+                <div class="col-span-1">{{ __('dns.record_priority') }}</div>
+                <div class="col-span-1 text-right">{{ __('common.actions') }}</div>
             </div>
 
             <div class="divide-y divide-gray-50">
@@ -82,17 +82,17 @@
                                                                 <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                                                             </div>
                                                             <div>
-                                                                <h3 class="text-lg font-semibold text-gray-900">Delete DNS Record</h3>
-                                                                <p class="mt-1 text-sm text-gray-500">Are you sure you want to delete this {{ $record['type'] }} record?</p>
+                                                                <h3 class="text-lg font-semibold text-gray-900">{{ __('dns.delete_dns_record') }}</h3>
+                                                                <p class="mt-1 text-sm text-gray-500">{{ __('dns.delete_this_record', ['type' => $record['type']]) }}</p>
                                                             </div>
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                                        <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Cancel</button>
+                                                        <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">{{ __('common.cancel') }}</button>
                                                         <form action="{{ route('user.dns.delete-record', $domain) }}" method="POST">
                                                             @csrf
                                                             <input type="hidden" name="record_id" value="{{ $record['id'] }}">
-                                                            <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">Delete</button>
+                                                            <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">{{ __('common.delete') }}</button>
                                                         </form>
                                                     </div>
                                                 </div>
@@ -111,14 +111,14 @@
     <!-- Add Record Form -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Add Record</h3>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('dns.add_record') }}</h3>
         </div>
         <form action="{{ route('user.dns.add-record', $domain) }}" method="POST" class="px-6 py-5"
               x-data="{ type: 'A' }">
             @csrf
             <div class="grid grid-cols-1 sm:grid-cols-6 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('dns.record_type') }}</label>
                     <select name="type" x-model="type"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         <option value="A">A</option>
@@ -131,7 +131,7 @@
                     </select>
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Name</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('dns.record_name') }}</label>
                     <input type="text" name="name"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
                         placeholder="{{ $domain->domain }}">
@@ -140,7 +140,7 @@
                     @enderror
                 </div>
                 <div class="sm:col-span-2">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Content</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('dns.record_content') }}</label>
                     <input type="text" name="content"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
                         :placeholder="type === 'A' ? '1.2.3.4' : type === 'CNAME' ? 'target.example.com' : type === 'MX' ? 'mail.example.com' : type === 'TXT' ? 'v=spf1 ...' : ''">
@@ -150,7 +150,7 @@
                 </div>
                 <div class="flex items-end space-x-3">
                     <div class="flex-1">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">TTL</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('dns.record_ttl') }}</label>
                         <input type="number" name="ttl" value="3600"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
@@ -159,7 +159,7 @@
 
             <div class="mt-4 flex items-center space-x-4">
                 <div x-show="type === 'MX' || type === 'SRV'" class="w-24">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Priority</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('dns.record_priority') }}</label>
                     <input type="number" name="priority" value="10"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                 </div>
@@ -168,7 +168,7 @@
                 </div>
                 <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                    Add Record
+                    {{ __('dns.add_record') }}
                 </button>
             </div>
         </form>

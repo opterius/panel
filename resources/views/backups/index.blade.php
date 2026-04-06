@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">Backups</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('backups.backups') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -15,14 +15,14 @@
         <div class="px-6 py-5">
             <form method="GET" action="{{ route('admin.backups.index') }}" class="flex items-end gap-4">
                 <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Server</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('backups.server_label') }}</label>
                     <select name="server_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         @foreach($servers as $server)
                             <option value="{{ $server->id }}" @selected($selectedServer && $selectedServer->id === $server->id)>{{ $server->name }} ({{ $server->ip_address }})</option>
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">Manage</button>
+                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">{{ __('backups.manage_btn') }}</button>
             </form>
         </div>
     </div>
@@ -31,7 +31,7 @@
         <!-- Create Backup -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Create Backup</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('backups.create_backup') }}</h3>
             </div>
             <form action="{{ route('admin.backups.create') }}" method="POST" class="px-6 py-5"
                   x-data="{ creating: false }" @submit="creating = true">
@@ -39,7 +39,7 @@
                 <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
                 <div class="flex flex-wrap items-end gap-4">
                     <div class="flex-1 min-w-48">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Account</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('backups.account_label') }}</label>
                         <select name="account_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @foreach($accounts as $account)
                                 <option value="{{ $account->id }}">{{ $account->username }}</option>
@@ -47,12 +47,12 @@
                         </select>
                     </div>
                     <div class="w-40">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('backups.backup_type') }}</label>
                         <select name="type" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <option value="full">Full Backup</option>
-                            <option value="files">Files Only</option>
-                            <option value="databases">Databases Only</option>
-                            <option value="email">Email Only</option>
+                            <option value="full">{{ __('backups.full_backup') }}</option>
+                            <option value="files">{{ __('backups.files_only') }}</option>
+                            <option value="databases">{{ __('backups.databases_only') }}</option>
+                            <option value="email">{{ __('backups.email_only') }}</option>
                         </select>
                     </div>
                     <button type="submit" :disabled="creating"
@@ -63,7 +63,7 @@
                         <template x-if="creating">
                             <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                         </template>
-                        <span x-text="creating ? 'Creating backup...' : 'Create Backup'">Create Backup</span>
+                        <span x-text="creating ? '{{ __('backups.creating_backup') }}' : '{{ __('backups.create_backup') }}'">{{ __('backups.create_backup') }}</span>
                     </button>
                 </div>
             </form>
@@ -72,15 +72,15 @@
         <!-- Backup List -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Backups</h3>
-                <p class="text-sm text-gray-500 mt-1">Stored at /var/backups/opterius/ on the server.</p>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('backups.backups') }}</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ __('backups.stored_at') }}</p>
             </div>
 
             @if($backups->isEmpty())
                 <div class="px-6 py-16 text-center">
                     <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                    <h3 class="mt-4 text-base font-medium text-gray-700">No backups yet</h3>
-                    <p class="mt-2 text-sm text-gray-500">Create your first backup above.</p>
+                    <h3 class="mt-4 text-base font-medium text-gray-700">{{ __('backups.no_backups_yet') }}</h3>
+                    <p class="mt-2 text-sm text-gray-500">{{ __('backups.no_backups_create_first') }}</p>
                 </div>
             @else
                 <div class="divide-y divide-gray-100">
@@ -110,7 +110,7 @@
 
                                 <a href="{{ route('admin.backups.download', $backup) }}" target="_blank"
                                     class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
-                                    Download
+                                    {{ __('common.download') }}
                                 </a>
 
                                 <form action="{{ route('admin.backups.restore', $backup) }}" method="POST"
@@ -118,13 +118,13 @@
                                     @csrf
                                     <button type="submit" :disabled="restoring"
                                         class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-amber-600 bg-amber-50 rounded-lg hover:bg-amber-100 transition disabled:opacity-50"
-                                        onclick="return confirm('Restore this backup? This will overwrite current files/databases.')">
-                                        <span x-text="restoring ? 'Restoring...' : 'Restore'">Restore</span>
+                                        onclick="return confirm('{{ __('backups.restore_this_backup') }}')">
+                                        <span x-text="restoring ? '{{ __('backups.restoring') }}' : '{{ __('common.restore') }}'">{{ __('common.restore') }}</span>
                                     </button>
                                 </form>
 
                                 <form action="{{ route('admin.backups.destroy', $backup) }}" method="POST"
-                                      onsubmit="return confirm('Delete this backup?')">
+                                      onsubmit="return confirm('{{ __('backups.delete_backup_confirm') }}')">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" class="text-gray-400 hover:text-red-600 transition">

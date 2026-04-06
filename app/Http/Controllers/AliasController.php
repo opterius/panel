@@ -33,7 +33,7 @@ class AliasController extends Controller
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'dns')) {
-            return back()->with('error', 'You do not have permission to manage domain aliases.');
+            return back()->with('error', __('aliases.no_permission_domain_alias'));
         }
 
         $alias = DomainAlias::create([
@@ -61,12 +61,12 @@ class AliasController extends Controller
             ActivityLogger::log('alias.created', 'domain', $domain->id, $validated['alias_domain'],
                 "Added domain alias {$validated['alias_domain']} → {$domain->domain}");
 
-            return back()->with('success', "Domain alias {$validated['alias_domain']} added.");
+            return back()->with('success', __('aliases.domain_alias_added', ['domain' => $validated['alias_domain']]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
         $alias->update(['status' => 'error']);
-        return back()->with('error', 'Failed to add alias: ' . $error)->withInput();
+        return back()->with('error', __('aliases.failed_to_add_domain_alias', ['error' => $error]))->withInput();
     }
 
     public function destroy(Request $request, DomainAlias $alias)
@@ -74,7 +74,7 @@ class AliasController extends Controller
         $alias->load('domain.account.server');
 
         if (!$alias->domain->account->userCan(auth()->user(), 'dns')) {
-            return back()->with('error', 'You do not have permission to manage domain aliases.');
+            return back()->with('error', __('aliases.no_permission_domain_alias'));
         }
 
         AgentService::for($alias->domain->account->server)->post('/domains/alias-remove', [
@@ -87,6 +87,6 @@ class AliasController extends Controller
 
         $alias->delete();
 
-        return back()->with('success', "Domain alias {$alias->alias_domain} removed.");
+        return back()->with('success', __('aliases.domain_alias_removed', ['domain' => $alias->alias_domain]));
     }
 }

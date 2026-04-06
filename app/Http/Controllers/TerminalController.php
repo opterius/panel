@@ -31,7 +31,7 @@ class TerminalController extends Controller
             ->findOrFail($validated['account_id']);
 
         if (!$account->userCan(auth()->user(), 'ssh')) {
-            return back()->with('error', 'You do not have SSH permission for this account.');
+            return back()->with('error', __('servers.no_ssh_permission'));
         }
 
         // Request a one-time terminal token from the agent
@@ -40,7 +40,7 @@ class TerminalController extends Controller
         ]);
 
         if (!$response || !$response->successful()) {
-            return back()->with('error', 'Could not connect to server agent.');
+            return back()->with('error', __('servers.terminal_connect_failed'));
         }
 
         $token = $response->json('token');

@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">Activity Log</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('activity.activity_log') }}</h2>
     </x-slot>
 
     <!-- Filters -->
@@ -8,25 +8,25 @@
         <form method="GET" action="{{ route('admin.activity-log.index') }}" class="px-6 py-4">
             <div class="flex flex-wrap items-end gap-4">
                 <div class="flex-1 min-w-48">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Search</label>
-                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Search descriptions, entities, IPs..."
+                    <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('common.search') }}</label>
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="{{ __('activity.search_descriptions') }}"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                 </div>
                 <div class="w-40">
-                    <label class="block text-xs font-medium text-gray-500 mb-1">Type</label>
+                    <label class="block text-xs font-medium text-gray-500 mb-1">{{ __('common.type') }}</label>
                     <select name="action"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                        <option value="">All</option>
+                        <option value="">{{ __('common.all') }}</option>
                         @foreach($actionTypes as $type)
                             <option value="{{ $type }}" @selected(request('action') === $type)>{{ ucfirst($type) }}</option>
                         @endforeach
                     </select>
                 </div>
                 <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                    Filter
+                    {{ __('common.filter') }}
                 </button>
                 @if(request()->hasAny(['search', 'action', 'user_id']))
-                    <a href="{{ route('admin.activity-log.index') }}" class="text-sm text-gray-500 hover:text-gray-700 transition">Clear</a>
+                    <a href="{{ route('admin.activity-log.index') }}" class="text-sm text-gray-500 hover:text-gray-700 transition">{{ __('common.clear') }}</a>
                 @endif
                 <a href="{{ route('admin.activity-log.export', request()->all()) }}" class="inline-flex items-center px-3 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
@@ -41,8 +41,8 @@
         @if($logs->isEmpty())
             <div class="px-6 py-16 text-center">
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                <h3 class="mt-4 text-base font-medium text-gray-700">No activity yet</h3>
-                <p class="mt-2 text-sm text-gray-500">Actions will appear here as they happen.</p>
+                <h3 class="mt-4 text-base font-medium text-gray-700">{{ __('activity.no_activity_yet') }}</h3>
+                <p class="mt-2 text-sm text-gray-500">{{ __('activity.actions_appear_here') }}</p>
             </div>
         @else
             <div class="divide-y divide-gray-100">

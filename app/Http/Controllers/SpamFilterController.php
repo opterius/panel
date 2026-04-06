@@ -50,10 +50,10 @@ class SpamFilterController extends Controller
             ActivityLogger::log("rspamd.{$action}", 'server', $server->id, $server->name,
                 ucfirst($action) . "d Rspamd on {$server->name}");
 
-            return back()->with('success', 'Spam filter ' . $action . 'd successfully.');
+            return back()->with('success', __('servers.spam_filter_configured', ['actioned' => $action . 'd']));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
-        return back()->with('error', 'Failed: ' . $error);
+        return back()->with('error', __('servers.spam_filter_failed', ['error' => $error]));
     }
 }

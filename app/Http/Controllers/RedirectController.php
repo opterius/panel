@@ -35,7 +35,7 @@ class RedirectController extends Controller
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {
-            return back()->with('error', 'You do not have permission to manage redirects.');
+            return back()->with('error', __('redirects.no_permission'));
         }
 
         Redirect::create([
@@ -51,7 +51,7 @@ class RedirectController extends Controller
         ActivityLogger::log('redirect.created', 'domain', $domain->id, $validated['source_path'],
             "Created redirect {$validated['source_path']} → {$validated['destination_url']} ({$validated['type']})");
 
-        return back()->with('success', 'Redirect created.');
+        return back()->with('success', __('redirects.redirect_created'));
     }
 
     public function destroy(Redirect $redirect)
@@ -59,7 +59,7 @@ class RedirectController extends Controller
         $redirect->load('domain.account.server');
 
         if (!$redirect->domain->account->userCan(auth()->user(), 'settings')) {
-            return back()->with('error', 'You do not have permission to manage redirects.');
+            return back()->with('error', __('redirects.no_permission'));
         }
 
         $domain = $redirect->domain;
@@ -72,7 +72,7 @@ class RedirectController extends Controller
         // Re-sync remaining redirects
         $this->syncRedirects($domain);
 
-        return back()->with('success', 'Redirect removed.');
+        return back()->with('success', __('redirects.redirect_removed'));
     }
 
     private function syncRedirects(Domain $domain): void

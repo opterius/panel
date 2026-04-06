@@ -1,0 +1,35 @@
+<?php
+
+return [
+    'ssl_certificates'              => 'SSL Certificates',
+    'installed_certificates'        => 'Installed Certificates',
+    'issue_free_ssl'                => 'Issue Free SSL Certificate',
+    'issue_free_ssl_letsencrypt'    => "Issue a free Let's Encrypt certificate for a domain without SSL.",
+    'issue_ssl'                     => 'Issue SSL',
+    'issuing_ssl_please_wait'       => 'Issuing SSL... Please wait',
+    'upload_custom_certificate'     => 'Upload Custom Certificate',
+    'paste_your_own_ssl'            => 'Paste your own SSL certificate and private key.',
+    'certificate_pem'               => 'Certificate (PEM)',
+    'private_key_pem'               => 'Private Key (PEM)',
+    'upload_certificate'            => 'Upload Certificate',
+    'no_ssl_certificates'           => 'No SSL certificates',
+    'issue_letsencrypt_or_upload'   => "Issue a Let's Encrypt certificate or upload a custom one.",
+    'expires'                       => 'Expires',
+    'auto_renew'                    => 'Auto-renew',
+    // Flash messages
+    'ssl_certificate_issued'        => 'SSL certificate is being issued for :domain. This takes 1-2 minutes. Refresh the page to check the status.',
+    'ssl_issuance_failed'           => 'SSL issuance failed: :error',
+    'custom_ssl_installed'          => 'Custom SSL certificate installed for :domain',
+    'ssl_upload_failed'             => 'SSL upload failed: :error',
+    'ssl_renewed'                   => 'SSL certificate renewed for :domain',
+    'ssl_renewal_failed'            => 'SSL renewal failed: :error',
+    'ssl_record_removed'            => 'SSL certificate record removed.',
+    'no_permission'                 => 'You do not have permission to perform this action.',
+    // UI labels
+    'domain_label'                  => 'Domain',
+    'email_for_letsencrypt'         => 'Email (for Let\'s Encrypt)',
+    'renew_btn'                     => 'Renew',
+    'remove_ssl_title'              => 'Remove SSL Certificate',
+    'remove_ssl_msg'                => 'Are you sure you want to remove this SSL certificate record?',
+    'replace_existing'              => 'replace existing',
+];

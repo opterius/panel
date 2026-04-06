@@ -1,6 +1,6 @@
 <x-user-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">SSH Access</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('ssh.ssh_keys') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -18,16 +18,16 @@
     <!-- Account Selector -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Select Account</h3>
-            <p class="text-sm text-gray-500 mt-1">Manage SSH keys and access per hosting account.</p>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('ssh.select_account') }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ __('ssh.select_account_hint') }}</p>
         </div>
         <div class="px-6 py-5">
             @if($accounts->isEmpty())
-                <p class="text-sm text-gray-500">No accounts available.</p>
+                <p class="text-sm text-gray-500">{{ __('ssh.no_accounts_available') }}</p>
             @else
                 <form method="GET" action="{{ route('user.ssh.index') }}" class="flex items-end gap-4">
                     <div class="flex-1">
-                        <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">Account</label>
+                        <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('cron.account') }}</label>
                         <select name="account_id" id="account_id"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @foreach($accounts as $account)
@@ -38,7 +38,7 @@
                         </select>
                     </div>
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                        Manage
+                        {{ __('common.manage') }}
                     </button>
                 </form>
             @endif
@@ -50,14 +50,14 @@
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 flex items-center justify-between">
                 <div>
-                    <h3 class="text-base font-semibold text-gray-800">SSH Shell Access</h3>
+                    <h3 class="text-base font-semibold text-gray-800">{{ __('ssh.ssh_shell') }}</h3>
                     <p class="text-sm text-gray-500 mt-1">
                         @if($sshEnabled)
-                            SSH login is <span class="text-green-600 font-medium">enabled</span> for <span class="font-mono">{{ $selectedAccount->username }}</span>.
-                            The user can connect via <span class="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">ssh {{ $selectedAccount->username }}@{{ $selectedAccount->server->ip_address }}</span>
+                            {{ __('ssh.ssh_login_enabled_for') }} <span class="text-green-600 font-medium">{{ __('common.enabled') }}</span> {{ __('ssh.for_user') }} <span class="font-mono">{{ $selectedAccount->username }}</span>.
+                            {{ __('ssh.connect_via') }} <span class="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">ssh {{ $selectedAccount->username }}@{{ $selectedAccount->server->ip_address }}</span>
                         @else
-                            SSH login is <span class="text-red-600 font-medium">disabled</span> for <span class="font-mono">{{ $selectedAccount->username }}</span>.
-                            Shell is set to <span class="font-mono text-xs">/usr/sbin/nologin</span>.
+                            {{ __('ssh.ssh_login_enabled_for') }} <span class="text-red-600 font-medium">{{ __('common.disabled') }}</span> {{ __('ssh.for_user') }} <span class="font-mono">{{ $selectedAccount->username }}</span>.
+                            {{ __('ssh.shell_set_to_nologin') }}
                         @endif
                     </p>
                 </div>
@@ -65,7 +65,7 @@
                     <div x-data="{ confirmDisable: false }">
                         <button type="button" @click="confirmDisable = true" class="inline-flex items-center px-4 py-2 text-sm font-medium text-red-600 bg-white border border-red-300 rounded-lg hover:bg-red-50 transition">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
-                            Disable SSH
+                            {{ __('ssh.disable_ssh') }}
                         </button>
                         <template x-teleport="body">
                             <div x-show="confirmDisable" x-cloak class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true">
@@ -78,18 +78,18 @@
                                                     <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                                                 </div>
                                                 <div>
-                                                    <h3 class="text-lg font-semibold text-gray-900">Disable SSH Access</h3>
-                                                    <p class="mt-1 text-sm text-gray-500">Are you sure you want to disable SSH access for {{ $selectedAccount->username }}? The shell will be set to /usr/sbin/nologin.</p>
+                                                    <h3 class="text-lg font-semibold text-gray-900">{{ __('ssh.disable_ssh') }}</h3>
+                                                    <p class="mt-1 text-sm text-gray-500">{{ __('ssh.disable_ssh_confirm', ['username' => $selectedAccount->username]) }}</p>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                            <button type="button" @click="confirmDisable = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                            <button type="button" @click="confirmDisable = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">{{ __('common.cancel') }}</button>
                                             <form action="{{ route('user.ssh.toggle-shell') }}" method="POST">
                                                 @csrf
                                                 <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                                                 <input type="hidden" name="enabled" value="0">
-                                                <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">Disable</button>
+                                                <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">{{ __('common.disable') }}</button>
                                             </form>
                                         </div>
                                     </div>
@@ -104,7 +104,7 @@
                         <input type="hidden" name="enabled" value="1">
                         <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z" /></svg>
-                            Enable SSH
+                            {{ __('ssh.enable_ssh') }}
                         </button>
                     </form>
                 @endif
@@ -114,14 +114,14 @@
         <!-- Authorized Keys -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Authorized Keys</h3>
-                <p class="text-sm text-gray-500 mt-1">Public keys authorized for SSH access to this account.</p>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('ssh.authorized_keys') }}</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ __('ssh.authorized_keys_hint') }}</p>
             </div>
 
             @if(empty($keys))
                 <div class="px-6 py-12 text-center">
                     <svg class="mx-auto w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
-                    <p class="mt-3 text-sm text-gray-500">No SSH keys authorized yet.</p>
+                    <p class="mt-3 text-sm text-gray-500">{{ __('ssh.no_ssh_keys') }}</p>
                 </div>
             @else
                 <div class="divide-y divide-gray-100">
@@ -132,7 +132,7 @@
                                     <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-semibold text-gray-800">{{ $key['comment'] ?: 'Unnamed key' }}</div>
+                                    <div class="text-sm font-semibold text-gray-800">{{ $key['comment'] ?: __('ssh.unnamed_key') }}</div>
                                     <div class="text-xs text-gray-500">
                                         <span class="font-mono">{{ $key['type'] }}</span>
                                         &middot;
@@ -141,7 +141,7 @@
                                 </div>
                             </div>
                             <div x-data="{ confirmDelete: false }" class="inline relative">
-                                <button type="button" @click="confirmDelete = true" class="text-gray-400 hover:text-red-600 transition" title="Remove key">
+                                <button type="button" @click="confirmDelete = true" class="text-gray-400 hover:text-red-600 transition" title="{{ __('ssh.remove_key') }}">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                                 </button>
                                 <template x-teleport="body">
@@ -155,18 +155,18 @@
                                                             <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
                                                         </div>
                                                         <div>
-                                                            <h3 class="text-lg font-semibold text-gray-900">Remove SSH Key</h3>
-                                                            <p class="mt-1 text-sm text-gray-500">Are you sure you want to remove this SSH key? The key will no longer be authorized for access.</p>
+                                                            <h3 class="text-lg font-semibold text-gray-900">{{ __('ssh.remove_key') }}</h3>
+                                                            <p class="mt-1 text-sm text-gray-500">{{ __('ssh.remove_key_confirm') }}</p>
                                                         </div>
                                                     </div>
                                                 </div>
                                                 <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                                    <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                    <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">{{ __('common.cancel') }}</button>
                                                     <form action="{{ route('user.ssh.delete-key') }}" method="POST">
                                                         @csrf
                                                         <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                                                         <input type="hidden" name="fingerprint" value="{{ $key['fingerprint'] }}">
-                                                        <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">Remove</button>
+                                                        <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">{{ __('common.remove') }}</button>
                                                     </form>
                                                 </div>
                                             </div>
@@ -183,29 +183,29 @@
         <!-- Add Key (tabs: Generate / Import) -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden" x-data="{ tab: 'generate' }">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Add SSH Key</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('ssh.add_ssh_key') }}</h3>
                 <div class="flex space-x-1 mt-3 bg-gray-100 rounded-lg p-1 w-fit">
                     <button type="button" @click="tab = 'generate'"
                         class="px-4 py-1.5 text-xs font-medium rounded-md transition"
                         :class="tab === 'generate' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-                        Generate New Key
+                        {{ __('ssh.generate_key') }}
                     </button>
                     <button type="button" @click="tab = 'import'"
                         class="px-4 py-1.5 text-xs font-medium rounded-md transition"
                         :class="tab === 'import' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
-                        Import Existing Key
+                        {{ __('ssh.import_key') }}
                     </button>
                 </div>
             </div>
 
             <!-- Generate Tab -->
             <div x-show="tab === 'generate'" class="px-6 py-5">
-                <p class="text-sm text-gray-500 mb-4">Generate a new SSH key pair. The public key will be added to the server automatically. You will download the private key — keep it safe.</p>
+                <p class="text-sm text-gray-500 mb-4">{{ __('ssh.generate_key_hint') }}</p>
                 <form action="{{ route('user.ssh.generate-key') }}" method="POST" class="space-y-4">
                     @csrf
                     <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Key Type</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('ssh.key_type') }}</label>
                         <div class="flex space-x-3">
                             <label class="relative">
                                 <input type="radio" name="key_type" value="ed25519" class="peer sr-only" checked>
@@ -227,20 +227,20 @@
                     </div>
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" /></svg>
-                        Generate &amp; Download Private Key
+                        {{ __('ssh.generate_and_download') }}
                     </button>
-                    <p class="text-xs text-gray-400">The private key file will download automatically. The public key is added to the server.</p>
+                    <p class="text-xs text-gray-400">{{ __('ssh.generate_download_hint') }}</p>
                 </form>
             </div>
 
             <!-- Import Tab -->
             <div x-show="tab === 'import'" class="px-6 py-5">
-                <p class="text-sm text-gray-500 mb-4">Import an existing SSH key pair. The public key authorizes access, the private key is stored on the server for outgoing connections.</p>
+                <p class="text-sm text-gray-500 mb-4">{{ __('ssh.import_key_hint') }}</p>
                 <form action="{{ route('user.ssh.import-key') }}" method="POST" class="space-y-4">
                     @csrf
                     <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                     <div>
-                        <label for="public_key" class="block text-sm font-medium text-gray-700 mb-1.5">Public Key</label>
+                        <label for="public_key" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('ssh.public_key') }}</label>
                         <textarea name="public_key" id="public_key" rows="3"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-xs font-mono focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="ssh-rsa AAAA... user@machine">{{ old('public_key') }}</textarea>
@@ -249,18 +249,18 @@
                         @enderror
                     </div>
                     <div>
-                        <label for="private_key" class="block text-sm font-medium text-gray-700 mb-1.5">Private Key <span class="text-gray-400 font-normal">(optional)</span></label>
+                        <label for="private_key" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('ssh.private_key') }} <span class="text-gray-400 font-normal">({{ __('common.optional') }})</span></label>
                         <textarea name="private_key" id="private_key" rows="5"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-xs font-mono focus:border-indigo-500 focus:ring-indigo-500"
                             placeholder="-----BEGIN OPENSSH PRIVATE KEY-----&#10;...&#10;-----END OPENSSH PRIVATE KEY-----">{{ old('private_key') }}</textarea>
-                        <p class="mt-1.5 text-xs text-gray-400">If provided, the private key will be stored in ~/.ssh/ for outgoing SSH connections (e.g., Git deployments).</p>
+                        <p class="mt-1.5 text-xs text-gray-400">{{ __('ssh.private_key_hint') }}</p>
                         @error('private_key')
                             <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                        Import Key Pair
+                        {{ __('ssh.import_key_pair') }}
                     </button>
                 </form>
             </div>

@@ -49,7 +49,7 @@ class ResellerController extends Controller
         ActivityLogger::log('reseller.created', 'user', $reseller->id, $reseller->name,
             "Created reseller {$reseller->name} ({$reseller->email})", ['email' => $reseller->email]);
 
-        return redirect()->route('admin.resellers.index')->with('success', 'Reseller ' . $validated['name'] . ' created.');
+        return redirect()->route('admin.resellers.index')->with('success', __('servers.reseller_created', ['name' => $validated['name']]));
     }
 
     public function show(User $reseller)
@@ -101,7 +101,7 @@ class ResellerController extends Controller
         ActivityLogger::log('reseller.updated', 'user', $reseller->id, $reseller->name,
             "Updated reseller {$reseller->name}");
 
-        return redirect()->route('admin.resellers.show', $reseller)->with('success', 'Reseller updated.');
+        return redirect()->route('admin.resellers.show', $reseller)->with('success', __('servers.reseller_updated'));
     }
 
     public function destroy(Request $request, User $reseller)
@@ -109,7 +109,7 @@ class ResellerController extends Controller
         abort_unless($reseller->isReseller(), 404);
 
         if (!Hash::check($request->password, auth()->user()->password)) {
-            return back()->withErrors(['password' => 'The password is incorrect.']);
+            return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
         ActivityLogger::log('reseller.deleted', 'user', $reseller->id, $reseller->name,
@@ -117,6 +117,6 @@ class ResellerController extends Controller
 
         $reseller->delete();
 
-        return redirect()->route('admin.resellers.index')->with('success', 'Reseller deleted.');
+        return redirect()->route('admin.resellers.index')->with('success', __('servers.reseller_deleted'));
     }
 }

@@ -74,7 +74,7 @@ class LaravelInstallerController extends Controller
                 'name' => $dbName,
             ]);
             if (!$response || !$response->successful()) {
-                return back()->with('error', 'Failed to create database.')->withInput();
+                return back()->with('error', __('servers.failed_to_create_database'))->withInput();
             }
 
             // Create user
@@ -86,7 +86,7 @@ class LaravelInstallerController extends Controller
             ]);
             if (!$response || !$response->successful()) {
                 AgentService::for($domain->account->server)->post('/databases/delete', ['name' => $dbName]);
-                return back()->with('error', 'Failed to create database user.')->withInput();
+                return back()->with('error', __('servers.failed_to_create_db_user_plain'))->withInput();
             }
         } else {
             $dbName = $validated['db_name'];
@@ -118,11 +118,11 @@ class LaravelInstallerController extends Controller
         if ($response && $response->successful()) {
             $data = $response->json();
             return redirect()->route('user.laravel.index')->with('success',
-                'Laravel ' . ($data['version'] ?? '') . ' installed on ' . $domain->domain
+                __('servers.laravel_installed', ['version' => $data['version'] ?? '', 'domain' => $domain->domain])
             );
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
-        return back()->with('error', 'Laravel installation failed: ' . $error)->withInput();
+        return back()->with('error', __('servers.laravel_install_failed', ['error' => $error]))->withInput();
     }
 }

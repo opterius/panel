@@ -6,7 +6,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">Edit Package — {{ $package->name }}</h2>
+            <h2 class="text-lg font-semibold text-gray-800">{{ __('common.edit') }} {{ __('packages.package') }} — {{ $package->name }}</h2>
         </div>
     </x-slot>
 

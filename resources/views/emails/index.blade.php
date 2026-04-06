@@ -1,6 +1,6 @@
 <x-user-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">Email Accounts</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('emails.email_accounts') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -21,7 +21,7 @@
            target="_blank"
            class="inline-flex items-center px-4 py-2.5 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-            Open Webmail
+            {{ __('emails.open_webmail') }}
         </a>
     </div>
 
@@ -29,7 +29,7 @@
     @if($domains->isNotEmpty())
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Create Email Account</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('emails.create_email_account') }}</h3>
             </div>
             <form action="{{ route('user.emails.store') }}" method="POST" class="px-6 py-5"
                   x-data="{
@@ -76,7 +76,7 @@
                     {{-- Row 1: Username @ Domain --}}
                     <div class="grid grid-cols-1 sm:grid-cols-12 gap-4">
                         <div class="sm:col-span-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('emails.username') }}</label>
                             <input type="text" name="username" x-model="username" @input="validateUsername()" maxlength="25"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                 placeholder="info">
@@ -92,7 +92,7 @@
                             <span class="text-lg text-gray-400 font-bold">@</span>
                         </div>
                         <div class="sm:col-span-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Domain</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('emails.domain') }}</label>
                             <select name="domain_id" x-on:change="selectedDomain = $event.target.options[$event.target.selectedIndex].text"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                 @foreach($domains as $domain)
@@ -101,7 +101,7 @@
                             </select>
                         </div>
                         <div class="sm:col-span-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Preview</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('emails.preview') }}</label>
                             <div class="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm font-mono text-gray-600 truncate">
                                 <span x-text="(cleanUsername || 'user') + '@' + selectedDomain"></span>
                             </div>
@@ -110,7 +110,7 @@
 
                     {{-- Row 2: Password with strength meter --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.password') }}</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
                                 <input type="password" name="password" x-model="password"
@@ -141,12 +141,12 @@
                                 </div>
                             </div>
                         </div>
-                        <p class="mt-1.5 text-xs text-gray-400">Use uppercase, lowercase, numbers, and symbols for a strong password.</p>
+                        <p class="mt-1.5 text-xs text-gray-400">{{ __('emails.password_strength_hint') }}</p>
                     </div>
 
                     {{-- Row 3: Quota picker --}}
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Mailbox Quota</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('emails.mailbox_quota') }}</label>
                         <div class="flex flex-wrap gap-2">
                             @foreach([
                                 '100' => '100 MB',
@@ -169,7 +169,7 @@
                                 <input type="number" x-model="customQuota" min="1" max="51200"
                                     class="w-32 rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
                                     placeholder="e.g. 2048">
-                                <span class="text-sm text-gray-500">MB</span>
+                                <span class="text-sm text-gray-500">{{ __('common.mb') }}</span>
                             </div>
                         </div>
                     </div>
@@ -180,10 +180,10 @@
                             :disabled="!cleanUsername || usernameError || passwordStrength.score < 3"
                             class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                             <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                            Create Email Account
+                            {{ __('emails.create_email_account') }}
                         </button>
                         <p class="text-xs text-gray-400" x-show="passwordStrength.score > 0 && passwordStrength.score < 3">
-                            Password must be at least "Good" strength to create.
+                            {{ __('emails.password_must_be_good') }}
                         </p>
                     </div>
                 </div>
@@ -195,16 +195,16 @@
     <div class="space-y-4">
         <div class="flex items-center justify-between">
             <div>
-                <h3 class="text-base font-semibold text-gray-800">Email Accounts</h3>
-                <p class="text-sm text-gray-500 mt-1">Manage email accounts for your domains.</p>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('emails.email_accounts') }}</h3>
+                <p class="text-sm text-gray-500 mt-1">{{ __('emails.manage_email_domains') }}</p>
             </div>
         </div>
 
         @if($emailAccounts->isEmpty())
             <div class="bg-white rounded-xl shadow-sm px-6 py-16 text-center">
                 <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                <h3 class="mt-4 text-base font-medium text-gray-700">No email accounts</h3>
-                <p class="mt-2 text-sm text-gray-500">Create your first email account above.</p>
+                <h3 class="mt-4 text-base font-medium text-gray-700">{{ __('emails.no_email_accounts_yet') }}</h3>
+                <p class="mt-2 text-sm text-gray-500">{{ __('emails.no_email_accounts_create') }}</p>
             </div>
         @else
             @foreach($emailAccounts as $account)
@@ -219,8 +219,8 @@
                                 <div class="text-sm font-semibold text-gray-800">{{ $account->email }}</div>
                                 <div class="text-xs text-gray-500">
                                     Quota: {{ $account->quota > 0 ? ($account->quota >= 1024 ? round($account->quota / 1024, 1) . ' GB' : $account->quota . ' MB') : 'Unlimited' }}
-                                    @if(!$account->can_send) &middot; <span class="text-red-500">Sending disabled</span> @endif
-                                    @if(!$account->can_receive) &middot; <span class="text-red-500">Receiving disabled</span> @endif
+                                    @if(!$account->can_send) &middot; <span class="text-red-500">{{ __('emails.sending_disabled') }}</span> @endif
+                                    @if(!$account->can_receive) &middot; <span class="text-red-500">{{ __('emails.receiving_disabled') }}</span> @endif
                                     @if($account->max_send_per_hour > 0) &middot; {{ $account->max_send_per_hour }}/hr @endif
                                 </div>
                             </div>
@@ -239,7 +239,7 @@
                         {{-- Tabs --}}
                         <div class="px-6 py-2.5 border-t border-gray-200 bg-white">
                             <div class="flex space-x-1 bg-gray-100 rounded-lg p-1 w-fit">
-                                @foreach(['password' => 'Password', 'quota' => 'Quota', 'restrictions' => 'Restrictions', 'delete' => 'Delete'] as $key => $label)
+                                @foreach(['password' => __('common.password'), 'quota' => __('emails.mailbox_quota'), 'restrictions' => __('emails.send_limits'), 'delete' => __('common.delete')] as $key => $label)
                                     <button type="button" @click="tab = '{{ $key }}'"
                                         class="px-4 py-1.5 text-xs font-medium rounded-md transition"
                                         :class="tab === '{{ $key }}' ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'">
@@ -255,12 +255,12 @@
                                 <form action="{{ route('user.emails.password', $account) }}" method="POST" class="max-w-md space-y-4">
                                     @csrf
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">New Password</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('emails.new_password') }}</label>
                                         <input type="password" name="password" placeholder="Min 8 characters"
                                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     </div>
                                     <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
-                                        Update Password
+                                        {{ __('emails.update_password') }}
                                     </button>
                                 </form>
                             </div>
@@ -271,7 +271,7 @@
                                     @csrf
                                     <input type="hidden" name="quota" :value="quotaOpt === 'custom' ? customQ : quotaOpt">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-2">Mailbox Quota</label>
+                                        <label class="block text-sm font-medium text-gray-700 mb-2">{{ __('emails.mailbox_quota') }}</label>
                                         <div class="flex flex-wrap gap-2">
                                             @foreach(['100' => '100 MB', '500' => '500 MB', '1024' => '1 GB', '2560' => '2.5 GB', '5120' => '5 GB', '0' => 'Unlimited', 'custom' => 'Custom'] as $val => $lbl)
                                                 <button type="button" @click="quotaOpt = '{{ $val }}'"
@@ -285,12 +285,12 @@
                                             <div class="flex items-center gap-2">
                                                 <input type="number" x-model="customQ" min="1" max="51200"
                                                     class="w-32 rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="e.g. 2048">
-                                                <span class="text-sm text-gray-500">MB</span>
+                                                <span class="text-sm text-gray-500">{{ __('common.mb') }}</span>
                                             </div>
                                         </div>
                                     </div>
                                     <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
-                                        Update Quota
+                                        {{ __('emails.update_quota') }}
                                     </button>
                                 </form>
                             </div>
@@ -302,7 +302,7 @@
 
                                     {{-- Access toggles --}}
                                     <div class="space-y-3">
-                                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Access</h4>
+                                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">{{ __('emails.access') }}</h4>
                                         <label class="flex items-center space-x-3 cursor-pointer">
                                             <div class="relative">
                                                 <input type="checkbox" name="can_send" value="1" @checked($account->can_send) class="sr-only peer">
@@ -310,8 +310,8 @@
                                                 <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
                                             </div>
                                             <div>
-                                                <span class="text-sm font-medium text-gray-700">Can Send Emails</span>
-                                                <p class="text-xs text-gray-400">Allow outgoing emails from this account</p>
+                                                <span class="text-sm font-medium text-gray-700">{{ __('emails.can_send') }}</span>
+                                                <p class="text-xs text-gray-400">{{ __('emails.allow_outgoing') }}</p>
                                             </div>
                                         </label>
                                         <label class="flex items-center space-x-3 cursor-pointer">
@@ -321,42 +321,42 @@
                                                 <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
                                             </div>
                                             <div>
-                                                <span class="text-sm font-medium text-gray-700">Can Receive Emails</span>
-                                                <p class="text-xs text-gray-400">Allow incoming emails to this account</p>
+                                                <span class="text-sm font-medium text-gray-700">{{ __('emails.can_receive') }}</span>
+                                                <p class="text-xs text-gray-400">{{ __('emails.allow_incoming') }}</p>
                                             </div>
                                         </label>
                                     </div>
 
                                     {{-- Send limits --}}
                                     <div class="space-y-3">
-                                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Send Limits</h4>
+                                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">{{ __('emails.send_limits') }}</h4>
                                         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                                             <div>
-                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Hour</label>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('emails.per_hour') }}</label>
                                                 <input type="number" name="max_send_per_hour" value="{{ $account->max_send_per_hour }}" min="0"
                                                     class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             </div>
                                             <div>
-                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Day</label>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('emails.per_day') }}</label>
                                                 <input type="number" name="max_send_per_day" value="{{ $account->max_send_per_day }}" min="0"
                                                     class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             </div>
                                             <div>
-                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Week</label>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('emails.per_week') }}</label>
                                                 <input type="number" name="max_send_per_week" value="{{ $account->max_send_per_week }}" min="0"
                                                     class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             </div>
                                             <div>
-                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Month</label>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">{{ __('emails.per_month') }}</label>
                                                 <input type="number" name="max_send_per_month" value="{{ $account->max_send_per_month }}" min="0"
                                                     class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                             </div>
                                         </div>
-                                        <p class="text-xs text-gray-400">0 = unlimited for all fields</p>
+                                        <p class="text-xs text-gray-400">{{ __('emails.zero_unlimited') }}</p>
                                     </div>
 
                                     <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
-                                        Save Restrictions
+                                        {{ __('emails.save_restrictions') }}
                                     </button>
                                 </form>
                             </div>
@@ -364,16 +364,16 @@
                             {{-- Delete Tab --}}
                             <div x-show="tab === 'delete'">
                                 <div class="max-w-md">
-                                    <p class="text-sm text-gray-600 mb-4">Permanently delete <strong>{{ $account->email }}</strong> and all emails in this mailbox. This cannot be undone.</p>
+                                    <p class="text-sm text-gray-600 mb-4">{{ __('emails.permanently_delete_msg', ['email' => $account->email]) }}</p>
                                     <x-delete-modal
                                         :action="route('user.emails.destroy', $account)"
-                                        title="Delete Email Account"
-                                        message="This will permanently delete {{ $account->email }} and all emails in this mailbox."
+                                        :title="__('emails.delete_email_account')"
+                                        :message="__('emails.delete_email_msg', ['email' => $account->email])"
                                         :confirm-password="true">
                                         <x-slot name="trigger">
                                             <button type="button" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">
                                                 <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                                                Delete {{ $account->email }}
+                                                {{ __('common.delete') }} {{ $account->email }}
                                             </button>
                                         </x-slot>
                                     </x-delete-modal>
@@ -389,42 +389,42 @@
     <!-- Mail Client Settings -->
     <div class="mt-6 bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">Mail Client Settings</h3>
-            <p class="text-sm text-gray-500 mt-1">Use these settings in Outlook, Thunderbird, or your phone.</p>
+            <h3 class="text-base font-semibold text-gray-800">{{ __('emails.mail_client_settings') }}</h3>
+            <p class="text-sm text-gray-500 mt-1">{{ __('emails.use_these_settings') }}</p>
         </div>
         <div class="px-6 py-5">
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 text-sm">
                 <div>
-                    <h4 class="font-semibold text-gray-700 mb-3">Incoming Mail (IMAP)</h4>
+                    <h4 class="font-semibold text-gray-700 mb-3">{{ __('emails.incoming_imap') }}</h4>
                     <dl class="space-y-2">
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Server</dt>
+                            <dt class="text-gray-500">{{ __('emails.server') }}</dt>
                             <dd class="font-mono text-gray-800">{{ request()->getHost() }}</dd>
                         </div>
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Port</dt>
+                            <dt class="text-gray-500">{{ __('emails.port') }}</dt>
                             <dd class="font-mono text-gray-800">993 (SSL) / 143 (STARTTLS)</dd>
                         </div>
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Username</dt>
-                            <dd class="font-mono text-gray-800">Full email address</dd>
+                            <dt class="text-gray-500">{{ __('emails.username') }}</dt>
+                            <dd class="font-mono text-gray-800">{{ __('emails.full_email_address') }}</dd>
                         </div>
                     </dl>
                 </div>
                 <div>
-                    <h4 class="font-semibold text-gray-700 mb-3">Outgoing Mail (SMTP)</h4>
+                    <h4 class="font-semibold text-gray-700 mb-3">{{ __('emails.outgoing_smtp') }}</h4>
                     <dl class="space-y-2">
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Server</dt>
+                            <dt class="text-gray-500">{{ __('emails.server') }}</dt>
                             <dd class="font-mono text-gray-800">{{ request()->getHost() }}</dd>
                         </div>
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Port</dt>
+                            <dt class="text-gray-500">{{ __('emails.port') }}</dt>
                             <dd class="font-mono text-gray-800">587 (STARTTLS) / 465 (SSL)</dd>
                         </div>
                         <div class="flex justify-between">
-                            <dt class="text-gray-500">Authentication</dt>
-                            <dd class="font-mono text-gray-800">Yes (same credentials)</dd>
+                            <dt class="text-gray-500">{{ __('emails.authentication') }}</dt>
+                            <dd class="font-mono text-gray-800">{{ __('emails.yes_same_credentials') }}</dd>
                         </div>
                     </dl>
                 </div>

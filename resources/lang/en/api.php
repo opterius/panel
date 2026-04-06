@@ -1,0 +1,35 @@
+<?php
+
+return [
+    'api_keys'                  => 'API Keys',
+    'api_key'                   => 'API Key',
+    'create_api_key'            => 'Create API Key',
+    'generate_api_key'          => 'Generate API Key',
+    'key_details'               => 'Key Details',
+    'give_key_descriptive_name' => 'Give this key a descriptive name.',
+    'server_scope'              => 'Server Scope',
+    'lock_key_to_server'        => 'Lock this key to a specific server, or leave blank for all servers.',
+    'all_servers'               => 'All servers',
+    'permissions'               => 'Permissions',
+    'select_what_key_can_do'    => 'Select what this key can do.',
+    'select_all'                => 'Select all',
+    'security'                  => 'Security',
+    'restrict_which_ips'        => 'Restrict which IPs can use this key.',
+    'allowed_ips'               => 'Allowed IPs',
+    'comma_separated_ips'       => 'Comma-separated list of IP addresses. Leave blank to allow any IP.',
+    'revoke_api_key'            => 'Revoke API Key',
+    'revoke_key_description'    => "This will immediately revoke the key ':name'. Any integrations using this key will stop working.",
+    'no_api_keys'               => 'No API keys',
+    'create_key_for_whmcs'      => 'Create an API key to integrate with WHMCS or other billing systems.',
+    'api_endpoint_info'         => 'Use this URL as the server hostname in WHMCS. Set the API key as the Access Hash.',
+    'api_endpoint'              => 'API Endpoint',
+    // Permissions
+    'perm_create_accounts'      => 'Create accounts',
+    'perm_suspend_accounts'     => 'Suspend accounts',
+    'perm_unsuspend_accounts'   => 'Unsuspend accounts',
+    'perm_terminate_accounts'   => 'Terminate (delete) accounts',
+    'perm_change_passwords'     => 'Change account passwords',
+    'perm_change_packages'      => 'Change account packages',
+    // Flash messages
+    'api_key_revoked'           => "API key ':name' revoked.",
+];

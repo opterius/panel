@@ -1,6 +1,6 @@
 <x-user-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">FTP Accounts</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('ftp.ftp_accounts') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -15,7 +15,7 @@
         <div class="px-6 py-5">
             <form method="GET" action="{{ route('user.ftp.index') }}" class="flex items-end gap-4">
                 <div class="flex-1">
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Account</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('cron.account') }}</label>
                     <select name="account_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         @foreach($accounts as $account)
                             <option value="{{ $account->id }}" @selected($selectedAccount && $selectedAccount->id === $account->id)>
@@ -24,7 +24,7 @@
                         @endforeach
                     </select>
                 </div>
-                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">Manage</button>
+                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">{{ __('common.manage') }}</button>
             </form>
         </div>
     </div>
@@ -33,27 +33,27 @@
         <!-- Create FTP Account -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">Create FTP Account</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('ftp.create_ftp_account') }}</h3>
             </div>
             <form action="{{ route('user.ftp.store') }}" method="POST" class="px-6 py-5">
                 @csrf
                 <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Username</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.username') }}</label>
                         <input type="text" name="username" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="ftpuser">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
-                        <input type="password" name="password" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="Min 8 chars">
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.password') }}</label>
+                        <input type="password" name="password" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500" placeholder="{{ __('ftp.min_chars') }}">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Directory</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('ftp.directory') }}</label>
                         <input type="text" name="directory" value="{{ $selectedAccount->home_directory }}" class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
                     </div>
                     <div class="flex items-end">
                         <button type="submit" class="w-full inline-flex items-center justify-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                            Create
+                            {{ __('common.create') }}
                         </button>
                     </div>
                 </div>
@@ -63,10 +63,10 @@
         <!-- FTP Accounts List -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">FTP Accounts</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('ftp.ftp_accounts') }}</h3>
             </div>
             @if(empty($ftpAccounts))
-                <div class="px-6 py-12 text-center text-sm text-gray-400">No FTP accounts for this user.</div>
+                <div class="px-6 py-12 text-center text-sm text-gray-400">{{ __('ftp.no_ftp_accounts') }}</div>
             @else
                 <div class="divide-y divide-gray-100">
                     @foreach($ftpAccounts as $ftp)
@@ -75,7 +75,7 @@
                                 <div class="text-sm font-semibold text-gray-800 font-mono">{{ $ftp['username'] }}</div>
                                 <div class="text-xs text-gray-500 font-mono">{{ $ftp['directory'] }}</div>
                             </div>
-                            <form action="{{ route('user.ftp.destroy') }}" method="POST" onsubmit="return confirm('Delete FTP account {{ $ftp['username'] }}?')">
+                            <form action="{{ route('user.ftp.destroy') }}" method="POST" onsubmit="return confirm('{{ __('ftp.delete_ftp_account', ['username' => $ftp['username']]) }}')">
                                 @csrf
                                 <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">
                                 <input type="hidden" name="username" value="{{ $ftp['username'] }}">
@@ -92,25 +92,25 @@
         <!-- Connection Details -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">FTP Connection Settings</h3>
+                <h3 class="text-base font-semibold text-gray-800">{{ __('ftp.ftp_connection_settings') }}</h3>
             </div>
             <div class="px-6 py-5">
                 <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <dt class="text-gray-500">Server</dt>
+                        <dt class="text-gray-500">{{ __('ftp.ftp_server') }}</dt>
                         <dd class="font-mono text-gray-800">{{ $selectedAccount->server->ip_address }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Port</dt>
+                        <dt class="text-gray-500">{{ __('ftp.ftp_port') }}</dt>
                         <dd class="font-mono text-gray-800">21</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Protocol</dt>
-                        <dd class="text-gray-800">FTP / FTPS (Explicit TLS)</dd>
+                        <dt class="text-gray-500">{{ __('ftp.ftp_protocol') }}</dt>
+                        <dd class="text-gray-800">{{ __('ftp.ftp_protocol_value') }}</dd>
                     </div>
                     <div>
-                        <dt class="text-gray-500">Username</dt>
-                        <dd class="text-gray-800">Your FTP username</dd>
+                        <dt class="text-gray-500">{{ __('common.username') }}</dt>
+                        <dd class="text-gray-800">{{ __('ftp.ftp_username') }}</dd>
                     </div>
                 </dl>
             </div>

@@ -1,6 +1,6 @@
 <x-admin-layout>
     <x-slot name="header">
-        <h2 class="text-lg font-semibold text-gray-800">cPanel Migrations</h2>
+        <h2 class="text-lg font-semibold text-gray-800">{{ __('migrations.cpanel_migrations') }}</h2>
     </x-slot>
 
     @if(session('success'))
@@ -11,29 +11,29 @@
     @endif
 
     <div class="flex justify-between items-center mb-6">
-        <p class="text-sm text-gray-500">Import accounts from cPanel full backups.</p>
+        <p class="text-sm text-gray-500">{{ __('migrations.import_from_cpanel') }}</p>
         <a href="{{ route('admin.migrations.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-            Import Backup
+            {{ __('migrations.import_backup') }}
         </a>
     </div>
 
     @if($migrations->isEmpty())
         <div class="bg-white rounded-xl shadow-sm px-6 py-16 text-center">
             <svg class="mx-auto w-12 h-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg>
-            <h3 class="mt-4 text-base font-medium text-gray-700">No migrations yet</h3>
-            <p class="mt-2 text-sm text-gray-500">Import your first cPanel backup to migrate an account.</p>
+            <h3 class="mt-4 text-base font-medium text-gray-700">{{ __('migrations.no_migrations_yet') }}</h3>
+            <p class="mt-2 text-sm text-gray-500">{{ __('migrations.import_first_cpanel_backup') }}</p>
         </div>
     @else
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
             <table class="w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Domain</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Username</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Server</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('migrations.domain') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('migrations.username') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('migrations.server') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('common.status') }}</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">{{ __('migrations.date') }}</th>
                         <th class="px-6 py-3 w-24"></th>
                     </tr>
                 </thead>
@@ -57,18 +57,18 @@
                             <td class="px-6 py-4 text-right">
                                 <div class="flex items-center justify-end space-x-3">
                                     @if($m->status === 'previewing')
-                                        <a href="{{ route('admin.migrations.preview', $m) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">Configure</a>
+                                        <a href="{{ route('admin.migrations.preview', $m) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">{{ __('migrations.configure') }}</a>
                                     @elseif($m->status === 'running')
-                                        <a href="{{ route('admin.migrations.show', $m) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View</a>
+                                        <a href="{{ route('admin.migrations.show', $m) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">{{ __('migrations.view') }}</a>
                                     @else
-                                        <a href="{{ route('admin.migrations.show', $m) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">View</a>
+                                        <a href="{{ route('admin.migrations.show', $m) }}" class="text-indigo-600 hover:text-indigo-800 text-sm font-medium">{{ __('migrations.view') }}</a>
                                     @endif
 
                                     @if(!in_array($m->status, ['running', 'parsing']))
                                         <x-delete-modal
                                             :action="route('admin.migrations.destroy', $m)"
-                                            title="Delete Migration Record"
-                                            message="This will delete the migration record for {{ $m->main_domain ?? 'this account' }}. The imported account and its data will not be affected."
+                                            :title="__('migrations.delete_migration_record')"
+                                            :message="__('migrations.delete_record_confirmation', ['domain' => $m->main_domain ?? 'this account'])"
                                             :confirm-password="false">
                                             <x-slot name="trigger">
                                                 <button type="button" class="text-gray-400 hover:text-red-600 transition" title="Delete">
