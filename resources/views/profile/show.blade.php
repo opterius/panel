@@ -40,6 +40,40 @@
                     @livewire('profile.delete-user-form')
                 </div>
             @endif
+
+            <x-section-border />
+
+            <!-- Language Preference -->
+            <div class="mt-10 sm:mt-0">
+                <x-form-section submit="">
+                    <x-slot name="title">{{ __('profile.language') }}</x-slot>
+                    <x-slot name="description">{{ __('profile.select_language') }}</x-slot>
+
+                    <x-slot name="form">
+                        @if(session('status') === 'locale-updated')
+                            <div class="col-span-6 text-sm text-green-600">{{ __('profile.language_updated') }}</div>
+                        @endif
+
+                        <div class="col-span-6 sm:col-span-4">
+                            <x-label for="locale" value="{{ __('profile.language') }}" />
+                            <form method="POST" action="{{ route('user.locale') }}" id="locale-form">
+                                @csrf
+                                @method('PATCH')
+                                <select id="locale" name="locale" onchange="document.getElementById('locale-form').submit()"
+                                    class="mt-1 block w-full border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm text-sm">
+                                    @foreach(config('app.available_locales', []) as $code => $label)
+                                        <option value="{{ $code }}" {{ auth()->user()->locale === $code ? 'selected' : '' }}>
+                                            {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </form>
+                        </div>
+                    </x-slot>
+
+                    <x-slot name="actions"></x-slot>
+                </x-form-section>
+            </div>
         </div>
     </div>
 </x-app-layout>

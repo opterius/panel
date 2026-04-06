@@ -82,6 +82,17 @@ return [
 
     'fallback_locale' => env('APP_FALLBACK_LOCALE', 'en'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Available Locales
+    |--------------------------------------------------------------------------
+    | Add a new locale here and drop a matching folder in resources/lang/
+    | to make it available in the language switcher.
+    */
+    'available_locales' => [
+        'en' => 'English',
+    ],
+
     'faker_locale' => env('APP_FAKER_LOCALE', 'en_US'),
 
     /*

@@ -38,6 +38,7 @@ use App\Http\Controllers\SshController;
 use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\SslController;
 use App\Http\Controllers\UserPhpController;
+use App\Http\Controllers\UserLocaleController;
 use App\Http\Controllers\WordPressController;
 use Illuminate\Support\Facades\Route;
 
@@ -54,6 +55,9 @@ Route::middleware([
     config('jetstream.auth_session'),
     'verified',
 ])->group(function () {
+
+    // Language preference
+    Route::patch('/user/locale', [UserLocaleController::class, 'update'])->name('user.locale');
 
     // Default dashboard redirect based on role
     Route::get('/dashboard', function () {
