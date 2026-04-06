@@ -54,7 +54,7 @@
             @else
                 <div class="divide-y divide-gray-100">
                     @foreach($services as $service)
-                        <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                        <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-100 transition">
                             <div class="flex items-center space-x-4">
                                 <div class="w-10 h-10 rounded-lg flex items-center justify-center
                                     @if($service['status'] === 'active') bg-green-100
@@ -113,7 +113,7 @@
                                                                 </div>
                                                             </div>
                                                             <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                                                <button type="button" @click="confirmRestart = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                                <button type="button" @click="confirmRestart = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Cancel</button>
                                                                 <form action="{{ route('admin.services.action') }}" method="POST">
                                                                     @csrf
                                                                     <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
@@ -162,7 +162,7 @@
                                                                     </div>
                                                                 </div>
                                                                 <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                                                    <button type="button" @click="confirmStop = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                                    <button type="button" @click="confirmStop = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Cancel</button>
                                                                     <form action="{{ route('admin.services.action') }}" method="POST">
                                                                         @csrf
                                                                         <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">

@@ -70,7 +70,7 @@
 
                 <div class="flex items-center space-x-2">
                     <!-- New Folder -->
-                    <button @click="newFolder = !newFolder" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                    <button @click="newFolder = !newFolder" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">
                         <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
                         New Folder
                     </button>
@@ -136,7 +136,7 @@
 
                 <div class="divide-y divide-gray-50">
                     @foreach($entries as $entry)
-                        <div class="grid grid-cols-12 items-center px-6 py-2.5 hover:bg-gray-50 transition text-sm">
+                        <div class="grid grid-cols-12 items-center px-6 py-2.5 hover:bg-gray-100 transition text-sm">
                             <!-- Name -->
                             <div class="col-span-6 flex items-center space-x-3 min-w-0">
                                 @if($entry['is_dir'])
@@ -208,7 +208,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                                        <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                        <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Cancel</button>
                                                         <form action="{{ route('user.filemanager.delete') }}" method="POST">
                                                             @csrf
                                                             <input type="hidden" name="account_id" value="{{ $selectedAccount->id }}">

@@ -45,7 +45,7 @@
 
             <div class="divide-y divide-gray-50">
                 @foreach($records as $record)
-                    <div class="grid grid-cols-12 items-center px-6 py-2.5 hover:bg-gray-50 transition text-sm">
+                    <div class="grid grid-cols-12 items-center px-6 py-2.5 hover:bg-gray-100 transition text-sm">
                         <div class="col-span-1">
                             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold
                                 @switch($record['type'])
@@ -88,7 +88,7 @@
                                                         </div>
                                                     </div>
                                                     <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
-                                                        <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                                        <button type="button" @click="confirmDelete = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition">Cancel</button>
                                                         <form action="{{ route('user.dns.delete-record', $domain) }}" method="POST">
                                                             @csrf
                                                             <input type="hidden" name="record_id" value="{{ $record['id'] }}">

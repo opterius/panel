@@ -39,7 +39,7 @@
         @else
             <div class="divide-y divide-gray-100">
                 @foreach($cronJobs as $cron)
-                    <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                    <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-100 transition">
                         <div class="flex items-center space-x-4">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center
                                 @if($cron->enabled) bg-teal-100 @else bg-gray-100 @endif">

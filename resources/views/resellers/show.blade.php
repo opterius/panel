@@ -95,7 +95,7 @@
         @else
             <div class="divide-y divide-gray-100">
                 @foreach($accounts as $account)
-                    <a href="{{ route('admin.accounts.show', $account) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.accounts.show', $account) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-100 transition">
                         <div>
                             <div class="text-sm font-semibold text-gray-800">{{ $account->username }}</div>
                             <div class="text-xs text-gray-500">{{ $account->server->name }} &middot; {{ $account->domains->count() }} domains</div>

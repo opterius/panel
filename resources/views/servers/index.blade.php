@@ -35,7 +35,7 @@
         @else
             <div class="divide-y divide-gray-100">
                 @foreach($servers as $server)
-                    <a href="{{ route('admin.servers.show', $server) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition">
+                    <a href="{{ route('admin.servers.show', $server) }}" class="flex items-center justify-between px-6 py-4 hover:bg-gray-100 transition">
                         <div class="flex items-center space-x-4">
                             <!-- Status Indicator -->
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center

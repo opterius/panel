@@ -143,7 +143,7 @@
 
     <!-- Upload Custom Certificate (collapsible) -->
     <div class="mt-6 bg-white rounded-xl shadow-sm overflow-hidden" x-data="{ open: false }">
-        <button @click="open = !open" class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-50 transition">
+        <button @click="open = !open" class="w-full px-6 py-4 flex items-center justify-between text-left hover:bg-gray-100 transition">
             <div>
                 <h3 class="text-sm font-semibold text-gray-800">Upload Custom Certificate</h3>
                 <p class="text-xs text-gray-500 mt-0.5">Paste your own SSL certificate and private key.</p>
