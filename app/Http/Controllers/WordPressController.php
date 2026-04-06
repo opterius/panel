@@ -31,7 +31,7 @@ class WordPressController extends Controller
             ]);
 
             if ($response && $response->successful()) {
-                $sites = array_merge($sites, $response->json('sites', []));
+                $sites = array_merge($sites, $response->json('sites') ?? []);
             }
         }
 
