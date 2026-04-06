@@ -25,7 +25,12 @@ class AccountController extends Controller
 
         $accounts = $query->latest()->get();
 
-        return view('accounts.index', compact('accounts'));
+        $license = new \App\Services\LicenseService();
+        $maxAccounts = $license->maxAccounts();
+        $currentAccounts = Account::count();
+        $atLimit = $currentAccounts >= $maxAccounts && $maxAccounts !== PHP_INT_MAX;
+
+        return view('accounts.index', compact('accounts', 'maxAccounts', 'currentAccounts', 'atLimit'));
     }
 
     public function create()
