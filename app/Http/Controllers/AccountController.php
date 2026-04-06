@@ -38,6 +38,23 @@ class AccountController extends Controller
 
     public function store(Request $request)
     {
+        // Check license account limit
+        $license = new \App\Services\LicenseService();
+        $maxAccounts = $license->maxAccounts();
+        $currentAccounts = Account::count();
+
+        if ($currentAccounts >= $maxAccounts) {
+            return back()->with('error', "Account limit reached ({$currentAccounts}/{$maxAccounts}). Upgrade your license at opterius.com to create more accounts.")->withInput();
+        }
+
+        // Check reseller account limit
+        if (auth()->user()->isReseller()) {
+            if (!auth()->user()->resellerCanCreate('accounts')) {
+                $usage = auth()->user()->resellerUsage();
+                return back()->with('error', "Reseller account limit reached ({$usage['accounts']['used']}/{$usage['accounts']['limit']}).")->withInput();
+            }
+        }
+
         $validated = $request->validate([
             'server_id'  => 'required|exists:servers,id',
             'username'   => 'required|string|max:32|alpha_dash|unique:accounts,username',

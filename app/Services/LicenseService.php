@@ -112,6 +112,16 @@ class LicenseService
     }
 
     /**
+     * Get the maximum number of accounts allowed.
+     */
+    public function maxAccounts(): int
+    {
+        $status = $this->verify();
+        $max = $status['max_accounts'] ?? $status['max_domains'] ?? 3;
+        return $max === 0 ? PHP_INT_MAX : $max; // 0 = unlimited
+    }
+
+    /**
      * Get the current license plan.
      */
     public function plan(): string
