@@ -7,7 +7,6 @@ use App\Models\Database;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -16,7 +15,7 @@ class DatabaseController extends Controller
     public function index()
     {
         $databases = Database::with('server', 'account')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->latest()
             ->get();
 
@@ -25,8 +24,8 @@ class DatabaseController extends Controller
 
     public function create()
     {
-        $accounts = Account::with('server')
-            ->where('user_id', Auth::id())
+        $accounts = auth()->user()->accessibleAccounts()
+            ->with('server')
             ->get();
 
         return view('databases.create', compact('accounts'));

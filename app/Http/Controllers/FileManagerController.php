@@ -5,14 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class FileManagerController extends Controller
 {
     public function index(Request $request)
     {
-        $accounts = Account::with('server')
-            ->where('user_id', Auth::id())
+        $accounts = auth()->user()->accessibleAccounts()
+            ->with('server')
             ->get();
 
         $selectedAccount = null;
@@ -20,8 +19,8 @@ class FileManagerController extends Controller
         $currentPath = '';
 
         if ($request->has('account_id')) {
-            $selectedAccount = Account::with('server')
-                ->where('user_id', Auth::id())
+            $selectedAccount = auth()->user()->accessibleAccounts()
+                ->with('server')
                 ->findOrFail($request->account_id);
 
             $currentPath = $request->get('path', '/home/' . $selectedAccount->username);
@@ -47,8 +46,8 @@ class FileManagerController extends Controller
             'path'       => 'required|string',
         ]);
 
-        $account = Account::with('server')
-            ->where('user_id', Auth::id())
+        $account = auth()->user()->accessibleAccounts()
+            ->with('server')
             ->findOrFail($validated['account_id']);
 
         $response = AgentService::for($account->server)->post('/files/read', [

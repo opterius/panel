@@ -9,7 +9,6 @@ use App\Models\Server;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use App\Services\ActivityLogger;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class DomainController extends Controller
@@ -17,7 +16,7 @@ class DomainController extends Controller
     public function index()
     {
         $domains = Domain::with('server', 'account', 'sslCertificate')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->latest()
             ->get();
 
@@ -26,8 +25,8 @@ class DomainController extends Controller
 
     public function create()
     {
-        $accounts = Account::with('server')
-            ->where('user_id', Auth::id())
+        $accounts = auth()->user()->accessibleAccounts()
+            ->with('server')
             ->get();
 
         return view('domains.create', compact('accounts'));

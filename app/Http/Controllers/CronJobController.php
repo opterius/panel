@@ -7,7 +7,6 @@ use App\Models\CronJob;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class CronJobController extends Controller
@@ -15,7 +14,7 @@ class CronJobController extends Controller
     public function index()
     {
         $cronJobs = CronJob::with('server', 'account')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->latest()
             ->get();
 
@@ -24,8 +23,8 @@ class CronJobController extends Controller
 
     public function create()
     {
-        $accounts = Account::with('server')
-            ->where('user_id', Auth::id())
+        $accounts = auth()->user()->accessibleAccounts()
+            ->with('server')
             ->get();
 
         return view('cronjobs.create', compact('accounts'));

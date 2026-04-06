@@ -6,14 +6,13 @@ use App\Models\Domain;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class ForwarderController extends Controller
 {
     public function index(Request $request)
     {
         $domains = Domain::with('account.server')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->where('status', 'active')
             ->get();
 
@@ -22,7 +21,7 @@ class ForwarderController extends Controller
 
         if ($request->has('domain_id')) {
             $selectedDomain = Domain::with('account.server')
-                ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+                ->whereIn('account_id', auth()->user()->accessibleAccountIds())
                 ->findOrFail($request->domain_id);
 
             $response = AgentService::for($selectedDomain->account->server)->post('/forwarder/list', [

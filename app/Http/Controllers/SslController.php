@@ -8,7 +8,6 @@ use App\Models\SslCertificate;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class SslController extends Controller
@@ -16,12 +15,12 @@ class SslController extends Controller
     public function index()
     {
         $certificates = SslCertificate::with('domain.server', 'domain.account')
-            ->whereHas('domain.account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereHas('domain', fn ($q) => $q->whereIn('account_id', auth()->user()->accessibleAccountIds()))
             ->latest()
             ->get();
 
         $domains = Domain::with('server', 'account', 'sslCertificate')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->where('status', 'active')
             ->doesntHave('sslCertificate')
             ->get();

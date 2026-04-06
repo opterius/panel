@@ -100,6 +100,23 @@ class User extends Authenticatable
         return $this->hasMany(Account::class);
     }
 
+    /**
+     * Get all accounts this user can access (owned + collaborator).
+     */
+    public function accessibleAccounts()
+    {
+        return Account::where('user_id', $this->id)
+            ->orWhereHas('collaborators', fn ($q) => $q->where('users.id', $this->id));
+    }
+
+    /**
+     * Scope: accessible account IDs for use in whereIn queries.
+     */
+    public function accessibleAccountIds(): array
+    {
+        return $this->accessibleAccounts()->pluck('id')->toArray();
+    }
+
     public function packages(): HasMany
     {
         return $this->hasMany(Package::class, 'owner_id');

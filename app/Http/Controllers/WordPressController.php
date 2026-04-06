@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\Domain;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class WordPressController extends Controller
@@ -13,7 +12,7 @@ class WordPressController extends Controller
     public function index()
     {
         $domains = Domain::with('account.server')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->where('status', 'active')
             ->get();
 
@@ -41,7 +40,7 @@ class WordPressController extends Controller
     public function create()
     {
         $domains = Domain::with('account.server')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->where('status', 'active')
             ->get();
 

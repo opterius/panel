@@ -6,22 +6,21 @@ use App\Models\Account;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class FtpController extends Controller
 {
     public function index(Request $request)
     {
-        $accounts = Account::with('server')
-            ->where('user_id', Auth::id())
+        $accounts = auth()->user()->accessibleAccounts()
+            ->with('server')
             ->get();
 
         $selectedAccount = null;
         $ftpAccounts = [];
 
         if ($request->has('account_id')) {
-            $selectedAccount = Account::with('server')
-                ->where('user_id', Auth::id())
+            $selectedAccount = auth()->user()->accessibleAccounts()
+                ->with('server')
                 ->findOrFail($request->account_id);
 
             $response = AgentService::for($selectedAccount->server)->post('/ftp/list', [

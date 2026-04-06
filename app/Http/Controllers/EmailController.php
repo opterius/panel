@@ -7,7 +7,6 @@ use App\Models\EmailAccount;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
 class EmailController extends Controller
@@ -15,12 +14,12 @@ class EmailController extends Controller
     public function index()
     {
         $emailAccounts = EmailAccount::with('domain.server', 'domain.account')
-            ->whereHas('domain.account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereHas('domain', fn ($q) => $q->whereIn('account_id', auth()->user()->accessibleAccountIds()))
             ->latest()
             ->get();
 
         $domains = Domain::with('account.server')
-            ->whereHas('account', fn ($q) => $q->where('user_id', Auth::id()))
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
             ->where('status', 'active')
             ->get();
 

@@ -6,14 +6,13 @@ use App\Models\Account;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class SshController extends Controller
 {
     public function index(Request $request)
     {
-        $accounts = Account::with('server')
-            ->where('user_id', Auth::id())
+        $accounts = auth()->user()->accessibleAccounts()
+            ->with('server')
             ->get();
 
         $selectedAccount = null;
@@ -21,8 +20,8 @@ class SshController extends Controller
         $sshEnabled = false;
 
         if ($request->has('account_id')) {
-            $selectedAccount = Account::with('server')
-                ->where('user_id', Auth::id())
+            $selectedAccount = auth()->user()->accessibleAccounts()
+                ->with('server')
                 ->findOrFail($request->account_id);
 
             // Fetch keys from agent
