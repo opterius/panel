@@ -84,19 +84,19 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">CPU Usage</h3>
-                    <canvas id="cpuChart" height="200"></canvas>
+                    <div class="relative h-48"><canvas id="cpuChart"></canvas></div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">Memory Usage</h3>
-                    <canvas id="memChart" height="200"></canvas>
+                    <div class="relative h-48"><canvas id="memChart"></canvas></div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">Network I/O (KB/s)</h3>
-                    <canvas id="netChart" height="200"></canvas>
+                    <div class="relative h-48"><canvas id="netChart"></canvas></div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
                     <h3 class="text-sm font-semibold text-gray-700 mb-4">Load Average</h3>
-                    <canvas id="loadChart" height="200"></canvas>
+                    <div class="relative h-48"><canvas id="loadChart"></canvas></div>
                 </div>
             </div>
 
