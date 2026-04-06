@@ -36,70 +36,59 @@
             term.open(document.getElementById('terminal'));
             fitAddon.fit();
 
-            const agentUrl = '{{ $agentUrl }}';
-            const username = '{{ $account->username }}';
-            const token = '{{ $token }}';
+            const proxyUrl = @json($proxyUrl);
+            const accountId = @json((string)$account->id);
+            const token = @json($token);
+            const csrfToken = @json(csrf_token());
 
-            // Connect via fetch streaming
-            const controller = new AbortController();
-            const encoder = new TextEncoder();
-            const decoder = new TextDecoder();
+            let polling = true;
+            let inputBuffer = '';
 
-            // Create a writable stream for input
-            let inputWriter = null;
+            function sendInput(data) {
+                fetch(proxyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/octet-stream',
+                    },
+                    body: JSON.stringify({
+                        account_id: accountId,
+                        token: token,
+                        input: data,
+                    }),
+                }).then(response => {
+                    if (response.ok) return response.text();
+                    throw new Error('Request failed');
+                }).then(output => {
+                    if (output) term.write(output);
+                }).catch(() => {});
+            }
 
-            const connectUrl = agentUrl + '/terminal/connect?username=' + username + '&token=' + token;
+            function pollOutput() {
+                if (!polling) return;
+                sendInput(inputBuffer);
+                inputBuffer = '';
+                setTimeout(pollOutput, 100);
+            }
 
-            fetch(connectUrl, {
-                method: 'POST',
-                signal: controller.signal,
-                headers: { 'Content-Type': 'application/octet-stream' },
-                body: new ReadableStream({
-                    start(ctrl) {
-                        inputWriter = ctrl;
-                    }
-                }),
-                duplex: 'half',
-            }).then(response => {
-                const reader = response.body.getReader();
-                function read() {
-                    reader.read().then(({ done, value }) => {
-                        if (done) {
-                            term.writeln('\r\n\x1b[33mSession ended.\x1b[0m');
-                            return;
-                        }
-                        term.write(value);
-                        read();
-                    });
-                }
-                read();
-            }).catch(err => {
-                if (err.name !== 'AbortError') {
-                    term.writeln('\r\n\x1b[31mConnection failed: ' + err.message + '\x1b[0m');
-                }
-            });
+            pollOutput();
 
-            // Send keystrokes
-            term.onData(data => {
-                if (inputWriter) {
-                    inputWriter.enqueue(encoder.encode(data));
-                }
-            });
+            term.onData(data => { inputBuffer += data; });
 
-            // Handle resize
             term.onResize(({ rows, cols }) => {
-                if (inputWriter) {
-                    const msg = '\x01' + JSON.stringify({ rows, cols });
-                    inputWriter.enqueue(encoder.encode(msg));
-                }
+                fetch(proxyUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrfToken },
+                    body: JSON.stringify({ account_id: accountId, token: token, input: '\x01' + JSON.stringify({ rows, cols }) }),
+                });
             });
 
             window.addEventListener('resize', () => fitAddon.fit());
 
-            // Cleanup on page leave
-            window.addEventListener('beforeunload', () => {
-                controller.abort();
-            });
+            term.writeln('\x1b[32mConnecting to {{ $account->username }}@{{ $account->server->ip_address }}...\x1b[0m\r\n');
+
+            window.addEventListener('beforeunload', () => { polling = false; });
         });
     </script>
 </x-user-layout>

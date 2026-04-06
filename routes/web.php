@@ -220,6 +220,7 @@ Route::middleware([
         // Web Terminal
         Route::get('/terminal', [TerminalController::class, 'index'])->name('terminal.index');
         Route::post('/terminal/connect', [TerminalController::class, 'connect'])->name('terminal.connect');
+        Route::post('/terminal/proxy', [TerminalController::class, 'proxy'])->name('terminal.proxy');
 
         // Custom Nginx Directives
         Route::get('/nginx-directives', [NginxDirectiveController::class, 'index'])->name('nginx-directives.index');
