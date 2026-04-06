@@ -5,7 +5,7 @@
 
     @php
         $accountIds = auth()->user()->accessibleAccountIds();
-        $myDomains = \App\Models\Domain::whereIn('account_id', $accountIds)->get();
+        $myDomains = \App\Models\Domain::whereIn('account_id', $accountIds)->whereNull('parent_id')->get();
         $myDatabases = \App\Models\Database::whereIn('account_id', $accountIds)->count();
         $myCerts = \App\Models\SslCertificate::whereHas('domain', fn($q) => $q->whereIn('account_id', $accountIds))->count();
         $myCrons = \App\Models\CronJob::whereIn('account_id', $accountIds)->count();
@@ -36,82 +36,111 @@
         </div>
     </div>
 
-    <!-- Feature Icons Grid (cPanel style) -->
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
-        <h3 class="text-base font-semibold text-gray-800 mb-6">Manage Your Hosting</h3>
+    <!-- Feature Groups -->
+    <div class="space-y-6 mb-8">
 
-        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
-            <a href="{{ route('user.domains.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-indigo-50 transition">
-                
-                    <svg class="w-10 h-10 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-indigo-700">Domains</span>
-            </a>
+        {{-- Domains --}}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Domains</h3>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                <a href="{{ route('user.domains.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
+                    <svg class="w-9 h-9 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-indigo-700">Domains</span>
+                </a>
+                @if($myDomains->isNotEmpty())
+                    <a href="{{ route('user.subdomains.create', $myDomains->first()) }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-sky-50 transition">
+                        <svg class="w-9 h-9 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-sky-700">Subdomains</span>
+                    </a>
+                    <a href="{{ route('user.dns.index', $myDomains->first()) }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-rose-50 transition">
+                        <svg class="w-9 h-9 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2m-2-4h.01M17 16h.01" /></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-rose-700">DNS</span>
+                    </a>
+                @endif
+                <a href="{{ route('user.ssl.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-green-50 transition">
+                    <svg class="w-9 h-9 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-green-700">SSL</span>
+                </a>
+            </div>
+        </div>
 
-            <a href="{{ route('user.filemanager.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-blue-50 transition">
-                
-                    <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-blue-700">File Manager</span>
-            </a>
+        {{-- Files --}}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Files</h3>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                <a href="{{ route('user.filemanager.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-blue-50 transition">
+                    <svg class="w-9 h-9 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-blue-700">File Manager</span>
+                </a>
+                <a href="{{ route('user.ftp.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-sky-50 transition">
+                    <svg class="w-9 h-9 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-sky-700">FTP</span>
+                </a>
+                <a href="{{ route('user.ssh.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-gray-100 transition">
+                    <svg class="w-9 h-9 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-gray-800">SSH</span>
+                </a>
+            </div>
+        </div>
 
-            <a href="{{ route('user.databases.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-purple-50 transition">
-                
-                    <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-purple-700">Databases</span>
-            </a>
+        {{-- Databases --}}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Databases</h3>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                <a href="{{ route('user.databases.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-purple-50 transition">
+                    <svg class="w-9 h-9 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-purple-700">Databases</span>
+                </a>
+                <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.phpmyadmin_url', 'http://SERVER_IP:8081')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-amber-50 transition">
+                    <svg class="w-9 h-9 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-amber-700">phpMyAdmin</span>
+                </a>
+            </div>
+        </div>
 
-            <a href="{{ route('user.emails.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-orange-50 transition">
-                
-                    <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-orange-700">Email</span>
-            </a>
+        {{-- Email --}}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Email</h3>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                <a href="{{ route('user.emails.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-orange-50 transition">
+                    <svg class="w-9 h-9 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-orange-700">Email Accounts</span>
+                </a>
+                <a href="{{ route('user.forwarders.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-cyan-50 transition">
+                    <svg class="w-9 h-9 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-cyan-700">Forwarders</span>
+                </a>
+                <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.webmail_url', 'http://SERVER_IP:8080')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-orange-50 transition">
+                    <svg class="w-9 h-9 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-orange-700">Webmail</span>
+                </a>
+            </div>
+        </div>
 
-            <a href="{{ route('user.ssl.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-green-50 transition">
-                
-                    <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-green-700">SSL</span>
-            </a>
+        {{-- Software --}}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Software</h3>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                <a href="{{ route('user.wordpress.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-blue-50 transition">
+                    <svg class="w-9 h-9 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M21.469 6.825c.84 1.537 1.318 3.3 1.318 5.175 0 3.979-2.156 7.456-5.363 9.325l3.295-9.527c.615-1.539.82-2.771.82-3.864 0-.405-.027-.78-.07-1.109m-7.981.105c.647-.034 1.229-.1 1.229-.1.578-.068.51-.919-.068-.886 0 0-1.739.136-2.86.136-1.052 0-2.825-.136-2.825-.136-.579-.034-.646.852-.068.886 0 0 .549.066 1.13.1l1.68 4.605-2.37 7.08L5.554 6.93c.647-.034 1.229-.1 1.229-.1.578-.068.51-.919-.068-.886 0 0-1.739.136-2.86.136-.201 0-.438-.005-.689-.015C4.911 3.15 8.186 1.213 11.951 1.213c2.8 0 5.35 1.072 7.269 2.818-.046-.003-.091-.009-.141-.009-1.052 0-1.798.919-1.798 1.904 0 .886.51 1.636 1.054 2.522.408.715.886 1.636.886 2.964 0 .919-.354 1.985-.82 3.472l-1.075 3.586-3.894-11.575m-3.007 1.21l-3.357 9.755-2.96-8.115c-.133-.35-.257-.671-.38-.96A8.757 8.757 0 0 1 3.213 12c0-1.665.47-3.222 1.275-4.545m8.463 8.847l2.482-7.19 2.54 6.946c.017.04.036.078.054.114-1.589.666-3.32 1.038-5.138 1.038-.583 0-1.153-.044-1.712-.12" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-blue-700">WordPress</span>
+                </a>
+                <a href="{{ route('user.laravel.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-red-50 transition">
+                    <svg class="w-9 h-9 text-red-500" viewBox="0 0 24 24" fill="currentColor"><path d="M23.642 5.43a.364.364 0 01.014.1v5.149a.361.361 0 01-.181.311l-4.32 2.494v4.934a.36.36 0 01-.181.311l-9.033 5.215a.367.367 0 01-.086.036.369.369 0 01-.274-.036L.548 18.73A.361.361 0 01.364 18.42V2.881a.361.361 0 01.014-.1.357.357 0 01.04-.09.36.36 0 01.056-.063l.01-.01a.36.36 0 01.077-.054L4.93.387a.361.361 0 01.361 0l4.369 2.523a.361.361 0 01.18.311v9.648l3.806-2.198V5.523a.358.358 0 01.015-.1.36.36 0 01.095-.153l.01-.01a.363.363 0 01.077-.054l4.369-2.523a.361.361 0 01.36 0l4.37 2.523a.36.36 0 01.077.054l.01.01a.36.36 0 01.055.063.361.361 0 01.04.09z"/></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-red-700">Laravel</span>
+                </a>
+            </div>
+        </div>
 
-            <a href="{{ route('user.forwarders.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-cyan-50 transition">
-                
-                    <svg class="w-10 h-10 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-cyan-700">Forwarders</span>
-            </a>
-
-            <a href="{{ route('user.cronjobs.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-teal-50 transition">
-                
-                    <svg class="w-10 h-10 text-teal-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-teal-700">Cron Jobs</span>
-            </a>
-
-            <a href="{{ route('user.ftp.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-sky-50 transition">
-                
-                    <svg class="w-10 h-10 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-sky-700">FTP</span>
-            </a>
-
-            <a href="{{ route('user.ssh.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition">
-                
-                    <svg class="w-10 h-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-gray-800">SSH</span>
-            </a>
-
-            <a href="{{ route('user.wordpress.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-blue-50 transition">
-                
-                    <svg class="w-10 h-10 text-blue-600" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-blue-700">WordPress</span>
-            </a>
-
-            <a href="{{ route('user.laravel.index') }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-red-50 transition">
-                
-                    <svg class="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-red-700">Laravel</span>
-            </a>
-
-            <a href="{{ route('user.dns.index', $myDomains->first() ?? 0) }}" class="group flex flex-col items-center p-4 rounded-xl hover:bg-rose-50 transition {{ $myDomains->isEmpty() ? 'opacity-50 pointer-events-none' : '' }}">
-                
-                    <svg class="w-10 h-10 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-rose-700">DNS</span>
-            </a>
+        {{-- Advanced --}}
+        <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-4">Advanced</h3>
+            <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                <a href="{{ route('user.cronjobs.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-teal-50 transition">
+                    <svg class="w-9 h-9 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                    <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-teal-700">Cron Jobs</span>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -141,7 +170,7 @@
                             </div>
                             <div>
                                 <div class="text-sm font-semibold text-gray-800">{{ $domain->domain }}</div>
-                                <div class="text-xs text-gray-500">PHP {{ $domain->php_version }} &middot; {{ $domain->document_root }}</div>
+                                <div class="text-xs text-gray-500">PHP {{ $domain->php_version }}</div>
                             </div>
                         </div>
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium

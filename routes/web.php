@@ -169,8 +169,8 @@ Route::middleware([
         Route::get('/laravel/install', [LaravelInstallerController::class, 'create'])->name('laravel.create');
         Route::post('/laravel/install', [LaravelInstallerController::class, 'store'])->name('laravel.store');
 
-        // Domains
-        Route::resource('domains', DomainController::class)->only(['index', 'create', 'store', 'destroy']);
+        // Domains (create/store removed — domain is created with the account)
+        Route::resource('domains', DomainController::class)->only(['index', 'destroy']);
 
         // Email Forwarders
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');

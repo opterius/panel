@@ -55,6 +55,7 @@ class SubdomainController extends Controller
         $subdomain = Domain::create([
             'server_id'     => $domain->server_id,
             'account_id'    => $domain->account_id,
+            'parent_id'     => $domain->id,
             'domain'        => $fullDomain,
             'document_root' => $documentRoot,
             'php_version'   => $domain->php_version,

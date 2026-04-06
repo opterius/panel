@@ -2,10 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\SslController;
-use App\Models\Account;
 use App\Models\Domain;
-use App\Models\Server;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use App\Services\ActivityLogger;
@@ -15,75 +12,14 @@ class DomainController extends Controller
 {
     public function index()
     {
-        $domains = Domain::with('server', 'account', 'sslCertificate')
+        // Only show main domains (not subdomains) — each account has exactly one main domain
+        $domains = Domain::with('server', 'account', 'sslCertificate', 'subdomains')
             ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereNull('parent_id')
             ->latest()
             ->get();
 
         return view('domains.index', compact('domains'));
-    }
-
-    public function create()
-    {
-        $accounts = auth()->user()->accessibleAccounts()
-            ->with('server')
-            ->get();
-
-        return view('domains.create', compact('accounts'));
-    }
-
-    public function store(Request $request)
-    {
-        $validated = $request->validate([
-            'account_id'  => 'required|exists:accounts,id',
-            'domain'      => 'required|string|max:255|unique:domains,domain',
-            'php_version' => 'required|string|in:' . implode(',', config('opterius.php_versions')),
-        ]);
-
-        $account = Account::with('server')->findOrFail($validated['account_id']);
-        $documentRoot = $account->home_directory . '/' . $validated['domain'] . '/public_html';
-
-        $domain = Domain::create([
-            'server_id'     => $account->server_id,
-            'account_id'    => $account->id,
-            'domain'        => $validated['domain'],
-            'document_root' => $documentRoot,
-            'php_version'   => $validated['php_version'],
-            'status'        => 'pending',
-        ]);
-
-        // Send create request to the Go agent
-        $response = AgentService::for($account->server)->post('/domains/create', [
-            'domain'        => $domain->domain,
-            'document_root' => $domain->document_root,
-            'username'      => $account->username,
-            'php_version'   => $domain->php_version,
-        ]);
-
-        if ($response && $response->successful()) {
-            $domain->update(['status' => 'active']);
-
-            // Auto-create DNS zone
-            AgentService::for($account->server)->post('/dns/create-zone', [
-                'domain'    => $domain->domain,
-                'server_ip' => $account->server->ip_address,
-                'ns1'       => config('opterius.ns1', 'ns1.' . $domain->domain),
-                'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
-            ]);
-
-            // Auto SSL
-            SslController::autoIssue($domain);
-
-            ActivityLogger::log('domain.created', 'domain', $domain->id, $domain->domain,
-                "Created domain {$domain->domain}", ['server_id' => $domain->server_id, 'account_id' => $account->id]);
-
-            return redirect()->route('user.domains.index')->with('success', 'Domain ' . $domain->domain . ' created successfully.');
-        }
-
-        $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
-        $domain->update(['status' => 'error']);
-
-        return redirect()->route('user.domains.index')->with('warning', 'Domain saved but agent setup failed: ' . $error);
     }
 
     public function destroy(Request $request, Domain $domain)
@@ -98,10 +34,15 @@ class DomainController extends Controller
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
 
+        // Only allow deleting subdomains, not the main domain (main domain is deleted with account)
+        if (!$domain->isSubdomain()) {
+            return back()->with('error', 'The main domain cannot be deleted. Delete the account instead.');
+        }
+
         $domain->load('account.server');
 
-        ActivityLogger::log('domain.deleted', 'domain', $domain->id, $domain->domain,
-            "Deleted domain {$domain->domain}", ['server_id' => $domain->server_id, 'account_id' => $domain->account_id]);
+        ActivityLogger::log('subdomain.deleted', 'domain', $domain->id, $domain->domain,
+            "Deleted subdomain {$domain->domain}", ['server_id' => $domain->server_id, 'account_id' => $domain->account_id]);
 
         // Send delete request to the Go agent
         AgentService::for($domain->account->server)->post('/domains/delete', [
@@ -112,6 +53,6 @@ class DomainController extends Controller
 
         $domain->delete();
 
-        return redirect()->route('user.domains.index')->with('success', 'Domain ' . $domain->domain . ' removed.');
+        return redirect()->route('user.domains.index')->with('success', 'Subdomain ' . $domain->domain . ' removed.');
     }
 }

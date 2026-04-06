@@ -4,12 +4,13 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Domain extends Model
 {
     protected $fillable = [
-        'server_id', 'account_id', 'domain', 'document_root', 'php_version', 'status',
+        'server_id', 'account_id', 'parent_id', 'domain', 'document_root', 'php_version', 'status',
     ];
 
     public function server(): BelongsTo
@@ -20,6 +21,21 @@ class Domain extends Model
     public function account(): BelongsTo
     {
         return $this->belongsTo(Account::class);
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(Domain::class, 'parent_id');
+    }
+
+    public function subdomains(): HasMany
+    {
+        return $this->hasMany(Domain::class, 'parent_id');
+    }
+
+    public function isSubdomain(): bool
+    {
+        return $this->parent_id !== null;
     }
 
     public function sslCertificate(): HasOne
