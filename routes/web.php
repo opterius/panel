@@ -4,6 +4,7 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\BackupController;
+use App\Http\Controllers\CollaboratorController;
 use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\UpdateController;
@@ -63,6 +64,10 @@ Route::middleware([
         Route::resource('servers', ServerController::class)->except(['edit', 'update']);
         Route::resource('accounts', AccountController::class)->except(['edit', 'update']);
         Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
+        Route::get('/accounts/{account}/collaborators', [CollaboratorController::class, 'index'])->name('collaborators.index');
+        Route::post('/accounts/{account}/collaborators', [CollaboratorController::class, 'store'])->name('collaborators.store');
+        Route::post('/accounts/{account}/collaborators/{user}/role', [CollaboratorController::class, 'updateRole'])->name('collaborators.update-role');
+        Route::delete('/accounts/{account}/collaborators/{user}', [CollaboratorController::class, 'destroy'])->name('collaborators.destroy');
         Route::resource('packages', PackageController::class)->except(['show']);
         Route::resource('resellers', ResellerController::class);
 

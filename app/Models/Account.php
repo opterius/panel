@@ -51,4 +51,42 @@ class Account extends Model
     {
         return $this->hasMany(CronJob::class);
     }
+
+    /**
+     * Users who have access to this account (collaborators).
+     */
+    public function collaborators()
+    {
+        return $this->belongsToMany(User::class, 'account_user')
+            ->withPivot('role')
+            ->withTimestamps();
+    }
+
+    /**
+     * Check if a user has a specific permission on this account.
+     */
+    public function userCan(User $user, string $permission): bool
+    {
+        // Account owner (user_id) always has full access
+        if ($this->user_id === $user->id) return true;
+
+        // Admin role always has full access
+        if ($user->isAdmin()) return true;
+
+        $pivot = $this->collaborators()->where('user_id', $user->id)->first();
+        if (!$pivot) return false;
+
+        $role = $pivot->pivot->role;
+
+        $permissions = [
+            'owner'         => ['files', 'databases', 'email', 'ssh', 'cron', 'ssl', 'dns', 'settings'],
+            'admin'         => ['files', 'databases', 'email', 'ssh', 'cron', 'ssl', 'dns'],
+            'developer'     => ['files', 'databases', 'ssh', 'cron'],
+            'designer'      => ['files'],
+            'email_manager' => ['email'],
+            'viewer'        => [],
+        ];
+
+        return in_array($permission, $permissions[$role] ?? []);
+    }
 }

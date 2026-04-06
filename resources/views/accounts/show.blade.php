@@ -155,6 +155,23 @@
         </div>
     </div>
 
+    <!-- Team Access -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold text-gray-800">Team Access</h3>
+                <p class="text-sm text-gray-500 mt-1">
+                    {{ $account->collaborators()->count() }} collaborator{{ $account->collaborators()->count() !== 1 ? 's' : '' }}
+                    &middot; Owner: {{ $account->user->email }}
+                </p>
+            </div>
+            <a href="{{ route('admin.collaborators.index', $account) }}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-600 bg-white border border-indigo-300 rounded-lg hover:bg-indigo-50 transition">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                Manage Team
+            </a>
+        </div>
+    </div>
+
     <!-- Bandwidth per Domain -->
     @if($stats && !empty($stats['bandwidth']['domains']))
         <div class="bg-white rounded-xl shadow-sm mb-8">
