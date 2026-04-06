@@ -97,6 +97,7 @@ class MigrationController extends Controller
         ]);
 
         $migration->update([
+            'status'          => 'pending',
             'target_username' => $validated['target_username'],
             'options' => [
                 'package'          => Package::find($validated['package_id'])->name,

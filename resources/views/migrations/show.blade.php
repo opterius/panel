@@ -9,9 +9,9 @@
     </x-slot>
 
     <div class="max-w-3xl space-y-6"
-         @if(in_array($migration->status, ['running', 'parsing']))
-            x-data="{ poll() { fetch('{{ route('admin.migrations.status', $migration) }}').then(r => r.json()).then(d => { this.status = d.status; this.progress = d.progress; this.step = d.current_step; this.result = d.result; this.error = d.error; if (!['running','parsing'].includes(d.status)) clearInterval(this.interval); }); }, status: '{{ $migration->status }}', progress: {{ $migration->progress }}, step: '{{ $migration->current_step }}', result: null, error: null, interval: null }"
-            x-init="interval = setInterval(() => poll(), 3000)"
+         @if(in_array($migration->status, ['running', 'parsing', 'pending', 'previewing']))
+            x-data="{ poll() { fetch('{{ route('admin.migrations.status', $migration) }}').then(r => r.json()).then(d => { this.status = d.status; this.progress = d.progress; this.step = d.current_step; this.result = d.result; this.error = d.error; if (['completed','partial','failed'].includes(d.status)) clearInterval(this.interval); }); }, status: '{{ $migration->status }}', progress: {{ $migration->progress }}, step: '{{ $migration->current_step ?? '' }}', result: null, error: null, interval: null }"
+            x-init="interval = setInterval(() => poll(), 2000)"
          @else
             x-data="{ status: '{{ $migration->status }}', progress: {{ $migration->progress }}, step: '', result: {{ json_encode($migration->result) }}, error: {{ json_encode($migration->error) }} }"
          @endif
