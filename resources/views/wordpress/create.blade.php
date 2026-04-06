@@ -15,7 +15,9 @@
     @endif
 
     <form action="{{ route('user.wordpress.store') }}" method="POST"
+          @submit="installing = true"
           x-data="{
+              installing: false,
               installPath: '',
               adminUser: '',
               password: '',
@@ -208,10 +210,15 @@
             {{-- Submit --}}
             <div class="flex items-center space-x-3">
                 <button type="submit"
-                    :disabled="!adminUser || passwordStrength.score < 3 || adminUser === 'admin'"
+                    :disabled="installing || !adminUser || passwordStrength.score < 3 || adminUser === 'admin'"
                     class="inline-flex items-center px-6 py-3 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/></svg>
-                    Install WordPress
+                    <template x-if="!installing">
+                        <svg class="w-4 h-4 mr-2" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z"/></svg>
+                    </template>
+                    <template x-if="installing">
+                        <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    </template>
+                    <span x-text="installing ? 'Installing WordPress... Please wait' : 'Install WordPress'">Install WordPress</span>
                 </button>
                 <a href="{{ route('user.wordpress.index') }}" class="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                     Cancel
