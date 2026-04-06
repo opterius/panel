@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\AlertController;
 use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\DnsController;
@@ -58,6 +59,12 @@ Route::middleware([
         Route::get('/monitor', [MonitorController::class, 'index'])->name('monitor.index');
         Route::get('/monitor/realtime', [MonitorController::class, 'realtime'])->name('monitor.realtime');
         Route::post('/monitor/processes', [MonitorController::class, 'topProcesses'])->name('monitor.processes');
+
+        // Alerts
+        Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
+        Route::post('/alerts', [AlertController::class, 'store'])->name('alerts.store');
+        Route::post('/alerts/{alertRule}/toggle', [AlertController::class, 'toggle'])->name('alerts.toggle');
+        Route::delete('/alerts/{alertRule}', [AlertController::class, 'destroy'])->name('alerts.destroy');
 
         // Services
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
