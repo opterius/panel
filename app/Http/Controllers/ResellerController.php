@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -40,7 +41,10 @@ class ResellerController extends Controller
         $validated['role'] = 'reseller';
         $validated['password'] = Hash::make($validated['password']);
 
-        User::create($validated);
+        $reseller = User::create($validated);
+
+        ActivityLogger::log('reseller.created', 'user', $reseller->id, $reseller->name,
+            "Created reseller {$reseller->name} ({$reseller->email})", ['email' => $reseller->email]);
 
         return redirect()->route('admin.resellers.index')->with('success', 'Reseller ' . $validated['name'] . ' created.');
     }
@@ -87,6 +91,9 @@ class ResellerController extends Controller
 
         $reseller->update($validated);
 
+        ActivityLogger::log('reseller.updated', 'user', $reseller->id, $reseller->name,
+            "Updated reseller {$reseller->name}");
+
         return redirect()->route('admin.resellers.show', $reseller)->with('success', 'Reseller updated.');
     }
 
@@ -97,6 +104,9 @@ class ResellerController extends Controller
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
+
+        ActivityLogger::log('reseller.deleted', 'user', $reseller->id, $reseller->name,
+            "Deleted reseller {$reseller->name} ({$reseller->email})", ['email' => $reseller->email]);
 
         $reseller->delete();
 

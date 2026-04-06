@@ -9,6 +9,7 @@ use App\Models\Server;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\Hash;
 
 class AccountController extends Controller
@@ -113,8 +114,14 @@ class AccountController extends Controller
                 'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
             ]);
 
+            ActivityLogger::log('account.created', 'account', $account->id, $account->username,
+                "Created account {$account->username} with domain {$validated['domain']}", ['server_id' => $account->server_id]);
+
             return redirect()->route('admin.accounts.show', $account)->with('success', 'Account created with domain ' . $validated['domain']);
         }
+
+        ActivityLogger::log('account.created', 'account', $account->id, $account->username,
+            "Created account {$account->username} (server setup failed)", ['server_id' => $account->server_id]);
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
         return redirect()->route('admin.accounts.show', $account)->with('warning', 'Account saved but server setup failed: ' . $error);
@@ -144,6 +151,9 @@ class AccountController extends Controller
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
+
+        ActivityLogger::log('account.deleted', 'account', $account->id, $account->username,
+            "Deleted account {$account->username}", ['server_id' => $account->server_id]);
 
         $account->delete();
 

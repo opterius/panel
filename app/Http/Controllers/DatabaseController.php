@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\Database;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -76,6 +77,9 @@ class DatabaseController extends Controller
             'status'      => 'active',
         ]);
 
+        ActivityLogger::log('database.created', 'database', $database->id, $database->name,
+            "Created database {$database->name}", ['server_id' => $account->server_id, 'account_id' => $account->id]);
+
         return redirect()->route('user.databases.show', $database)->with('success', 'Database ' . $database->name . ' created successfully.');
     }
 
@@ -110,6 +114,9 @@ class DatabaseController extends Controller
         ]);
 
         if ($response && $response->successful()) {
+            ActivityLogger::log('database.password_changed', 'database', $database->id, $database->name,
+                "Changed password for database user {$database->db_username}", ['db_username' => $database->db_username]);
+
             return redirect()->route('user.databases.show', $database)->with('success', 'Password changed for ' . $database->db_username);
         }
 
@@ -142,6 +149,9 @@ class DatabaseController extends Controller
         }
 
         $database->load('account.server');
+
+        ActivityLogger::log('database.deleted', 'database', $database->id, $database->name,
+            "Deleted database {$database->name}", ['server_id' => $database->server_id, 'account_id' => $database->account_id]);
 
         AgentService::for($database->account->server)->post('/databases/delete', [
             'name' => $database->name,

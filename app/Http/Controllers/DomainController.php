@@ -7,6 +7,7 @@ use App\Models\Domain;
 use App\Models\Server;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
+use App\Services\ActivityLogger;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 
@@ -70,6 +71,9 @@ class DomainController extends Controller
                 'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
             ]);
 
+            ActivityLogger::log('domain.created', 'domain', $domain->id, $domain->domain,
+                "Created domain {$domain->domain}", ['server_id' => $domain->server_id, 'account_id' => $account->id]);
+
             return redirect()->route('user.domains.index')->with('success', 'Domain ' . $domain->domain . ' created successfully.');
         }
 
@@ -86,6 +90,9 @@ class DomainController extends Controller
         }
 
         $domain->load('account.server');
+
+        ActivityLogger::log('domain.deleted', 'domain', $domain->id, $domain->domain,
+            "Deleted domain {$domain->domain}", ['server_id' => $domain->server_id, 'account_id' => $domain->account_id]);
 
         // Send delete request to the Go agent
         AgentService::for($domain->account->server)->post('/domains/delete', [

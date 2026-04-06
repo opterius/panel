@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,6 +59,9 @@ class SshController extends Controller
         if ($response && $response->successful()) {
             $data = $response->json();
 
+            ActivityLogger::log('ssh.key_generated', 'account', $account->id, $account->username,
+                "Generated {$validated['key_type']} SSH key for {$account->username}", ['key_type' => $validated['key_type'], 'server_id' => $account->server_id]);
+
             // Return private key as a downloadable file
             return response($data['private_key'])
                 ->header('Content-Type', 'application/x-pem-file')
@@ -85,6 +89,9 @@ class SshController extends Controller
         ]);
 
         if ($response && $response->successful()) {
+            ActivityLogger::log('ssh.key_imported', 'account', $account->id, $account->username,
+                "Imported SSH key for {$account->username}", ['server_id' => $account->server_id]);
+
             return redirect()
                 ->route('user.ssh.index', ['account_id' => $account->id])
                 ->with('success', 'SSH key imported successfully.');
@@ -109,6 +116,9 @@ class SshController extends Controller
         ]);
 
         if ($response && $response->successful()) {
+            ActivityLogger::log('ssh.key_deleted', 'account', $account->id, $account->username,
+                "Deleted SSH key for {$account->username}", ['server_id' => $account->server_id, 'fingerprint' => $validated['fingerprint']]);
+
             return redirect()
                 ->route('user.ssh.index', ['account_id' => $account->id])
                 ->with('success', 'SSH key removed.');
@@ -135,6 +145,10 @@ class SshController extends Controller
         if ($response && $response->successful()) {
             $account->update(['ssh_enabled' => (bool) $validated['enabled']]);
             $state = $validated['enabled'] ? 'enabled' : 'disabled';
+
+            ActivityLogger::log('ssh.shell_toggled', 'account', $account->id, $account->username,
+                "SSH shell {$state} for {$account->username}", ['enabled' => (bool) $validated['enabled'], 'server_id' => $account->server_id]);
+
             return redirect()
                 ->route('user.ssh.index', ['account_id' => $account->id])
                 ->with('success', "SSH access $state for {$account->username}.");

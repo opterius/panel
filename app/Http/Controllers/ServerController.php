@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Server;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -38,6 +39,9 @@ class ServerController extends Controller
 
         $server = Server::create($validated);
 
+        ActivityLogger::log('server.added', 'server', $server->id, $server->name,
+            "Added server {$server->name} ({$server->ip_address})", ['ip_address' => $server->ip_address]);
+
         return redirect()->route('admin.servers.show', $server)->with('success', 'Server added successfully.');
     }
 
@@ -62,6 +66,9 @@ class ServerController extends Controller
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
+
+        ActivityLogger::log('server.removed', 'server', $server->id, $server->name,
+            "Removed server {$server->name} ({$server->ip_address})", ['ip_address' => $server->ip_address]);
 
         $server->delete();
 

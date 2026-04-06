@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DatabaseController;
@@ -94,6 +95,10 @@ Route::middleware([
         // Email Settings (global)
         Route::get('/email-settings', [EmailSettingsController::class, 'index'])->name('email-settings.index');
         Route::put('/email-settings', [EmailSettingsController::class, 'update'])->name('email-settings.update');
+
+        // Activity Log
+        Route::get('/activity-log', [ActivityLogController::class, 'index'])->name('activity-log.index');
+        Route::get('/activity-log/export', [ActivityLogController::class, 'export'])->name('activity-log.export');
 
         // Updates
         Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');

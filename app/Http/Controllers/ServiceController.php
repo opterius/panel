@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Server;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 
@@ -42,6 +43,9 @@ class ServiceController extends Controller
         ]);
 
         if ($response && $response->successful()) {
+            ActivityLogger::log("service.{$validated['action']}", 'server', $server->id, $server->name,
+                ucfirst($validated['action']) . " {$validated['service']} on {$server->name}", ['service' => $validated['service'], 'action' => $validated['action']]);
+
             return redirect()
                 ->route('admin.services.index', ['server_id' => $server->id])
                 ->with('success', ucfirst($validated['action']) . ' ' . $validated['service'] . ' successful.');

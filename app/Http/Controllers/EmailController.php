@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Domain;
 use App\Models\EmailAccount;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -54,12 +55,15 @@ class EmailController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            EmailAccount::create([
+            $emailAccount = EmailAccount::create([
                 'domain_id' => $domain->id,
                 'email'     => $email,
                 'quota'     => $validated['quota'] ?? 0,
                 'status'    => 'active',
             ]);
+
+            ActivityLogger::log('email.created', 'email', $emailAccount->id, $emailAccount->email,
+                "Created email account {$email}", ['domain_id' => $domain->id]);
 
             return redirect()->route('user.emails.index')->with('success', 'Email account ' . $email . ' created.');
         }
@@ -82,6 +86,9 @@ class EmailController extends Controller
         ]);
 
         if ($response && $response->successful()) {
+            ActivityLogger::log('email.password_changed', 'email', $emailAccount->id, $emailAccount->email,
+                "Changed password for email {$emailAccount->email}");
+
             return redirect()->route('user.emails.index')->with('success', 'Password changed for ' . $emailAccount->email);
         }
 
@@ -116,6 +123,12 @@ class EmailController extends Controller
             'max_send_per_day'  => $validated['max_send_per_day'] ?? 0,
         ]);
 
+        ActivityLogger::log('email.restrictions_changed', 'email', $emailAccount->id, $emailAccount->email,
+            "Updated restrictions for email {$emailAccount->email}", [
+                'can_send' => $request->boolean('can_send'),
+                'can_receive' => $request->boolean('can_receive'),
+            ]);
+
         return redirect()->route('user.emails.index')->with('success', 'Restrictions updated for ' . $emailAccount->email);
     }
 
@@ -126,6 +139,9 @@ class EmailController extends Controller
         }
 
         $emailAccount->load('domain.account.server');
+
+        ActivityLogger::log('email.deleted', 'email', $emailAccount->id, $emailAccount->email,
+            "Deleted email account {$emailAccount->email}", ['domain_id' => $emailAccount->domain_id]);
 
         AgentService::for($emailAccount->domain->account->server)->post('/email/delete', [
             'email'  => $emailAccount->email,

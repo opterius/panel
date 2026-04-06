@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Domain;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -75,6 +76,9 @@ class SubdomainController extends Controller
                 'content' => $domain->account->server->ip_address,
                 'ttl'     => 3600,
             ]);
+
+            ActivityLogger::log('subdomain.created', 'domain', $subdomain->id, $subdomain->domain,
+                "Created subdomain {$fullDomain}", ['server_id' => $domain->server_id, 'parent_domain_id' => $domain->id]);
 
             return redirect()->route('user.domains.index')->with('success', 'Subdomain ' . $fullDomain . ' created.');
         }

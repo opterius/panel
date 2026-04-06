@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\CronJob;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -58,13 +59,16 @@ class CronJobController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            CronJob::create([
+            $cronJob = CronJob::create([
                 'server_id'  => $account->server_id,
                 'account_id' => $account->id,
                 'command'    => $validated['command'],
                 'schedule'   => $schedule,
                 'enabled'    => true,
             ]);
+
+            ActivityLogger::log('cron.created', 'cron_job', $cronJob->id, $cronJob->command,
+                "Created cron job: {$schedule} {$validated['command']}", ['server_id' => $account->server_id, 'account_id' => $account->id]);
 
             return redirect()->route('user.cronjobs.index')->with('success', 'Cron job created successfully.');
         }
@@ -87,6 +91,10 @@ class CronJobController extends Controller
         if ($response && $response->successful()) {
             $cronJob->update(['enabled' => $newState]);
             $state = $newState ? 'enabled' : 'disabled';
+
+            ActivityLogger::log('cron.toggled', 'cron_job', $cronJob->id, $cronJob->command,
+                "Cron job {$state}: {$cronJob->command}", ['enabled' => $newState]);
+
             return redirect()->route('user.cronjobs.index')->with('success', "Cron job $state.");
         }
 
@@ -101,6 +109,9 @@ class CronJobController extends Controller
         }
 
         $cronJob->load('account.server');
+
+        ActivityLogger::log('cron.deleted', 'cron_job', $cronJob->id, $cronJob->command,
+            "Deleted cron job: {$cronJob->schedule} {$cronJob->command}", ['server_id' => $cronJob->server_id, 'account_id' => $cronJob->account_id]);
 
         AgentService::for($cronJob->account->server)->post('/cron/delete', [
             'username' => $cronJob->account->username,

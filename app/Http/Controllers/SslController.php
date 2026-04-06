@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Domain;
 use App\Models\SslCertificate;
+use App\Services\ActivityLogger;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -43,7 +44,7 @@ class SslController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            SslCertificate::updateOrCreate(
+            $ssl = SslCertificate::updateOrCreate(
                 ['domain_id' => $domain->id],
                 [
                     'type'       => 'letsencrypt',
@@ -52,6 +53,9 @@ class SslController extends Controller
                     'auto_renew' => true,
                 ]
             );
+
+            ActivityLogger::log('ssl.issued', 'ssl_certificate', $ssl->id, $domain->domain,
+                "Issued Let's Encrypt SSL for {$domain->domain}", ['domain_id' => $domain->id]);
 
             return redirect()->route('user.ssl.index')->with('success', 'SSL certificate issued for ' . $domain->domain);
         }
@@ -78,7 +82,7 @@ class SslController extends Controller
         ]);
 
         if ($response && $response->successful()) {
-            SslCertificate::updateOrCreate(
+            $ssl = SslCertificate::updateOrCreate(
                 ['domain_id' => $domain->id],
                 [
                     'type'       => 'custom',
@@ -86,6 +90,9 @@ class SslController extends Controller
                     'auto_renew' => false,
                 ]
             );
+
+            ActivityLogger::log('ssl.uploaded', 'ssl_certificate', $ssl->id, $domain->domain,
+                "Uploaded custom SSL for {$domain->domain}", ['domain_id' => $domain->id]);
 
             return redirect()->route('user.ssl.index')->with('success', 'Custom SSL certificate installed for ' . $domain->domain);
         }
@@ -108,6 +115,9 @@ class SslController extends Controller
                 'expires_at' => now()->addDays(90),
             ]);
 
+            ActivityLogger::log('ssl.renewed', 'ssl_certificate', $certificate->id, $certificate->domain->domain,
+                "Renewed SSL certificate for {$certificate->domain->domain}", ['domain_id' => $certificate->domain_id]);
+
             return redirect()->route('user.ssl.index')->with('success', 'SSL certificate renewed for ' . $certificate->domain->domain);
         }
 
@@ -120,6 +130,9 @@ class SslController extends Controller
         if (!Hash::check($request->password, auth()->user()->password)) {
             return back()->withErrors(['password' => 'The password is incorrect.']);
         }
+
+        ActivityLogger::log('ssl.deleted', 'ssl_certificate', $certificate->id, null,
+            "Deleted SSL certificate record", ['domain_id' => $certificate->domain_id]);
 
         $certificate->delete();
 

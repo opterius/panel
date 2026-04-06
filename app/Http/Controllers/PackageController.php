@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Package;
+use App\Services\ActivityLogger;
 use Illuminate\Http\Request;
 
 class PackageController extends Controller
@@ -63,7 +64,10 @@ class PackageController extends Controller
             Package::query()->update(['is_default' => false]);
         }
 
-        Package::create($validated);
+        $package = Package::create($validated);
+
+        ActivityLogger::log('package.created', 'package', $package->id, $package->name,
+            "Created package {$package->name}");
 
         return redirect()->route('admin.packages.index')->with('success', 'Package created successfully.');
     }
@@ -108,6 +112,9 @@ class PackageController extends Controller
 
         $package->update($validated);
 
+        ActivityLogger::log('package.updated', 'package', $package->id, $package->name,
+            "Updated package {$package->name}");
+
         return redirect()->route('admin.packages.index')->with('success', 'Package updated successfully.');
     }
 
@@ -116,6 +123,9 @@ class PackageController extends Controller
         if ($package->accounts()->exists()) {
             return back()->with('error', 'Cannot delete a package that has accounts assigned to it.');
         }
+
+        ActivityLogger::log('package.deleted', 'package', $package->id, $package->name,
+            "Deleted package {$package->name}");
 
         $package->delete();
 
