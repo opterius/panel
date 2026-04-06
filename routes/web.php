@@ -8,6 +8,8 @@ use App\Http\Controllers\DnsTemplateController;
 use App\Http\Controllers\IpAddressController;
 use App\Http\Controllers\NginxDirectiveController;
 use App\Http\Controllers\RedirectController;
+use App\Http\Controllers\SpamFilterController;
+use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
@@ -130,6 +132,10 @@ Route::middleware([
         Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');
         Route::post('/updates/run', [UpdateController::class, 'run'])->name('updates.run');
 
+        // Spam Filter
+        Route::get('/spam-filter', [SpamFilterController::class, 'index'])->name('spam-filter.index');
+        Route::post('/spam-filter', [SpamFilterController::class, 'configure'])->name('spam-filter.configure');
+
         // DNS Templates
         Route::resource('dns-templates', DnsTemplateController::class)->except(['show']);
 
@@ -210,6 +216,10 @@ Route::middleware([
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
         Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');
         Route::post('/forwarders/delete', [ForwarderController::class, 'destroy'])->name('forwarders.destroy');
+
+        // Web Terminal
+        Route::get('/terminal', [TerminalController::class, 'index'])->name('terminal.index');
+        Route::post('/terminal/connect', [TerminalController::class, 'connect'])->name('terminal.connect');
 
         // Custom Nginx Directives
         Route::get('/nginx-directives', [NginxDirectiveController::class, 'index'])->name('nginx-directives.index');

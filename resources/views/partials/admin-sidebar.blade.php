@@ -146,6 +146,13 @@
                 PHP Versions
             </x-sidebar-link>
 
+            <x-sidebar-link href="{{ route('admin.spam-filter.index') }}" :active="request()->routeIs('admin.spam-filter.*')">
+                <x-slot name="icon">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12" /></svg>
+                </x-slot>
+                Spam Filter
+            </x-sidebar-link>
+
             <x-sidebar-link href="{{ route('admin.email-settings.index') }}" :active="request()->routeIs('admin.email-settings.*')">
                 <x-slot name="icon">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
