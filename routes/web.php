@@ -1,6 +1,8 @@
 <?php
 
 use App\Http\Controllers\AccountController;
+use App\Http\Controllers\ApiKeyController;
+use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
 use App\Http\Controllers\BackupController;
@@ -121,6 +123,22 @@ Route::middleware([
         // Updates
         Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');
         Route::post('/updates/run', [UpdateController::class, 'run'])->name('updates.run');
+
+        // cPanel Migrations
+        Route::get('/migrations', [MigrationController::class, 'index'])->name('migrations.index');
+        Route::get('/migrations/create', [MigrationController::class, 'create'])->name('migrations.create');
+        Route::post('/migrations/parse', [MigrationController::class, 'parse'])->name('migrations.parse');
+        Route::get('/migrations/{migration}/preview', [MigrationController::class, 'preview'])->name('migrations.preview');
+        Route::post('/migrations/{migration}/execute', [MigrationController::class, 'execute'])->name('migrations.execute');
+        Route::get('/migrations/{migration}', [MigrationController::class, 'show'])->name('migrations.show');
+        Route::get('/migrations/{migration}/status', [MigrationController::class, 'status'])->name('migrations.status');
+        Route::delete('/migrations/{migration}', [MigrationController::class, 'destroy'])->name('migrations.destroy');
+
+        // API Keys
+        Route::get('/api-keys', [ApiKeyController::class, 'index'])->name('api-keys.index');
+        Route::get('/api-keys/create', [ApiKeyController::class, 'create'])->name('api-keys.create');
+        Route::post('/api-keys', [ApiKeyController::class, 'store'])->name('api-keys.store');
+        Route::delete('/api-keys/{apiKey}', [ApiKeyController::class, 'destroy'])->name('api-keys.destroy');
 
         // License
         Route::get('/license', [LicenseController::class, 'index'])->name('license.index');

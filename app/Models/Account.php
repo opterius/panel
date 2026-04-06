@@ -11,6 +11,7 @@ class Account extends Model
     protected $fillable = [
         'server_id', 'user_id', 'package_id', 'username', 'home_directory', 'disk_quota', 'php_version', 'ssh_enabled',
         'suspended', 'suspended_at', 'suspend_reason',
+        'whmcs_service_id', 'whmcs_client_id', 'created_via',
     ];
 
     protected function casts(): array

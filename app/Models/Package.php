@@ -23,6 +23,7 @@ class Package extends Model
         'memory_per_process',
         'ssl_enabled',
         'cron_jobs_enabled',
+        'php_switch_enabled',
         'is_default',
     ];
 
@@ -30,6 +31,7 @@ class Package extends Model
         'php_versions' => 'array',
         'ssl_enabled' => 'boolean',
         'cron_jobs_enabled' => 'boolean',
+        'php_switch_enabled' => 'boolean',
         'is_default' => 'boolean',
     ];
 

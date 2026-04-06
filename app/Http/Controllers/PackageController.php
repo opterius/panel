@@ -49,6 +49,7 @@ class PackageController extends Controller
             'memory_per_process'  => 'required|integer|min:32|max:4096',
             'ssl_enabled'         => 'boolean',
             'cron_jobs_enabled'   => 'boolean',
+            'php_switch_enabled'  => 'boolean',
             'is_default'          => 'boolean',
         ]);
 
@@ -58,6 +59,7 @@ class PackageController extends Controller
 
         $validated['ssl_enabled'] = $request->boolean('ssl_enabled');
         $validated['cron_jobs_enabled'] = $request->boolean('cron_jobs_enabled');
+        $validated['php_switch_enabled'] = $request->boolean('php_switch_enabled');
         $validated['is_default'] = $request->boolean('is_default');
 
         if ($validated['is_default']) {
@@ -95,6 +97,7 @@ class PackageController extends Controller
             'memory_per_process'  => 'required|integer|min:32|max:4096',
             'ssl_enabled'         => 'boolean',
             'cron_jobs_enabled'   => 'boolean',
+            'php_switch_enabled'  => 'boolean',
             'is_default'          => 'boolean',
         ]);
 
@@ -104,6 +107,7 @@ class PackageController extends Controller
 
         $validated['ssl_enabled'] = $request->boolean('ssl_enabled');
         $validated['cron_jobs_enabled'] = $request->boolean('cron_jobs_enabled');
+        $validated['php_switch_enabled'] = $request->boolean('php_switch_enabled');
         $validated['is_default'] = $request->boolean('is_default');
 
         if ($validated['is_default']) {

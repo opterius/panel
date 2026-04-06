@@ -37,6 +37,7 @@
 
         <!-- Left Column: Feature Icons -->
         <div class="lg:col-span-2">
+          <div class="bg-white rounded-xl shadow-sm p-6">
 
             {{-- Domain --}}
             <div class="mb-6">
@@ -90,7 +91,7 @@
                         <svg class="w-9 h-9 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-purple-700">Databases</span>
                     </a>
-                    <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.phpmyadmin_url', 'http://SERVER_IP:8081')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-amber-50 transition">
+                    <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-amber-50 transition">
                         <svg class="w-9 h-9 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-amber-700">phpMyAdmin</span>
                     </a>
@@ -109,7 +110,7 @@
                         <svg class="w-9 h-9 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-cyan-700">Forwarders</span>
                     </a>
-                    <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.webmail_url', 'http://SERVER_IP:8080')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-orange-50 transition">
+                    <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.webmail_url', 'https://SERVER_IP:8080')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-orange-50 transition">
                         <svg class="w-9 h-9 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-orange-700">Webmail</span>
                     </a>
@@ -132,7 +133,7 @@
             </div>
 
             {{-- Advanced --}}
-            <div class="mb-6">
+            <div>
                 <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">Advanced</h3>
                 <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-1">
                     <a href="{{ route('user.php.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
@@ -146,6 +147,7 @@
                 </div>
             </div>
 
+          </div>
         </div>
 
         <!-- Right Column: Account Summary & Stats -->

@@ -82,9 +82,17 @@ class AgentService
     }
 
     /**
+     * Send an authenticated POST with extended timeout (for migrations, backups, etc).
+     */
+    public function postLong(string $path, array $data = [], int $timeout = 600): ?Response
+    {
+        return $this->request('POST', $path, $data, $timeout);
+    }
+
+    /**
      * Send an HMAC-signed request to the Go agent.
      */
-    private function request(string $method, string $path, array $data = []): ?Response
+    private function request(string $method, string $path, array $data = [], ?int $timeout = null): ?Response
     {
         $url = $this->url($path);
         $body = !empty($data) ? json_encode($data) : '';
@@ -96,7 +104,7 @@ class AgentService
 
         try {
             $request = Http::withoutVerifying()
-                ->timeout(120)
+                ->timeout($timeout ?? 120)
                 ->withHeaders([
                     'X-Signature' => $signature,
                     'X-Timestamp' => $timestamp,

@@ -257,6 +257,12 @@
                            @checked(old('cron_jobs_enabled', $package?->cron_jobs_enabled ?? true))>
                     <label for="cron_jobs_enabled" class="text-sm text-gray-700">Cron Jobs</label>
                 </div>
+                <div class="flex items-center space-x-3">
+                    <input type="checkbox" name="php_switch_enabled" id="php_switch_enabled" value="1"
+                           class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
+                           @checked(old('php_switch_enabled', $package?->php_switch_enabled ?? false))>
+                    <label for="php_switch_enabled" class="text-sm text-gray-700">Allow PHP version switching <span class="text-gray-400">(let domain owner change PHP version)</span></label>
+                </div>
             </div>
         </div>
 

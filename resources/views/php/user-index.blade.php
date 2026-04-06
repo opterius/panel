@@ -44,11 +44,19 @@
                             <span class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold bg-indigo-100 text-indigo-700">
                                 PHP {{ $domain->php_version }}
                             </span>
-                            <button @click="switching = !switching" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">
-                                <span x-text="switching ? 'Cancel' : 'Change'"></span>
-                            </button>
+                            @if($domain->account->package?->php_switch_enabled ?? false)
+                                <button @click="switching = !switching" class="text-sm text-indigo-600 hover:text-indigo-800 font-medium transition">
+                                    <span x-text="switching ? 'Cancel' : 'Change'"></span>
+                                </button>
+                            @endif
                         </div>
                     </div>
+
+                    @if(!($domain->account->package?->php_switch_enabled ?? false))
+                        <div class="px-6 py-3 bg-gray-50 border-t border-gray-100">
+                            <p class="text-xs text-gray-500">PHP version switching is not available on your current package. Contact your hosting provider to upgrade.</p>
+                        </div>
+                    @endif
 
                     {{-- Version Switcher --}}
                     <div x-show="switching" x-collapse class="px-6 py-4 bg-gray-50 border-t border-gray-100">

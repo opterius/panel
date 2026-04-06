@@ -23,8 +23,19 @@ class UserPhpController extends Controller
             $server = $domains->first()->account->server;
             $response = AgentService::for($server)->post('/php/list-versions', []);
             if ($response && $response->successful()) {
-                $versions = $response->json('versions', []);
+                $allVersions = $response->json('versions', []);
+                // Extract only installed version strings
+                $versions = collect($allVersions)
+                    ->filter(fn($v) => $v['installed'] ?? false)
+                    ->pluck('version')
+                    ->values()
+                    ->toArray();
             }
+        }
+
+        // Fallback to config if agent returned nothing
+        if (empty($versions)) {
+            $versions = config('opterius.php_versions', []);
         }
 
         return view('php.user-index', compact('domains', 'versions'));
@@ -43,6 +54,11 @@ class UserPhpController extends Controller
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {
             return back()->with('error', 'You do not have permission to change PHP version.');
+        }
+
+        // Check if package allows PHP switching
+        if ($domain->account->package && !$domain->account->package->php_switch_enabled) {
+            return back()->with('error', 'PHP version switching is not enabled for your package.');
         }
 
         // Check version is allowed by package

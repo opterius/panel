@@ -51,7 +51,7 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'webmail_url' => env('OPTERIUS_WEBMAIL_URL', 'http://SERVER_IP:8080'),
+    'webmail_url' => env('OPTERIUS_WEBMAIL_URL', 'https://SERVER_IP:8080'),
 
     /*
     |--------------------------------------------------------------------------
@@ -59,7 +59,17 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'phpmyadmin_url' => env('OPTERIUS_PHPMYADMIN_URL', 'http://SERVER_IP:8081'),
+    'phpmyadmin_url' => env('OPTERIUS_PHPMYADMIN_URL', 'https://SERVER_IP:8081'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | API
+    |--------------------------------------------------------------------------
+    */
+
+    'api' => [
+        'rate_limit' => env('OPTERIUS_API_RATE_LIMIT', 60),
+    ],
 
     'version' => '1.0.0',
     'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
