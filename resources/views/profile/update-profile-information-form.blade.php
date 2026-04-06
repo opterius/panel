@@ -62,7 +62,12 @@
         <!-- Email -->
         <div class="col-span-6 sm:col-span-4">
             <x-label for="email" value="{{ __('Email') }}" />
-            <x-input id="email" type="email" class="mt-1 block w-full" wire:model="state.email" required autocomplete="username" />
+            @if(auth()->user()->isAdmin() || auth()->user()->isReseller())
+                <x-input id="email" type="email" class="mt-1 block w-full" wire:model="state.email" required autocomplete="username" />
+            @else
+                <x-input id="email" type="email" class="mt-1 block w-full bg-gray-50" wire:model="state.email" disabled />
+                <p class="text-xs text-gray-400 mt-1">Contact your hosting provider to change your email address.</p>
+            @endif
             <x-input-error for="email" class="mt-2" />
 
             @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::emailVerification()) && ! $this->user->hasVerifiedEmail())
