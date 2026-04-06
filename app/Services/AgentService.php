@@ -96,7 +96,7 @@ class AgentService
 
         try {
             $request = Http::withoutVerifying()
-                ->timeout(30)
+                ->timeout(120)
                 ->withHeaders([
                     'X-Signature' => $signature,
                     'X-Timestamp' => $timestamp,

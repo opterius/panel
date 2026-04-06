@@ -22,7 +22,8 @@
                 <h3 class="text-base font-semibold text-gray-800">Issue Free SSL Certificate</h3>
                 <p class="text-sm text-gray-500 mt-1">Issue a free Let's Encrypt certificate for a domain without SSL.</p>
             </div>
-            <form action="{{ route('user.ssl.issue') }}" method="POST" class="px-6 py-5">
+            <form action="{{ route('user.ssl.issue') }}" method="POST" class="px-6 py-5"
+                  x-data="{ issuing: false }" @submit="issuing = true">
                 @csrf
                 <div class="flex flex-col sm:flex-row gap-4">
                     <div class="flex-1">
@@ -46,9 +47,15 @@
                         @enderror
                     </div>
                     <div class="flex items-end">
-                        <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-                            Issue SSL
+                        <button type="submit" :disabled="issuing"
+                            class="inline-flex items-center px-5 py-2.5 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <template x-if="!issuing">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                            </template>
+                            <template x-if="issuing">
+                                <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                            </template>
+                            <span x-text="issuing ? 'Issuing SSL... Please wait' : 'Issue SSL'">Issue SSL</span>
                         </button>
                     </div>
                 </div>
