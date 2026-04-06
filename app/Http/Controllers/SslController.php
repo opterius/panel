@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Domain;
+use App\Models\Setting;
 use App\Models\SslCertificate;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
@@ -37,27 +38,29 @@ class SslController extends Controller
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
-        $response = AgentService::for($domain->account->server)->post('/ssl/issue', [
+        // Use async endpoint — returns immediately
+        $response = AgentService::for($domain->account->server)->post('/ssl/issue-async', [
             'domain'   => $domain->domain,
             'email'    => $validated['email'],
             'username' => $domain->account->username,
         ]);
 
-        if ($response && $response->successful()) {
-            $ssl = SslCertificate::updateOrCreate(
+        if ($response && ($response->successful() || $response->status() === 202)) {
+            SslCertificate::updateOrCreate(
                 ['domain_id' => $domain->id],
                 [
                     'type'       => 'letsencrypt',
-                    'status'     => 'active',
+                    'status'     => 'pending',
                     'expires_at' => now()->addDays(90),
                     'auto_renew' => true,
                 ]
             );
 
-            ActivityLogger::log('ssl.issued', 'ssl_certificate', $ssl->id, $domain->domain,
-                "Issued Let's Encrypt SSL for {$domain->domain}", ['domain_id' => $domain->id]);
+            ActivityLogger::log('ssl.issued', 'ssl_certificate', null, $domain->domain,
+                "SSL issuance started for {$domain->domain}", ['domain_id' => $domain->id]);
 
-            return redirect()->route('user.ssl.index')->with('success', 'SSL certificate issued for ' . $domain->domain);
+            return redirect()->route('user.ssl.index')->with('success',
+                'SSL certificate is being issued for ' . $domain->domain . '. This takes 1-2 minutes. Refresh the page to check the status.');
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
@@ -137,5 +140,37 @@ class SslController extends Controller
         $certificate->delete();
 
         return redirect()->route('user.ssl.index')->with('success', 'SSL certificate record removed.');
+    }
+
+    /**
+     * Auto-issue SSL for a domain (called from domain/account creation).
+     */
+    public static function autoIssue(Domain $domain): void
+    {
+        if (Setting::get('auto_ssl_enabled', '1') !== '1') {
+            return;
+        }
+
+        $domain->load('account.server');
+        if (!$domain->account || !$domain->account->server) return;
+
+        // Queue async SSL issuance
+        $email = auth()->user()->email ?? 'admin@' . $domain->domain;
+
+        AgentService::for($domain->account->server)->post('/ssl/issue-async', [
+            'domain'   => $domain->domain,
+            'email'    => $email,
+            'username' => $domain->account->username,
+        ]);
+
+        SslCertificate::updateOrCreate(
+            ['domain_id' => $domain->id],
+            [
+                'type'       => 'letsencrypt',
+                'status'     => 'pending',
+                'expires_at' => now()->addDays(90),
+                'auto_renew' => true,
+            ]
+        );
     }
 }

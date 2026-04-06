@@ -6,6 +6,7 @@ use App\Models\Account;
 use App\Models\Domain;
 use App\Models\Package;
 use App\Models\Server;
+use App\Http\Controllers\SslController;
 use App\Services\AgentService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -118,6 +119,9 @@ class AccountController extends Controller
                 'ns1'       => config('opterius.ns1', 'ns1.' . $domain->domain),
                 'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
             ]);
+
+            // Auto SSL
+            SslController::autoIssue($domain);
 
             ActivityLogger::log('account.created', 'account', $account->id, $account->username,
                 "Created account {$account->username} with domain {$validated['domain']}", ['server_id' => $account->server_id]);

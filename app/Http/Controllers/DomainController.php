@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\SslController;
 use App\Models\Account;
 use App\Models\Domain;
 use App\Models\Server;
@@ -70,6 +71,9 @@ class DomainController extends Controller
                 'ns1'       => config('opterius.ns1', 'ns1.' . $domain->domain),
                 'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
             ]);
+
+            // Auto SSL
+            SslController::autoIssue($domain);
 
             ActivityLogger::log('domain.created', 'domain', $domain->id, $domain->domain,
                 "Created domain {$domain->domain}", ['server_id' => $domain->server_id, 'account_id' => $account->id]);
