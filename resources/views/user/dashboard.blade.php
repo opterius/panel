@@ -110,6 +110,10 @@
                         <svg class="w-9 h-9 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 7l5 5m0 0l-5 5m5-5H6" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-cyan-700">Forwarders</span>
                     </a>
+                    <a href="{{ route('user.autoresponders.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-violet-50 transition">
+                        <svg class="w-9 h-9 text-violet-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-violet-700">Autoresponders</span>
+                    </a>
                     <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.webmail_url', 'https://SERVER_IP:8080')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-orange-50 transition">
                         <svg class="w-9 h-9 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-orange-700">Webmail</span>

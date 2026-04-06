@@ -115,6 +115,13 @@
             Forwarders
         </x-sidebar-link>
 
+        <x-sidebar-link href="{{ route('user.autoresponders.index') }}" :active="request()->routeIs('user.autoresponders.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
+            </x-slot>
+            Autoresponders
+        </x-sidebar-link>
+
         {{-- Software --}}
         <div class="pt-4 pb-2 px-3">
             <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Software</span>

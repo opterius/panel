@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ApiKeyController;
+use App\Http\Controllers\AutoresponderController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
@@ -195,6 +196,10 @@ Route::middleware([
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
         Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');
         Route::post('/forwarders/delete', [ForwarderController::class, 'destroy'])->name('forwarders.destroy');
+
+        // Autoresponders
+        Route::get('/autoresponders', [AutoresponderController::class, 'index'])->name('autoresponders.index');
+        Route::post('/autoresponders', [AutoresponderController::class, 'store'])->name('autoresponders.store');
 
         // Subdomains
         Route::get('/subdomains/{domain}/create', [SubdomainController::class, 'create'])->name('subdomains.create');
