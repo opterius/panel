@@ -11,7 +11,7 @@
     @php $m = $migration->manifest ?? []; @endphp
 
     <form action="{{ route('admin.migrations.execute', $migration) }}" method="POST"
-          x-data="{ username: '{{ $migration->target_username }}' }">
+          x-data="{ username: '{{ $migration->target_username }}', loading: false }" @submit="loading = true">
         @csrf
 
         <div class="max-w-3xl space-y-6">
@@ -175,8 +175,8 @@
             </div>
 
             {{-- Actions --}}
-            <div class="flex items-center space-x-3" x-data="{ loading: false }">
-                <button type="submit" @click="loading = true" :disabled="loading"
+            <div class="flex items-center space-x-3">
+                <button type="submit" :disabled="loading"
                     class="inline-flex items-center px-6 py-3 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                     <svg x-show="!loading" class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
                     <svg x-show="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
