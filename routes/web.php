@@ -10,6 +10,7 @@ use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\LaravelInstallerController;
 use App\Http\Controllers\LicenseController;
+use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PhpController;
 use App\Http\Controllers\ResellerController;
@@ -52,6 +53,11 @@ Route::middleware([
         Route::resource('accounts', AccountController::class)->except(['edit', 'update']);
         Route::resource('packages', PackageController::class)->except(['show']);
         Route::resource('resellers', ResellerController::class);
+
+        // Monitor
+        Route::get('/monitor', [MonitorController::class, 'index'])->name('monitor.index');
+        Route::get('/monitor/realtime', [MonitorController::class, 'realtime'])->name('monitor.realtime');
+        Route::post('/monitor/processes', [MonitorController::class, 'topProcesses'])->name('monitor.processes');
 
         // Services
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
