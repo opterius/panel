@@ -188,6 +188,24 @@
                     </div>
                 </div>
 
+                {{-- Panel Access Info --}}
+                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5">
+                    <div class="flex items-start space-x-3">
+                        <svg class="w-5 h-5 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        <div>
+                            <h4 class="text-sm font-semibold text-gray-700">Panel Access</h4>
+                            <p class="text-sm text-gray-500 mt-1">
+                                This account will be managed by <span class="font-medium text-gray-700">{{ Auth::user()->name }}</span>
+                                (<span class="font-mono text-xs">{{ Auth::user()->email }}</span>).
+                            </p>
+                            <p class="text-xs text-gray-400 mt-2">
+                                The hosting client can manage their domains, email, databases and files by logging in with the account owner's credentials.
+                                To give clients separate access, create a user account for them and assign this hosting account to their user.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Summary --}}
                 <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-5">
                     <h4 class="text-sm font-semibold text-indigo-800 mb-3">Summary</h4>
