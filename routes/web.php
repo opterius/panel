@@ -4,6 +4,9 @@ use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AliasController;
 use App\Http\Controllers\ApiKeyController;
 use App\Http\Controllers\AutoresponderController;
+use App\Http\Controllers\DnsTemplateController;
+use App\Http\Controllers\IpAddressController;
+use App\Http\Controllers\NginxDirectiveController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\ActivityLogController;
@@ -127,6 +130,15 @@ Route::middleware([
         Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');
         Route::post('/updates/run', [UpdateController::class, 'run'])->name('updates.run');
 
+        // DNS Templates
+        Route::resource('dns-templates', DnsTemplateController::class)->except(['show']);
+
+        // IP Address Management
+        Route::get('/ip-addresses', [IpAddressController::class, 'index'])->name('ip-addresses.index');
+        Route::post('/ip-addresses', [IpAddressController::class, 'store'])->name('ip-addresses.store');
+        Route::put('/ip-addresses/{ipAddress}/assign', [IpAddressController::class, 'assign'])->name('ip-addresses.assign');
+        Route::delete('/ip-addresses/{ipAddress}', [IpAddressController::class, 'destroy'])->name('ip-addresses.destroy');
+
         // cPanel Migrations
         Route::get('/migrations', [MigrationController::class, 'index'])->name('migrations.index');
         Route::get('/migrations/create', [MigrationController::class, 'create'])->name('migrations.create');
@@ -198,6 +210,11 @@ Route::middleware([
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
         Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');
         Route::post('/forwarders/delete', [ForwarderController::class, 'destroy'])->name('forwarders.destroy');
+
+        // Custom Nginx Directives
+        Route::get('/nginx-directives', [NginxDirectiveController::class, 'index'])->name('nginx-directives.index');
+        Route::post('/nginx-directives', [NginxDirectiveController::class, 'store'])->name('nginx-directives.store');
+        Route::delete('/nginx-directives/{domain}', [NginxDirectiveController::class, 'destroy'])->name('nginx-directives.destroy');
 
         // Autoresponders
         Route::get('/autoresponders', [AutoresponderController::class, 'index'])->name('autoresponders.index');

@@ -52,4 +52,9 @@ class Domain extends Model
     {
         return $this->hasMany(Redirect::class);
     }
+
+    public function nginxDirective(): HasOne
+    {
+        return $this->hasOne(NginxDirective::class);
+    }
 }
