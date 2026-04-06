@@ -10,6 +10,7 @@ class EmailAccount extends Model
     protected $fillable = [
         'domain_id', 'email', 'quota', 'status',
         'can_send', 'can_receive', 'max_send_per_hour', 'max_send_per_day',
+        'max_send_per_week', 'max_send_per_month',
     ];
 
     protected function casts(): array

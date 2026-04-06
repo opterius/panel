@@ -249,7 +249,7 @@
                             </div>
                         </div>
 
-                        <div class="px-6 py-5 border-t border-gray-100 bg-gray-50/50">
+                        <div class="px-6 py-4 border-t border-gray-100 bg-white">
                             {{-- Password Tab --}}
                             <div x-show="tab === 'password'">
                                 <form action="{{ route('user.emails.password', $account) }}" method="POST" class="max-w-md space-y-4">
@@ -299,42 +299,62 @@
                             <div x-show="tab === 'restrictions'">
                                 <form action="{{ route('user.emails.restrictions', $account) }}" method="POST" class="space-y-5">
                                     @csrf
-                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                        <div class="space-y-4">
-                                            <h4 class="text-sm font-semibold text-gray-700">Access</h4>
-                                            <label class="flex items-center justify-between p-3 border rounded-lg">
-                                                <div>
-                                                    <span class="text-sm font-medium text-gray-700">Can Send Emails</span>
-                                                    <p class="text-xs text-gray-400">Allow this account to send emails</p>
-                                                </div>
-                                                <input type="checkbox" name="can_send" value="1" @checked($account->can_send)
-                                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                            </label>
-                                            <label class="flex items-center justify-between p-3 border rounded-lg">
-                                                <div>
-                                                    <span class="text-sm font-medium text-gray-700">Can Receive Emails</span>
-                                                    <p class="text-xs text-gray-400">Allow this account to receive emails</p>
-                                                </div>
-                                                <input type="checkbox" name="can_receive" value="1" @checked($account->can_receive)
-                                                    class="rounded border-gray-300 text-indigo-600 focus:ring-indigo-500">
-                                            </label>
-                                        </div>
-                                        <div class="space-y-4">
-                                            <h4 class="text-sm font-semibold text-gray-700">Send Limits</h4>
-                                            <div>
-                                                <label class="block text-sm text-gray-600 mb-1">Max emails per hour</label>
-                                                <input type="number" name="max_send_per_hour" value="{{ $account->max_send_per_hour }}" min="0" max="10000"
-                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                                <p class="text-xs text-gray-400 mt-1">0 = unlimited</p>
+
+                                    {{-- Access toggles --}}
+                                    <div class="space-y-3">
+                                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Access</h4>
+                                        <label class="flex items-center space-x-3 cursor-pointer">
+                                            <div class="relative">
+                                                <input type="checkbox" name="can_send" value="1" @checked($account->can_send) class="sr-only peer">
+                                                <div class="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                                                <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
                                             </div>
                                             <div>
-                                                <label class="block text-sm text-gray-600 mb-1">Max emails per day</label>
-                                                <input type="number" name="max_send_per_day" value="{{ $account->max_send_per_day }}" min="0" max="100000"
-                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                                                <p class="text-xs text-gray-400 mt-1">0 = unlimited</p>
+                                                <span class="text-sm font-medium text-gray-700">Can Send Emails</span>
+                                                <p class="text-xs text-gray-400">Allow outgoing emails from this account</p>
                                             </div>
-                                        </div>
+                                        </label>
+                                        <label class="flex items-center space-x-3 cursor-pointer">
+                                            <div class="relative">
+                                                <input type="checkbox" name="can_receive" value="1" @checked($account->can_receive) class="sr-only peer">
+                                                <div class="w-10 h-5 bg-gray-200 rounded-full peer-checked:bg-indigo-600 transition-colors"></div>
+                                                <div class="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full shadow peer-checked:translate-x-5 transition-transform"></div>
+                                            </div>
+                                            <div>
+                                                <span class="text-sm font-medium text-gray-700">Can Receive Emails</span>
+                                                <p class="text-xs text-gray-400">Allow incoming emails to this account</p>
+                                            </div>
+                                        </label>
                                     </div>
+
+                                    {{-- Send limits --}}
+                                    <div class="space-y-3">
+                                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Send Limits</h4>
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Hour</label>
+                                                <input type="number" name="max_send_per_hour" value="{{ $account->max_send_per_hour }}" min="0"
+                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Day</label>
+                                                <input type="number" name="max_send_per_day" value="{{ $account->max_send_per_day }}" min="0"
+                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Week</label>
+                                                <input type="number" name="max_send_per_week" value="{{ $account->max_send_per_week }}" min="0"
+                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            </div>
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-600 mb-1">Per Month</label>
+                                                <input type="number" name="max_send_per_month" value="{{ $account->max_send_per_month }}" min="0"
+                                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                            </div>
+                                        </div>
+                                        <p class="text-xs text-gray-400">0 = unlimited for all fields</p>
+                                    </div>
+
                                     <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
                                         Save Restrictions
                                     </button>

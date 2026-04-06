@@ -110,17 +110,21 @@ class EmailController extends Controller
     public function updateRestrictions(Request $request, EmailAccount $emailAccount)
     {
         $validated = $request->validate([
-            'can_send'          => 'boolean',
-            'can_receive'       => 'boolean',
-            'max_send_per_hour' => 'nullable|integer|min:0|max:10000',
-            'max_send_per_day'  => 'nullable|integer|min:0|max:100000',
+            'can_send'           => 'boolean',
+            'can_receive'        => 'boolean',
+            'max_send_per_hour'  => 'nullable|integer|min:0|max:10000',
+            'max_send_per_day'   => 'nullable|integer|min:0|max:100000',
+            'max_send_per_week'  => 'nullable|integer|min:0|max:500000',
+            'max_send_per_month' => 'nullable|integer|min:0|max:2000000',
         ]);
 
         $emailAccount->update([
-            'can_send'          => $request->boolean('can_send'),
-            'can_receive'       => $request->boolean('can_receive'),
-            'max_send_per_hour' => $validated['max_send_per_hour'] ?? 0,
-            'max_send_per_day'  => $validated['max_send_per_day'] ?? 0,
+            'can_send'           => $request->boolean('can_send'),
+            'can_receive'        => $request->boolean('can_receive'),
+            'max_send_per_hour'  => $validated['max_send_per_hour'] ?? 0,
+            'max_send_per_day'   => $validated['max_send_per_day'] ?? 0,
+            'max_send_per_week'  => $validated['max_send_per_week'] ?? 0,
+            'max_send_per_month' => $validated['max_send_per_month'] ?? 0,
         ]);
 
         ActivityLogger::log('email.restrictions_changed', 'email', $emailAccount->id, $emailAccount->email,
