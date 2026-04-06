@@ -27,6 +27,7 @@ use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SshController;
 use App\Http\Controllers\SubdomainController;
 use App\Http\Controllers\SslController;
+use App\Http\Controllers\UserPhpController;
 use App\Http\Controllers\WordPressController;
 use Illuminate\Support\Facades\Route;
 
@@ -212,6 +213,10 @@ Route::middleware([
         Route::post('/ssh/import-key', [SshController::class, 'importKey'])->name('ssh.import-key');
         Route::post('/ssh/delete-key', [SshController::class, 'deleteKey'])->name('ssh.delete-key');
         Route::post('/ssh/toggle-shell', [SshController::class, 'toggleShell'])->name('ssh.toggle-shell');
+
+        // PHP Version
+        Route::get('/php', [UserPhpController::class, 'index'])->name('php.index');
+        Route::post('/php/switch', [UserPhpController::class, 'switchVersion'])->name('php.switch');
 
         // Cron Jobs
         Route::get('/cron-jobs', [CronJobController::class, 'index'])->name('cronjobs.index');
