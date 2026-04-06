@@ -157,6 +157,10 @@ class AccountController extends Controller
 
     public function suspend(Request $request, Account $account)
     {
+        if (!Hash::check($request->password, auth()->user()->password)) {
+            return back()->withErrors(['password' => 'The password is incorrect.']);
+        }
+
         $account->load('server', 'domains');
         $action = $account->suspended ? 'unsuspend' : 'suspend';
 

@@ -275,19 +275,31 @@
                     @endif
                 </p>
             </div>
-            <form action="{{ route('admin.accounts.suspend', $account) }}" method="POST">
-                @csrf
-                @if($account->suspended)
-                    <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition">
-                        Unsuspend
-                    </button>
-                @else
-                    <button type="submit" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-amber-600 bg-white border border-amber-300 rounded-lg hover:bg-amber-50 transition"
-                            onclick="return confirm('Suspend account {{ $account->username }}? All sites will be taken offline.')">
-                        Suspend
-                    </button>
-                @endif
-            </form>
+            @if($account->suspended)
+                <x-delete-modal
+                    :action="route('admin.accounts.suspend', $account)"
+                    title="Unsuspend Account"
+                    message="This will restore all domains, email, and SSH access for {{ $account->username }}."
+                    :confirm-password="true">
+                    <x-slot name="trigger">
+                        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-green-600 bg-white border border-green-300 rounded-lg hover:bg-green-50 transition">
+                            Unsuspend
+                        </button>
+                    </x-slot>
+                </x-delete-modal>
+            @else
+                <x-delete-modal
+                    :action="route('admin.accounts.suspend', $account)"
+                    title="Suspend Account"
+                    message="This will take all domains offline, disable email and SSH for {{ $account->username }}. Suspended sites will show a 'Account Suspended' page."
+                    :confirm-password="true">
+                    <x-slot name="trigger">
+                        <button type="button" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-amber-600 bg-white border border-amber-300 rounded-lg hover:bg-amber-50 transition">
+                            Suspend
+                        </button>
+                    </x-slot>
+                </x-delete-modal>
+            @endif
         </div>
     </div>
 
