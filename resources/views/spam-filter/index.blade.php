@@ -44,13 +44,16 @@
                 </div>
 
                 @if(!($status['running'] ?? false))
-                    <form action="{{ route('admin.spam-filter.configure') }}" method="POST">
+                    <form action="{{ route('admin.spam-filter.configure') }}" method="POST"
+                          x-data="{ loading: false }" @submit="loading = true">
                         @csrf
                         <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
                         <input type="hidden" name="action" value="enable">
                         <p class="text-sm text-gray-500 mb-4">Enable Rspamd to automatically filter spam for all email accounts on this server.</p>
-                        <button type="submit" class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition">
-                            Enable Spam Filter
+                        <button type="submit" :disabled="loading"
+                            class="inline-flex items-center px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                            <svg x-show="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                            <span x-text="loading ? 'Installing Rspamd...' : 'Enable Spam Filter'">Enable Spam Filter</span>
                         </button>
                     </form>
                 @else
