@@ -1,0 +1,136 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Account;
+use App\Models\Backup;
+use App\Models\Server;
+use App\Services\ActivityLogger;
+use App\Services\AgentService;
+use Illuminate\Http\Request;
+
+class BackupController extends Controller
+{
+    public function index(Request $request)
+    {
+        $servers = Server::all();
+        $selectedServer = null;
+        $backups = collect();
+        $accounts = collect();
+
+        if ($request->has('server_id')) {
+            $selectedServer = Server::findOrFail($request->server_id);
+            $backups = Backup::where('server_id', $selectedServer->id)->latest()->get();
+            $accounts = Account::where('server_id', $selectedServer->id)->get();
+
+            // Sync with agent's backup list
+            $response = AgentService::for($selectedServer)->post('/backup/list', []);
+            if ($response && $response->successful()) {
+                $agentBackups = $response->json('backups') ?? [];
+                foreach ($agentBackups as $ab) {
+                    if (!$backups->where('filename', $ab['filename'])->first()) {
+                        Backup::create([
+                            'server_id' => $selectedServer->id,
+                            'username'  => $ab['username'] ?? '',
+                            'filename'  => $ab['filename'],
+                            'type'      => $ab['type'] ?? 'full',
+                            'size_mb'   => $ab['size_mb'] ?? 0,
+                            'status'    => 'completed',
+                        ]);
+                    }
+                }
+                $backups = Backup::where('server_id', $selectedServer->id)->latest()->get();
+            }
+        }
+
+        return view('backups.index', compact('servers', 'selectedServer', 'backups', 'accounts'));
+    }
+
+    public function create(Request $request)
+    {
+        $validated = $request->validate([
+            'server_id'  => 'required|exists:servers,id',
+            'account_id' => 'required|exists:accounts,id',
+            'type'       => 'required|in:full,files,databases,email',
+        ]);
+
+        $server = Server::findOrFail($validated['server_id']);
+        $account = Account::with('domains', 'databases')->findOrFail($validated['account_id']);
+
+        $response = AgentService::for($server)->post('/backup/create', [
+            'username'  => $account->username,
+            'type'      => $validated['type'],
+            'databases' => $account->databases->pluck('name')->toArray(),
+            'domains'   => $account->domains->pluck('domain')->toArray(),
+        ]);
+
+        if ($response && $response->successful()) {
+            $data = $response->json();
+
+            Backup::create([
+                'server_id'  => $server->id,
+                'account_id' => $account->id,
+                'username'   => $account->username,
+                'filename'   => $data['filename'] ?? '',
+                'type'       => $validated['type'],
+                'size_mb'    => $data['size_mb'] ?? 0,
+                'status'     => 'completed',
+            ]);
+
+            ActivityLogger::log('backup.created', 'account', $account->id, $account->username,
+                "Created {$validated['type']} backup for {$account->username} ({$data['size_mb']} MB)");
+
+            return redirect()->route('admin.backups.index', ['server_id' => $server->id])
+                ->with('success', "Backup created for {$account->username} ({$data['size_mb']} MB, {$data['duration']})");
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
+        return back()->with('error', 'Backup failed: ' . $error);
+    }
+
+    public function restore(Request $request, Backup $backup)
+    {
+        $backup->load('server');
+
+        $response = AgentService::for($backup->server)->post('/backup/restore', [
+            'filename' => $backup->filename,
+            'username' => $backup->username,
+            'type'     => $request->input('type', 'full'),
+        ]);
+
+        if ($response && $response->successful()) {
+            $restored = $response->json('restored', []);
+            ActivityLogger::log('backup.restored', 'account', $backup->account_id, $backup->username,
+                "Restored backup {$backup->filename}: " . implode(', ', $restored));
+
+            return redirect()->route('admin.backups.index', ['server_id' => $backup->server_id])
+                ->with('success', "Restored: " . implode(', ', $restored));
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
+        return back()->with('error', 'Restore failed: ' . $error);
+    }
+
+    public function download(Backup $backup)
+    {
+        $downloadUrl = $backup->server->agent_url . '/backup/download?filename=' . urlencode($backup->filename);
+        return redirect($downloadUrl);
+    }
+
+    public function destroy(Backup $backup)
+    {
+        $backup->load('server');
+
+        AgentService::for($backup->server)->post('/backup/delete', [
+            'filename' => $backup->filename,
+        ]);
+
+        ActivityLogger::log('backup.deleted', 'account', $backup->account_id, $backup->username,
+            "Deleted backup {$backup->filename}");
+
+        $backup->delete();
+
+        return redirect()->route('admin.backups.index', ['server_id' => $backup->server_id])
+            ->with('success', 'Backup deleted.');
+    }
+}

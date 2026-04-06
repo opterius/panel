@@ -3,6 +3,7 @@
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\AlertController;
+use App\Http\Controllers\BackupController;
 use App\Http\Controllers\CronJobController;
 use App\Http\Controllers\DatabaseController;
 use App\Http\Controllers\UpdateController;
@@ -80,6 +81,13 @@ Route::middleware([
         Route::post('/alerts', [AlertController::class, 'store'])->name('alerts.store');
         Route::post('/alerts/{alertRule}/toggle', [AlertController::class, 'toggle'])->name('alerts.toggle');
         Route::delete('/alerts/{alertRule}', [AlertController::class, 'destroy'])->name('alerts.destroy');
+
+        // Backups
+        Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
+        Route::post('/backups/create', [BackupController::class, 'create'])->name('backups.create');
+        Route::post('/backups/{backup}/restore', [BackupController::class, 'restore'])->name('backups.restore');
+        Route::get('/backups/{backup}/download', [BackupController::class, 'download'])->name('backups.download');
+        Route::delete('/backups/{backup}', [BackupController::class, 'destroy'])->name('backups.destroy');
 
         // Services
         Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
