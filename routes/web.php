@@ -15,6 +15,7 @@ use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\PackageController;
 use App\Http\Controllers\PhpController;
 use App\Http\Controllers\ResellerController;
+use App\Http\Controllers\SecurityController;
 use App\Http\Controllers\ServerController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\SshController;
@@ -59,6 +60,14 @@ Route::middleware([
         Route::get('/monitor', [MonitorController::class, 'index'])->name('monitor.index');
         Route::get('/monitor/realtime', [MonitorController::class, 'realtime'])->name('monitor.realtime');
         Route::post('/monitor/processes', [MonitorController::class, 'topProcesses'])->name('monitor.processes');
+
+        // Security
+        Route::get('/security', [SecurityController::class, 'index'])->name('security.index');
+        Route::post('/security/scan', [SecurityController::class, 'scan'])->name('security.scan');
+        Route::post('/security/firewall-add', [SecurityController::class, 'firewallAdd'])->name('security.firewall-add');
+        Route::post('/security/firewall-remove', [SecurityController::class, 'firewallRemove'])->name('security.firewall-remove');
+        Route::post('/security/ip-block', [SecurityController::class, 'ipBlock'])->name('security.ip-block');
+        Route::post('/security/fail2ban-unban', [SecurityController::class, 'fail2banUnban'])->name('security.fail2ban-unban');
 
         // Alerts
         Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');
