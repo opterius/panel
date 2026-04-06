@@ -34,11 +34,12 @@
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">SSH Enabled</span>
                     </div>
                     <div class="px-6 py-4 bg-gray-50 border-t border-gray-100 space-y-3">
+                        @php $sshCmd = 'ssh ' . $account->username . '@' . $account->server->ip_address; @endphp
                         <div>
                             <label class="block text-xs font-medium text-gray-500 mb-1">SSH Command</label>
-                            <div class="flex items-center gap-2" x-data="{ copied: false }">
-                                <code class="flex-1 bg-gray-900 text-green-400 px-4 py-2.5 rounded-lg text-sm font-mono select-all">ssh {{ $account->username }}@{{ $account->server->ip_address }}</code>
-                                <button type="button" @click="navigator.clipboard.writeText('ssh {{ $account->username }}@{{ $account->server->ip_address }}'); copied = true; setTimeout(() => copied = false, 2000)"
+                            <div class="flex items-center gap-2" x-data="{ copied: false, cmd: @js($sshCmd) }">
+                                <code class="flex-1 bg-gray-900 text-green-400 px-4 py-2.5 rounded-lg text-sm font-mono select-all" x-text="cmd"></code>
+                                <button type="button" @click="navigator.clipboard.writeText(cmd); copied = true; setTimeout(() => copied = false, 2000)"
                                     class="p-2 rounded-lg bg-gray-900 hover:bg-gray-800 transition">
                                     <svg x-show="!copied" class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                                     <svg x-show="copied" class="w-4 h-4 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
