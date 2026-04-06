@@ -58,10 +58,20 @@ class LicenseService
             return $result;
 
         } catch (\Exception $e) {
-            // License server unreachable — use cached or allow gracefully
+            // License server unreachable — use Laravel cache first
             $cached = Cache::get('license_status');
             if ($cached !== null) {
                 return $cached;
+            }
+
+            // Try agent's cache file as fallback
+            $agentCache = '/etc/opterius/license-cache.json';
+            if (file_exists($agentCache)) {
+                $data = json_decode(file_get_contents($agentCache), true);
+                if ($data && ($data['valid'] ?? false)) {
+                    Cache::put('license_status', $data, now()->addHours(24));
+                    return $data;
+                }
             }
 
             // No cache, no server — allow restricted mode
