@@ -26,7 +26,7 @@
         </div>
     @else
         <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-            <table class="min-w-full divide-y divide-gray-200">
+            <table class="w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Domain</th>
@@ -34,7 +34,7 @@
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Server</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-6 py-3"></th>
+                        <th class="px-6 py-3 w-24"></th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
