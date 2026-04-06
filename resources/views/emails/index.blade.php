@@ -208,9 +208,9 @@
             </div>
         @else
             @foreach($emailAccounts as $account)
-                <div class="bg-white rounded-xl shadow-sm overflow-hidden" x-data="{ open: false, tab: 'password' }">
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200" x-data="{ open: false, tab: 'password' }">
                     {{-- Header --}}
-                    <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-gray-50 transition" @click="open = !open">
+                    <div class="flex items-center justify-between px-6 py-4 cursor-pointer hover:bg-indigo-50/50 transition" @click="open = !open">
                         <div class="flex items-center space-x-4">
                             <div class="w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
                                 <svg class="w-5 h-5 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
@@ -237,8 +237,8 @@
                     {{-- Expandable Panel --}}
                     <div x-show="open" x-collapse>
                         {{-- Tabs --}}
-                        <div class="px-6 py-2 border-t border-gray-100 bg-gray-50">
-                            <div class="flex space-x-1">
+                        <div class="px-6 py-2.5 border-t border-gray-200 bg-white">
+                            <div class="flex space-x-1 bg-gray-100 rounded-lg p-1 w-fit">
                                 @foreach(['password' => 'Password', 'quota' => 'Quota', 'restrictions' => 'Restrictions', 'delete' => 'Delete'] as $key => $label)
                                     <button type="button" @click="tab = '{{ $key }}'"
                                         class="px-4 py-1.5 text-xs font-medium rounded-md transition"
@@ -249,7 +249,7 @@
                             </div>
                         </div>
 
-                        <div class="px-6 py-5 border-t border-gray-100">
+                        <div class="px-6 py-5 border-t border-gray-100 bg-gray-50/50">
                             {{-- Password Tab --}}
                             <div x-show="tab === 'password'">
                                 <form action="{{ route('user.emails.password', $account) }}" method="POST" class="max-w-md space-y-4">
