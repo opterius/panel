@@ -22,7 +22,11 @@
 
         <div class="min-h-screen flex bg-gray-50">
             <!-- Sidebar -->
-            @include('partials.sidebar')
+            @if(Auth::check() && (Auth::user()->isAdmin() || Auth::user()->isReseller()))
+                @include('partials.admin-sidebar')
+            @else
+                @include('partials.user-sidebar')
+            @endif
 
             <!-- Main Content -->
             <div class="flex-1 flex flex-col min-w-0">
