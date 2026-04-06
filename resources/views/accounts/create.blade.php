@@ -8,6 +8,12 @@
         </div>
     </x-slot>
 
+    @if(session('error'))
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {{ session('error') }}
+        </div>
+    @endif
+
     @if($servers->isEmpty())
         <div class="max-w-2xl">
             <div class="bg-white rounded-xl shadow-sm p-6 text-center py-16">
