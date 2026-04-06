@@ -68,10 +68,11 @@
 
             @if($stats)
                 @php
-                    $diskTotal = max($stats['disk_usage']['total_mb'] ?? 0, 0.01);
-                    $homePct = ($stats['disk_usage']['home_mb'] ?? 0) / $diskTotal * 100;
-                    $emailPct = ($stats['disk_usage']['email_mb'] ?? 0) / $diskTotal * 100;
-                    $dbPct = ($stats['database_size_mb'] ?? 0) / $diskTotal * 100;
+                    // Use disk quota as the reference. If unlimited (0), use 10GB as visual reference.
+                    $quotaMb = $account->disk_quota > 0 ? $account->disk_quota : 10240;
+                    $homePct = min(100, ($stats['disk_usage']['home_mb'] ?? 0) / $quotaMb * 100);
+                    $emailPct = min(100, ($stats['disk_usage']['email_mb'] ?? 0) / $quotaMb * 100);
+                    $dbPct = min(100, ($stats['database_size_mb'] ?? 0) / $quotaMb * 100);
                 @endphp
                 <div class="space-y-4">
                     <div>
