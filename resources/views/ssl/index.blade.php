@@ -45,11 +45,32 @@
                     'statusLabel' => $statusLabel,
                 ];
             };
+
+            // Reusable secondary text so non-active rows still have a second line
+            // and don't visually collapse next to active rows.
+            $secondaryText = function ($info, $isSub = false) {
+                if ($info['cert'] && $info['cert']->expires_at && $info['status'] === 'active') {
+                    return [
+                        'text' => ucfirst($info['cert']->type ?? 'letsencrypt')
+                                  . ' · Expires ' . $info['cert']->expires_at->format('M d, Y')
+                                  . ($info['cert']->auto_renew ? ' · Auto-renew' : ''),
+                        'class' => 'text-gray-500',
+                    ];
+                }
+                return match ($info['status']) {
+                    'pending' => ['text' => 'Issuing certificate…', 'class' => 'text-amber-600'],
+                    'error'   => ['text' => 'Certificate issuance failed', 'class' => 'text-red-600'],
+                    default   => ['text' => $isSub ? 'No certificate installed' : 'Main domain', 'class' => 'text-gray-400'],
+                };
+            };
         @endphp
 
         <div class="space-y-5">
             @foreach($mainDomains as $domain)
-                @php $info = $renderRow($domain); @endphp
+                @php
+                    $info = $renderRow($domain);
+                    $sec = $secondaryText($info);
+                @endphp
                 <div class="bg-white rounded-xl shadow-sm overflow-hidden">
                     {{-- Main Domain Row --}}
                     <div class="px-6 py-4 border-b border-gray-100">
@@ -62,17 +83,7 @@
                                 @endif
                                 <div class="min-w-0 flex-1">
                                     <div class="text-sm font-semibold text-gray-800 truncate">{{ $domain->domain }}</div>
-                                    @if($info['cert'] && $info['cert']->expires_at)
-                                        <div class="text-xs text-gray-500">
-                                            {{ ucfirst($info['cert']->type ?? 'letsencrypt') }} &middot;
-                                            Expires {{ $info['cert']->expires_at->format('M d, Y') }}
-                                            @if($info['cert']->auto_renew)
-                                                &middot; Auto-renew
-                                            @endif
-                                        </div>
-                                    @else
-                                        <div class="text-xs text-gray-400">Main domain</div>
-                                    @endif
+                                    <div class="text-xs {{ $sec['class'] }}">{{ $sec['text'] }}</div>
                                 </div>
                                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $info['statusColor'] }}">
                                     {{ $info['statusLabel'] }}
@@ -149,21 +160,22 @@
                     @if($domain->subdomains->isNotEmpty())
                         <div class="divide-y divide-gray-50">
                             @foreach($domain->subdomains as $sub)
-                                @php $subInfo = $renderRow($sub, true); @endphp
-                                <div class="pl-12 pr-6 py-3 flex items-center justify-between bg-gray-50/50">
+                                @php
+                                    $subInfo = $renderRow($sub, true);
+                                    $subSec = $secondaryText($subInfo, true);
+                                @endphp
+                                <div class="pl-12 pr-6 py-4 flex items-center justify-between bg-gray-50/50">
                                     <div class="flex items-center space-x-3 min-w-0 flex-1">
                                         @if($subInfo['status'] === 'active')
-                                            <svg class="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
+                                            <svg class="w-5 h-5 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>
                                         @else
-                                            <svg class="w-4 h-4 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
+                                            <svg class="w-5 h-5 text-gray-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/></svg>
                                         @endif
                                         <div class="min-w-0 flex-1">
-                                            <div class="text-sm text-gray-700 truncate">{{ $sub->domain }}</div>
-                                            @if($subInfo['cert'] && $subInfo['cert']->expires_at && $subInfo['status'] === 'active')
-                                                <div class="text-xs text-gray-400">Expires {{ $subInfo['cert']->expires_at->format('M d, Y') }}</div>
-                                            @endif
+                                            <div class="text-sm font-semibold text-gray-800 truncate">{{ $sub->domain }}</div>
+                                            <div class="text-xs {{ $subSec['class'] }}">{{ $subSec['text'] }}</div>
                                         </div>
-                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $subInfo['statusColor'] }}">
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $subInfo['statusColor'] }}">
                                             {{ $subInfo['statusLabel'] }}
                                         </span>
                                     </div>

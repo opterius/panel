@@ -46,6 +46,29 @@ class SslOverviewController extends Controller
                 ->orderBy('username')
                 ->get();
 
+            // Sync any non-active certs against the live agent so the page reflects
+            // reality (e.g. a "pending" cert that finished issuing in the background).
+            // We only check non-active ones to keep the page snappy.
+            foreach ($accounts as $account) {
+                foreach ($account->domains as $domain) {
+                    $this->syncIfStale($domain, $selectedServer);
+                    foreach ($domain->subdomains as $sub) {
+                        $this->syncIfStale($sub, $selectedServer);
+                    }
+                }
+            }
+
+            // Reload after sync so the view sees the updated cert records.
+            $accounts = Account::with([
+                'user',
+                'domains' => fn ($q) => $q->whereNull('parent_id')->orderBy('domain'),
+                'domains.sslCertificate',
+                'domains.subdomains.sslCertificate',
+            ])
+                ->where('server_id', $selectedServer->id)
+                ->orderBy('username')
+                ->get();
+
             // Calculate stats across all domains
             foreach ($accounts as $account) {
                 foreach ($account->domains as $domain) {
@@ -60,6 +83,37 @@ class SslOverviewController extends Controller
         $autoSslEnabled = Setting::get('auto_ssl_enabled', '1') === '1';
 
         return view('ssl-overview.index', compact('servers', 'selectedServer', 'accounts', 'stats', 'autoSslEnabled'));
+    }
+
+    /**
+     * For any domain whose cert is NOT marked active, ask the agent whether the
+     * cert file actually exists on disk and update the DB record accordingly.
+     * Active certs are skipped to keep page loads fast.
+     */
+    private function syncIfStale(Domain $domain, Server $server): void
+    {
+        $cert = $domain->sslCertificate;
+        if ($cert && $cert->status === 'active') {
+            return;
+        }
+
+        $resp = AgentService::for($server)->post('/ssl/status', [
+            'domain' => $domain->domain,
+        ]);
+
+        if (!$resp || !$resp->successful()) return;
+
+        if ($resp->json('exists', false)) {
+            SslCertificate::updateOrCreate(
+                ['domain_id' => $domain->id],
+                [
+                    'type'       => $cert->type ?? 'letsencrypt',
+                    'status'     => 'active',
+                    'expires_at' => now()->addDays(90),
+                    'auto_renew' => true,
+                ]
+            );
+        }
     }
 
     private function countStat(Domain $domain, array &$stats): void
