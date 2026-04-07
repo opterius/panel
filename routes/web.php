@@ -9,6 +9,7 @@ use App\Http\Controllers\IpAddressController;
 use App\Http\Controllers\NginxDirectiveController;
 use App\Http\Controllers\RedirectController;
 use App\Http\Controllers\SpamFilterController;
+use App\Http\Controllers\SslOverviewController;
 use App\Http\Controllers\TerminalController;
 use App\Http\Controllers\MigrationController;
 use App\Http\Controllers\ActivityLogController;
@@ -141,6 +142,11 @@ Route::middleware([
         // Spam Filter
         Route::get('/spam-filter', [SpamFilterController::class, 'index'])->name('spam-filter.index');
         Route::post('/spam-filter', [SpamFilterController::class, 'configure'])->name('spam-filter.configure');
+
+        // SSL Overview (server-wide)
+        Route::get('/ssl-overview', [SslOverviewController::class, 'index'])->name('ssl-overview.index');
+        Route::post('/ssl-overview/toggle-auto', [SslOverviewController::class, 'toggleAutoSsl'])->name('ssl-overview.toggle-auto');
+        Route::post('/ssl-overview/recheck', [SslOverviewController::class, 'recheckMissing'])->name('ssl-overview.recheck');
 
         // DNS Templates
         Route::resource('dns-templates', DnsTemplateController::class)->except(['show']);
