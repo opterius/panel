@@ -50,11 +50,13 @@
     <div x-show="value.length > 0" x-cloak class="space-y-1.5">
         <div class="flex items-center gap-2">
             <div class="flex-1 h-1.5 bg-gray-100 rounded-full overflow-hidden">
+                {{-- Inline hex colors instead of Tailwind classes — the JIT scanner can't
+                     see classes that only appear inside Alpine strings, so it would purge
+                     them from the build and the bar would render gray. --}}
                 <div class="h-full transition-all duration-200"
-                     :class="strength.barClass"
-                     :style="`width: ${strength.percent}%`"></div>
+                     :style="`width: ${strength.percent}%; background-color: ${strength.barColor};`"></div>
             </div>
-            <span class="text-xs font-medium tabular-nums" :class="strength.textClass" x-text="strength.label"></span>
+            <span class="text-xs font-medium tabular-nums" :style="`color: ${strength.textColor};`" x-text="strength.label"></span>
         </div>
     </div>
 
@@ -111,7 +113,7 @@
                 digits: true,
                 symbols: true,
             },
-            strength: { percent: 0, label: '', barClass: '', textClass: '' },
+            strength: { percent: 0, label: '', barColor: '', textColor: '' },
 
             generate() {
                 // Always use crypto.getRandomValues — never Math.random — for any
@@ -158,7 +160,7 @@
             recalcStrength() {
                 const v = this.value;
                 if (!v) {
-                    this.strength = { percent: 0, label: '', barClass: '', textClass: '' };
+                    this.strength = { percent: 0, label: '', barColor: '', textColor: '' };
                     return;
                 }
                 let score = 0;
@@ -171,18 +173,19 @@
                 if (/[0-9]/.test(v)) score++;
                 if (/[^a-zA-Z0-9]/.test(v)) score++;
 
-                // Map score (0–8) to four buckets
+                // Map score (0–8) to four buckets. Hex literals so Tailwind's
+                // JIT scanner doesn't purge dynamically-referenced classes.
                 let label, bar, text;
-                if (score <= 2)      { label = 'Weak';      bar = 'bg-red-500';    text = 'text-red-600'; }
-                else if (score <= 4) { label = 'Fair';      bar = 'bg-amber-500';  text = 'text-amber-600'; }
-                else if (score <= 6) { label = 'Strong';    bar = 'bg-green-500';  text = 'text-green-600'; }
-                else                 { label = 'Excellent'; bar = 'bg-emerald-600'; text = 'text-emerald-700'; }
+                if (score <= 2)      { label = 'Weak';      bar = '#ef4444'; text = '#dc2626'; } // red-500 / red-600
+                else if (score <= 4) { label = 'Fair';      bar = '#f59e0b'; text = '#d97706'; } // amber-500 / amber-600
+                else if (score <= 6) { label = 'Strong';    bar = '#22c55e'; text = '#16a34a'; } // green-500 / green-600
+                else                 { label = 'Excellent'; bar = '#059669'; text = '#047857'; } // emerald-600 / emerald-700
 
                 this.strength = {
                     percent: Math.min(100, (score / 8) * 100),
                     label,
-                    barClass: bar,
-                    textClass: text,
+                    barColor: bar,
+                    textColor: text,
                 };
             },
 
