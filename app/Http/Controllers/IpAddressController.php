@@ -18,6 +18,11 @@ class IpAddressController extends Controller
 
         if ($request->has('server_id')) {
             $selectedServer = Server::findOrFail($request->server_id);
+        } elseif ($servers->count() === 1) {
+            $selectedServer = $servers->first();
+        }
+
+        if ($selectedServer) {
             $ipAddresses = IpAddress::with('account')
                 ->where('server_id', $selectedServer->id)
                 ->orderBy('ip_address')

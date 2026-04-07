@@ -17,6 +17,11 @@ class SpamFilterController extends Controller
 
         if ($request->has('server_id')) {
             $selectedServer = Server::findOrFail($request->server_id);
+        } elseif ($servers->count() === 1) {
+            $selectedServer = $servers->first();
+        }
+
+        if ($selectedServer) {
             $response = AgentService::for($selectedServer)->post('/rspamd/status', []);
             if ($response && $response->successful()) {
                 $status = $response->json();

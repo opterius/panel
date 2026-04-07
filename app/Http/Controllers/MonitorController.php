@@ -16,6 +16,8 @@ class MonitorController extends Controller
 
         if ($request->has('server_id')) {
             $selectedServer = Server::findOrFail($request->server_id);
+        } elseif ($servers->count() === 1) {
+            $selectedServer = $servers->first();
         }
 
         return view('monitor.index', compact('servers', 'selectedServer'));

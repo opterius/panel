@@ -17,7 +17,11 @@ class ServiceController extends Controller
 
         if ($request->has('server_id')) {
             $selectedServer = Server::findOrFail($request->server_id);
+        } elseif ($servers->count() === 1) {
+            $selectedServer = $servers->first();
+        }
 
+        if ($selectedServer) {
             $response = AgentService::for($selectedServer)->post('/services/list', []);
             if ($response && $response->successful()) {
                 $services = $response->json('services', []);
