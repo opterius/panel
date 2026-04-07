@@ -97,8 +97,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.new_password') }}</label>
-                    <input type="password" name="db_password" placeholder="Min 8 characters"
-                        class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    <x-password-input name="db_password" id="db_password_change" placeholder="Min 8 characters" :min-length="8" :default-length="20" />
                     @error('db_password')
                         <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                     @enderror

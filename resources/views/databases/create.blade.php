@@ -140,9 +140,7 @@
                         </div>
                         <div>
                             <label for="db_password" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.db_password') }}</label>
-                            <input type="password" name="db_password" id="db_password"
-                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                placeholder="Minimum 8 characters">
+                            <x-password-input name="db_password" id="db_password" placeholder="Minimum 8 characters" :min-length="8" :default-length="20" />
                             @error('db_password')
                                 <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                             @enderror
