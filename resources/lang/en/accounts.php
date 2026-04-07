@@ -38,7 +38,7 @@ return [
     'takes_all_domains_offline'         => 'This will take all domains offline, disable email and SSH for :username. Suspended sites will show a "Account Suspended" page.',
     'delete_account'                    => 'Delete Account',
     'deleting_removes_domains_databases'=> 'Deleting this account will remove all associated domains, databases, and cron jobs.',
-    'permanently_delete_account'        => 'This will permanently delete the account ":username" and all associated domains, databases, and cron jobs.',
+    'permanently_delete_account'        => 'This will permanently delete the account :username and all associated domains, databases, and cron jobs. This cannot be undone.',
     'no_servers_available'              => 'No servers available',
     'need_server_to_create_account'     => 'You need to add a server before creating an account.',
     'no_accounts_yet'                   => 'No accounts yet',

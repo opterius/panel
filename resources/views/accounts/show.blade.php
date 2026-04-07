@@ -407,8 +407,9 @@
 
         <x-delete-modal
             :action="route('admin.accounts.destroy', $account)"
-            title="{{ __('accounts.delete_account') }}"
-            message="{{ __('accounts.permanently_delete_account', ['username' => $account->username]) }}"
+            :title="__('accounts.delete_account')"
+            :message="__('accounts.permanently_delete_account', ['username' => $account->username])"
+            :confirm-text="$account->username"
             :confirm-password="true">
             <x-slot name="trigger">
                 <button type="button" class="inline-flex items-center px-4 py-2.5 bg-white text-red-600 text-sm font-medium border border-red-300 rounded-lg hover:bg-red-50 transition">

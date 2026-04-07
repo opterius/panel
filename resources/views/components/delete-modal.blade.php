@@ -1,6 +1,30 @@
-@props(['action', 'title' => 'Delete Item', 'message' => 'Are you sure? This action cannot be undone.', 'confirmPassword' => false])
+@props([
+    'action',
+    'title' => 'Delete Item',
+    'message' => 'Are you sure? This action cannot be undone.',
+    'confirmPassword' => false,
+    'confirmText' => null,  // Require user to type this exact text to enable delete
+])
 
-<div x-data="{ open: false, password: '', loading: false, error: '' }" x-cloak>
+<div x-data="{
+        open: false,
+        password: '',
+        typedConfirm: '',
+        loading: false,
+        error: '',
+        requiredConfirm: @js($confirmText),
+        canDelete() {
+            if (this.requiredConfirm && this.typedConfirm !== this.requiredConfirm) return false;
+            if (@js($confirmPassword) && this.password.length === 0) return false;
+            return true;
+        },
+        reset() {
+            this.open = false;
+            this.error = '';
+            this.password = '';
+            this.typedConfirm = '';
+        }
+    }" x-cloak>
     <!-- Trigger -->
     <div @click="open = true">
         {{ $trigger }}
@@ -18,7 +42,7 @@
                 x-transition:leave-start="opacity-100"
                 x-transition:leave-end="opacity-0"
                 class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm"
-                @click="open = false; error = ''; password = ''">
+                @click="reset()">
             </div>
 
             <!-- Modal Panel -->
@@ -30,7 +54,7 @@
                     x-transition:leave="ease-in duration-200"
                     x-transition:leave-start="opacity-100 scale-100"
                     x-transition:leave-end="opacity-0 scale-95"
-                    @keydown.escape.window="open = false; error = ''; password = ''"
+                    @keydown.escape.window="reset()"
                     @click.stop
                     class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
 
@@ -49,14 +73,24 @@
                         </div>
                     </div>
 
-                    <!-- Password Field -->
+                    @if($confirmText)
+                        <div class="px-6 pt-5">
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                Type <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs font-mono text-red-600">{{ $confirmText }}</code> to confirm
+                            </label>
+                            <input type="text" x-model="typedConfirm" autocomplete="off"
+                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-red-500 focus:ring-red-500"
+                                :placeholder="requiredConfirm">
+                        </div>
+                    @endif
+
                     @if($confirmPassword)
                         <div class="px-6 pt-5">
                             <label for="confirm_password" class="block text-sm font-medium text-gray-700 mb-1.5">Enter your password to confirm</label>
-                            <input type="password" id="confirm_password" x-model="password"
+                            <input type="password" id="confirm_password" x-model="password" autocomplete="current-password"
                                 class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-red-500 focus:ring-red-500"
                                 placeholder="Your password"
-                                @keydown.enter="if(password.length > 0) { $refs.form.submit(); }">
+                                @keydown.enter="if(canDelete()) { $refs.form.submit(); }">
                             <template x-if="error">
                                 <p class="mt-1.5 text-sm text-red-600" x-text="error"></p>
                             </template>
@@ -66,7 +100,7 @@
                     <!-- Footer -->
                     <div class="flex items-center justify-end space-x-3 px-6 py-5 mt-2">
                         <button type="button"
-                            @click="open = false; error = ''; password = ''"
+                            @click="reset()"
                             class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
                             Cancel
                         </button>
@@ -77,11 +111,9 @@
                             @if($confirmPassword)
                                 <input type="hidden" name="password" :value="password">
                             @endif
-                            <button type="submit"
-                                @if($confirmPassword)
-                                    @click.prevent="if(password.length === 0) { error = 'Password is required.'; return; } $refs.form.submit();"
-                                @endif
-                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition">
+                            <button type="submit" :disabled="!canDelete()"
+                                @click.prevent="if(!canDelete()) { error = 'Confirmation incomplete.'; return; } $refs.form.submit();"
+                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
                                 Delete
                             </button>
                         </form>
