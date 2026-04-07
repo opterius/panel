@@ -12,7 +12,7 @@ class LaravelInstallerController extends Controller
     public function index()
     {
         $domains = Domain::with('account.server')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->where('status', 'active')
             ->get();
 
@@ -40,7 +40,7 @@ class LaravelInstallerController extends Controller
     public function create()
     {
         $domains = Domain::with('account.server')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->where('status', 'active')
             ->get();
 

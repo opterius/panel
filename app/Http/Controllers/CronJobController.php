@@ -14,7 +14,7 @@ class CronJobController extends Controller
     public function index()
     {
         $cronJobs = CronJob::with('server', 'account')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->latest()
             ->get();
 
@@ -23,7 +23,7 @@ class CronJobController extends Controller
 
     public function create()
     {
-        $accounts = auth()->user()->accessibleAccounts()
+        $accounts = auth()->user()->scopedToCurrent()
             ->with('server')
             ->get();
 

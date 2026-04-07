@@ -14,7 +14,7 @@ class SubdomainController extends Controller
     public function index()
     {
         $domains = Domain::with('account.server', 'subdomains')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->whereNull('parent_id')
             ->where('status', 'active')
             ->get();
@@ -25,7 +25,7 @@ class SubdomainController extends Controller
     public function create(Domain $domain)
     {
         // Authorization
-        if (!in_array($domain->account_id, auth()->user()->accessibleAccountIds())) {
+        if (!in_array($domain->account_id, auth()->user()->currentAccountIds())) {
             abort(404);
         }
 
@@ -38,7 +38,7 @@ class SubdomainController extends Controller
     {
         $subdomain->load('account.server', 'parent');
 
-        if (!in_array($subdomain->account_id, auth()->user()->accessibleAccountIds())) {
+        if (!in_array($subdomain->account_id, auth()->user()->currentAccountIds())) {
             abort(404);
         }
 

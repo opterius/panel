@@ -14,12 +14,12 @@ class EmailController extends Controller
     public function index()
     {
         $emailAccounts = EmailAccount::with('domain.server', 'domain.account')
-            ->whereHas('domain', fn ($q) => $q->whereIn('account_id', auth()->user()->accessibleAccountIds()))
+            ->whereHas('domain', fn ($q) => $q->whereIn('account_id', auth()->user()->currentAccountIds()))
             ->latest()
             ->get();
 
         $domains = Domain::with('account.server')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->where('status', 'active')
             ->get();
 

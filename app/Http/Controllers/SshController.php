@@ -11,7 +11,7 @@ class SshController extends Controller
 {
     public function index(Request $request)
     {
-        $accounts = auth()->user()->accessibleAccounts()
+        $accounts = auth()->user()->scopedToCurrent()
             ->with('server')
             ->get();
 

@@ -191,6 +191,27 @@ class User extends Authenticatable
         return $accounts->first();
     }
 
+    /**
+     * Returns the current account ID wrapped in an array.
+     * Drop-in replacement for accessibleAccountIds() in Hosting Mode controllers
+     * where each session should be scoped to ONE active account (cPanel-style).
+     */
+    public function currentAccountIds(): array
+    {
+        $current = $this->currentAccount();
+        return $current ? [$current->id] : [];
+    }
+
+    /**
+     * Query builder scoped to the user's currently selected account only.
+     * Drop-in replacement for accessibleAccounts() in Hosting Mode controllers.
+     */
+    public function scopedToCurrent()
+    {
+        $ids = $this->currentAccountIds();
+        return Account::whereIn('id', $ids ?: [0]);
+    }
+
     public function packages(): HasMany
     {
         return $this->hasMany(Package::class, 'owner_id');

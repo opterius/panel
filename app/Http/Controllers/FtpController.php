@@ -11,7 +11,7 @@ class FtpController extends Controller
 {
     public function index(Request $request)
     {
-        $accounts = auth()->user()->accessibleAccounts()
+        $accounts = auth()->user()->scopedToCurrent()
             ->with('server')
             ->get();
 
@@ -19,7 +19,7 @@ class FtpController extends Controller
         $ftpAccounts = [];
 
         if ($request->has('account_id')) {
-            $selectedAccount = auth()->user()->accessibleAccounts()
+            $selectedAccount = auth()->user()->scopedToCurrent()
                 ->with('server')
                 ->findOrFail($request->account_id);
 

@@ -15,12 +15,12 @@ class SslController extends Controller
     public function index()
     {
         $certificates = SslCertificate::with('domain.server', 'domain.account')
-            ->whereHas('domain', fn ($q) => $q->whereIn('account_id', auth()->user()->accessibleAccountIds()))
+            ->whereHas('domain', fn ($q) => $q->whereIn('account_id', auth()->user()->currentAccountIds()))
             ->latest()
             ->get();
 
         $domains = Domain::with('server', 'account', 'sslCertificate')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->where('status', 'active')
             ->doesntHave('sslCertificate')
             ->get();

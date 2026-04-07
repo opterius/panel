@@ -13,7 +13,7 @@ class AutoresponderController extends Controller
     public function index(Request $request)
     {
         $domains = Domain::with('account.server')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->whereNull('parent_id')
             ->where('status', 'active')
             ->get();
@@ -23,7 +23,7 @@ class AutoresponderController extends Controller
 
         if ($request->has('domain_id')) {
             $selectedDomain = Domain::with('account.server')
-                ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+                ->whereIn('account_id', auth()->user()->currentAccountIds())
                 ->findOrFail($request->domain_id);
 
             // Get email accounts for this domain
@@ -58,7 +58,7 @@ class AutoresponderController extends Controller
         ]);
 
         $domain = Domain::with('account.server')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'email')) {

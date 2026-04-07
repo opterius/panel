@@ -14,7 +14,7 @@ class DomainController extends Controller
     {
         // Only show main domains (not subdomains) — each account has exactly one main domain
         $domains = Domain::with('server', 'account', 'sslCertificate', 'subdomains')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->whereNull('parent_id')
             ->latest()
             ->get();

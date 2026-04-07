@@ -13,7 +13,7 @@ class NginxDirectiveController extends Controller
     public function index()
     {
         $domains = Domain::with('account.server', 'nginxDirective')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->whereNull('parent_id')
             ->where('status', 'active')
             ->get();
@@ -29,7 +29,7 @@ class NginxDirectiveController extends Controller
         ]);
 
         $domain = Domain::with('account.server')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {

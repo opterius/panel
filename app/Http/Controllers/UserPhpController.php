@@ -12,7 +12,7 @@ class UserPhpController extends Controller
     public function index()
     {
         $domains = Domain::with('account.server', 'account.package')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->whereNull('parent_id')
             ->where('status', 'active')
             ->get();
@@ -49,7 +49,7 @@ class UserPhpController extends Controller
         ]);
 
         $domain = Domain::with('account.server', 'account.package')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->findOrFail($validated['domain_id']);
 
         if (!$domain->account->userCan(auth()->user(), 'settings')) {

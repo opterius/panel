@@ -10,7 +10,7 @@ class FileManagerController extends Controller
 {
     public function index(Request $request)
     {
-        $accounts = auth()->user()->accessibleAccounts()
+        $accounts = auth()->user()->scopedToCurrent()
             ->with('server')
             ->get();
 
@@ -19,7 +19,7 @@ class FileManagerController extends Controller
         $currentPath = '';
 
         if ($request->has('account_id')) {
-            $selectedAccount = auth()->user()->accessibleAccounts()
+            $selectedAccount = auth()->user()->scopedToCurrent()
                 ->with('server')
                 ->findOrFail($request->account_id);
 
@@ -46,7 +46,7 @@ class FileManagerController extends Controller
             'path'       => 'required|string',
         ]);
 
-        $account = auth()->user()->accessibleAccounts()
+        $account = auth()->user()->scopedToCurrent()
             ->with('server')
             ->findOrFail($validated['account_id']);
 

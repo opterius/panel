@@ -12,7 +12,7 @@ class ForwarderController extends Controller
     public function index(Request $request)
     {
         $domains = Domain::with('account.server')
-            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->where('status', 'active')
             ->get();
 
@@ -21,7 +21,7 @@ class ForwarderController extends Controller
 
         if ($request->has('domain_id')) {
             $selectedDomain = Domain::with('account.server')
-                ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+                ->whereIn('account_id', auth()->user()->currentAccountIds())
                 ->findOrFail($request->domain_id);
 
             $response = AgentService::for($selectedDomain->account->server)->post('/forwarder/list', [

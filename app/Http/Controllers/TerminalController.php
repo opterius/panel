@@ -12,7 +12,7 @@ class TerminalController extends Controller
     public function index()
     {
         $accounts = Account::with('server', 'domains')
-            ->whereIn('id', auth()->user()->accessibleAccountIds())
+            ->whereIn('id', auth()->user()->currentAccountIds())
             ->where('ssh_enabled', true)
             ->get();
 
@@ -26,7 +26,7 @@ class TerminalController extends Controller
         ]);
 
         $account = Account::with('server')
-            ->whereIn('id', auth()->user()->accessibleAccountIds())
+            ->whereIn('id', auth()->user()->currentAccountIds())
             ->where('ssh_enabled', true)
             ->findOrFail($validated['account_id']);
 
@@ -65,7 +65,7 @@ class TerminalController extends Controller
         ]);
 
         $account = Account::with('server')
-            ->whereIn('id', auth()->user()->accessibleAccountIds())
+            ->whereIn('id', auth()->user()->currentAccountIds())
             ->findOrFail($validated['account_id']);
 
         $agentUrl = rtrim($account->server->agent_url, '/');
