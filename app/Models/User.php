@@ -160,8 +160,10 @@ class User extends Authenticatable
      */
     public function accessibleAccounts()
     {
-        return Account::where('user_id', $this->id)
-            ->orWhereHas('collaborators', fn ($q) => $q->where('users.id', $this->id));
+        return Account::where(function ($query) {
+            $query->where('user_id', $this->id)
+                ->orWhereHas('collaborators', fn ($q) => $q->where('users.id', $this->id));
+        });
     }
 
     /**

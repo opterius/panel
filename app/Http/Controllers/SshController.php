@@ -20,15 +20,15 @@ class SshController extends Controller
         $sshEnabled = false;
 
         if ($request->has('account')) {
-            $selectedAccount = auth()->user()->accessibleAccounts()
-                ->with('server')
-                ->where('username', $request->input('account'))
-                ->firstOrFail();
+            $selectedAccount = $accounts->firstWhere('username', $request->input('account'));
+            if (!$selectedAccount) {
+                abort(404);
+            }
         } elseif ($request->has('account_id')) {
-            // Backwards compatibility
-            $selectedAccount = auth()->user()->accessibleAccounts()
-                ->with('server')
-                ->findOrFail($request->account_id);
+            $selectedAccount = $accounts->firstWhere('id', (int) $request->input('account_id'));
+            if (!$selectedAccount) {
+                abort(404);
+            }
         }
 
         if ($selectedAccount) {
