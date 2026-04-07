@@ -129,10 +129,13 @@ class SubdomainController extends Controller
                 'ttl'     => 3600,
             ]);
 
+            // Auto-issue SSL for the subdomain
+            \App\Http\Controllers\SslController::autoIssue($subdomain);
+
             ActivityLogger::log('subdomain.created', 'domain', $subdomain->id, $subdomain->domain,
                 "Created subdomain {$fullDomain}", ['server_id' => $domain->server_id, 'parent_domain_id' => $domain->id]);
 
-            return redirect()->route('user.domains.index')->with('success', __('domains.subdomain_created', ['domain' => $fullDomain]));
+            return redirect()->route('user.subdomains.index')->with('success', __('domains.subdomain_created', ['domain' => $fullDomain]));
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';

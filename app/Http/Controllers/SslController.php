@@ -14,18 +14,66 @@ class SslController extends Controller
 {
     public function index()
     {
-        $certificates = SslCertificate::with('domain.server', 'domain.account')
-            ->whereHas('domain', fn ($q) => $q->whereIn('account_id', auth()->user()->currentAccountIds()))
-            ->latest()
-            ->get();
-
-        $domains = Domain::with('server', 'account', 'sslCertificate')
+        // Get all main domains for the current account, with their subdomains and SSL records
+        $mainDomains = Domain::with('server', 'account', 'sslCertificate', 'subdomains.sslCertificate', 'subdomains.server')
             ->whereIn('account_id', auth()->user()->currentAccountIds())
+            ->whereNull('parent_id')
             ->where('status', 'active')
-            ->doesntHave('sslCertificate')
+            ->orderBy('domain')
             ->get();
 
-        return view('ssl.index', compact('certificates', 'domains'));
+        // Sync DB status with actual cert files on disk (for any domain that has a cert record)
+        foreach ($mainDomains as $main) {
+            $this->syncDomainSslStatus($main);
+            foreach ($main->subdomains as $sub) {
+                $this->syncDomainSslStatus($sub);
+            }
+        }
+
+        // Reload after sync
+        $mainDomains = Domain::with('server', 'account', 'sslCertificate', 'subdomains.sslCertificate', 'subdomains.server')
+            ->whereIn('account_id', auth()->user()->currentAccountIds())
+            ->whereNull('parent_id')
+            ->where('status', 'active')
+            ->orderBy('domain')
+            ->get();
+
+        return view('ssl.index', compact('mainDomains'));
+    }
+
+    /**
+     * Check the actual cert file on the server and update the DB record.
+     */
+    private function syncDomainSslStatus(Domain $domain): void
+    {
+        if (!$domain->account || !$domain->account->server) return;
+
+        $response = AgentService::for($domain->account->server)->post('/ssl/status', [
+            'domain' => $domain->domain,
+        ]);
+
+        if (!$response || !$response->successful()) return;
+
+        $exists = $response->json('exists', false);
+        $cert = $domain->sslCertificate;
+
+        if ($exists) {
+            // Cert exists on disk → mark active
+            if (!$cert || $cert->status !== 'active') {
+                SslCertificate::updateOrCreate(
+                    ['domain_id' => $domain->id],
+                    [
+                        'type'       => $cert->type ?? 'letsencrypt',
+                        'status'     => 'active',
+                        'expires_at' => now()->addDays(90),
+                        'auto_renew' => true,
+                    ]
+                );
+            }
+        } else if ($cert && $cert->status !== 'pending') {
+            // Cert was supposed to exist but doesn't → mark error
+            $cert->update(['status' => 'error']);
+        }
     }
 
     public function issue(Request $request)
