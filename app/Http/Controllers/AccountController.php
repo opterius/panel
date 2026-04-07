@@ -180,6 +180,30 @@ class AccountController extends Controller
         return redirect()->route('admin.accounts.show', $account)->with('success', __('accounts.account_owner_updated'));
     }
 
+    public function changePassword(Request $request, Account $account)
+    {
+        $validated = $request->validate([
+            'system_password' => 'required|string|min:8',
+        ]);
+
+        $account->load('server');
+
+        $response = AgentService::for($account->server)->post('/account/password', [
+            'username' => $account->username,
+            'password' => $validated['system_password'],
+        ]);
+
+        if ($response && $response->successful()) {
+            ActivityLogger::log('account.password_changed', 'account', $account->id, $account->username,
+                "Changed system password for {$account->username}", ['server_id' => $account->server_id]);
+
+            return back()->with('success', 'System password changed for ' . $account->username . '.');
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
+        return back()->with('error', 'Failed to change password: ' . $error);
+    }
+
     public function suspend(Request $request, Account $account)
     {
         if (auth()->user()->isReseller() && !auth()->user()->resellerCan('account.suspend')) {

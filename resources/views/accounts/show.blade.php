@@ -160,6 +160,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-base font-semibold text-gray-800">{{ __('accounts.account_owner') }}</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Used to log into the Opterius Panel (web UI).</p>
                 <div class="mt-2 flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
                         <span class="text-sm font-bold text-indigo-600">{{ strtoupper(substr($account->user->name, 0, 2)) }}</span>
@@ -199,6 +200,43 @@
                 <div class="flex items-center space-x-3">
                     <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
                         {{ __('accounts.save_changes') }}
+                    </button>
+                    <button type="button" @click="editing = false" class="text-sm text-gray-500 hover:text-gray-700 transition">
+                        {{ __('common.cancel') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- System Password (SSH/SFTP/FTP) -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8" x-data="{ editing: false }">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold text-gray-800">System Password</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Used for SSH, SFTP and FTP login as <code class="bg-gray-100 px-1 rounded">{{ $account->username }}</code>. Different from the panel login password above.</p>
+            </div>
+            <button type="button" @click="editing = !editing" x-show="!editing"
+                class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                Change
+            </button>
+        </div>
+
+        <div x-show="editing" x-collapse class="mt-4">
+            <form action="{{ route('admin.accounts.change-password', $account) }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">New System Password</label>
+                    <input type="password" name="system_password" placeholder="Min 8 characters" autocomplete="new-password"
+                        class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                    @error('system_password')
+                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                    @enderror
+                    <p class="mt-1.5 text-xs text-gray-400">This will change the Linux user password on the server. SSH key authentication is not affected.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                        Update System Password
                     </button>
                     <button type="button" @click="editing = false" class="text-sm text-gray-500 hover:text-gray-700 transition">
                         {{ __('common.cancel') }}
