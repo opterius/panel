@@ -66,21 +66,47 @@ class AccountController extends Controller
         }
 
         $validated = $request->validate([
-            'server_id'  => 'required|exists:servers,id',
-            'username'   => 'required|string|max:32|alpha_dash|unique:accounts,username',
-            'domain'     => 'required|string|max:255|unique:domains,domain',
-            'package_id' => 'required|exists:packages,id',
+            'server_id'      => 'required|exists:servers,id',
+            'username'       => 'required|string|max:32|alpha_dash|unique:accounts,username',
+            'domain'         => 'required|string|max:255|unique:domains,domain',
+            'package_id'     => 'required|exists:packages,id',
+            'owner_email'    => 'required|email|max:255',
+            'owner_name'     => 'nullable|string|max:255',
+            'owner_password' => 'nullable|string|min:8',
         ]);
 
         $package = Package::findOrFail($validated['package_id']);
         $phpVersion = $package->default_php_version;
         $diskQuota = $package->disk_quota;
 
-        $account = DB::transaction(function () use ($validated, $phpVersion, $diskQuota) {
+        // Resolve account owner: existing user by email, or create a new one
+        $owner = \App\Models\User::where('email', $validated['owner_email'])->first();
+        $newOwnerCreated = false;
+        $generatedPassword = null;
+
+        if (!$owner) {
+            // Create a new user as the owner
+            if (empty($validated['owner_password'])) {
+                $generatedPassword = \Illuminate\Support\Str::random(16);
+                $passwordToUse = $generatedPassword;
+            } else {
+                $passwordToUse = $validated['owner_password'];
+            }
+
+            $owner = \App\Models\User::create([
+                'name'     => $validated['owner_name'] ?: explode('@', $validated['owner_email'])[0],
+                'email'    => $validated['owner_email'],
+                'password' => Hash::make($passwordToUse),
+                'role'     => 'user',
+            ]);
+            $newOwnerCreated = true;
+        }
+
+        $account = DB::transaction(function () use ($validated, $phpVersion, $diskQuota, $owner) {
             $homeDir = '/home/' . $validated['username'];
 
             $account = Account::create([
-                'user_id'      => auth()->id(),
+                'user_id'      => $owner->id,
                 'server_id'    => $validated['server_id'],
                 'package_id'   => $validated['package_id'] ?? null,
                 'username'     => $validated['username'],
@@ -127,9 +153,17 @@ class AccountController extends Controller
             SslController::autoIssue($domain);
 
             ActivityLogger::log('account.created', 'account', $account->id, $account->username,
-                "Created account {$account->username} with domain {$validated['domain']}", ['server_id' => $account->server_id]);
+                "Created account {$account->username} with domain {$validated['domain']} for owner {$owner->email}",
+                ['server_id' => $account->server_id, 'owner_id' => $owner->id]);
 
-            return redirect()->route('admin.accounts.show', $account)->with('success', __('accounts.account_created', ['domain' => $validated['domain']]));
+            $msg = __('accounts.account_created', ['domain' => $validated['domain']]);
+            if ($newOwnerCreated && $generatedPassword) {
+                $msg .= " New panel user created: {$owner->email} with password: {$generatedPassword} (save this — it won't be shown again)";
+            } elseif ($newOwnerCreated) {
+                $msg .= " New panel user created: {$owner->email}";
+            }
+
+            return redirect()->route('admin.accounts.show', $account)->with('success', $msg);
         }
 
         ActivityLogger::log('account.created', 'account', $account->id, $account->username,

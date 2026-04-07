@@ -188,20 +188,52 @@
                     </div>
                 </div>
 
-                {{-- Panel Access Info --}}
-                <div class="bg-gray-50 border border-gray-200 rounded-xl p-5">
-                    <div class="flex items-start space-x-3">
-                        <svg class="w-5 h-5 text-gray-400 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                {{-- Account Owner --}}
+                <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+                    <div class="px-6 py-5 border-b border-gray-100">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center">
+                                <span class="text-sm font-bold text-indigo-600">4</span>
+                            </div>
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-800">Account Owner</h3>
+                                <p class="text-sm text-gray-500">Who will manage this hosting account from the panel.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="px-6 py-5 space-y-5">
                         <div>
-                            <h4 class="text-sm font-semibold text-gray-700">{{ __('accounts.panel_access') }}</h4>
-                            <p class="text-sm text-gray-500 mt-1">
-                                {{ __('accounts.panel_access_managed_by') }} <span class="font-medium text-gray-700">{{ Auth::user()->name }}</span>
-                                (<span class="font-mono text-xs">{{ Auth::user()->email }}</span>).
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Owner Email</label>
+                            <input type="email" name="owner_email" value="{{ old('owner_email', Auth::user()->email) }}"
+                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                placeholder="client@example.com">
+                            <p class="mt-1.5 text-xs text-gray-400">
+                                If a user with this email already exists, the account is assigned to them.
+                                Otherwise, a new user is created and they'll receive login credentials.
+                                Default is your own email if you'll manage this account yourself.
                             </p>
-                            <p class="text-xs text-gray-400 mt-2">
-                                {{ __('accounts.hosting_client_can_manage') }}
-                                {{ __('accounts.give_clients_separate_access') }}
-                            </p>
+                            @error('owner_email')
+                                <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Owner Name <span class="text-gray-400 font-normal">(only used for new users)</span></label>
+                            <input type="text" name="owner_name" value="{{ old('owner_name') }}"
+                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                placeholder="Full name">
+                            @error('owner_name')
+                                <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Owner Password <span class="text-gray-400 font-normal">(only used for new users)</span></label>
+                            <input type="password" name="owner_password" value="{{ old('owner_password') }}"
+                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                placeholder="Min 8 characters (leave blank to auto-generate)">
+                            <p class="mt-1.5 text-xs text-gray-400">If left blank, a random password will be generated and shown after account creation.</p>
+                            @error('owner_password')
+                                <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                     </div>
                 </div>
