@@ -125,12 +125,15 @@ class SubdomainController extends Controller
             'status'        => 'pending',
         ]);
 
-        // Tell the agent to create the vhost (but NOT a new system user — reuse parent's)
+        // Tell the agent to create the vhost (but NOT a new system user — reuse parent's).
+        // Pass parent_domain so the agent nests this subdomain's logs under the
+        // parent's logs/ folder instead of creating a new top-level dir in /home/{user}/.
         $response = AgentService::for($domain->account->server)->post('/domains/create', [
             'domain'        => $subdomain->domain,
             'document_root' => $subdomain->document_root,
             'username'      => $domain->account->username,
             'php_version'   => $subdomain->php_version,
+            'parent_domain' => $domain->domain,
         ]);
 
         if ($response && $response->successful()) {
