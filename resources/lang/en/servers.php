@@ -105,4 +105,9 @@ return [
     'no_ssh_permission'         => 'You do not have SSH permission for this account.',
     'terminal_connect_failed'   => 'Could not connect to server agent.',
     'setup_welcome'             => 'Welcome to Opterius Panel! Your admin account has been created.',
+
+    // System tools card on the server detail page
+    'system_tools'      => 'System tools',
+    'server_time'       => 'Server time',
+    'server_time_desc'  => 'Timezone, NTP sync, live clock',
 ];

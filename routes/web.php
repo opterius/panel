@@ -78,6 +78,17 @@ Route::middleware([
         })->name('dashboard');
 
         Route::resource('servers', ServerController::class)->except(['edit', 'update']);
+        Route::get('/servers/{server}/time', [\App\Http\Controllers\ServerTimeController::class, 'show'])->name('servers.time');
+        Route::post('/servers/{server}/time/timezone', [\App\Http\Controllers\ServerTimeController::class, 'updateTimezone'])->name('servers.time.timezone');
+        Route::post('/servers/{server}/time/sync', [\App\Http\Controllers\ServerTimeController::class, 'syncNow'])->name('servers.time.sync');
+
+        // System Settings (admin-only, server-wide policies)
+        Route::get('/system-settings/{category?}', [\App\Http\Controllers\SystemSettingsController::class, 'index'])
+            ->where('category', '[a-z_-]+')
+            ->name('system-settings.index');
+        Route::post('/system-settings/{category}', [\App\Http\Controllers\SystemSettingsController::class, 'update'])
+            ->where('category', '[a-z_-]+')
+            ->name('system-settings.update');
         Route::resource('accounts', AccountController::class)->except(['edit', 'update']);
         Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
         Route::post('/accounts/{account}/update-owner', [AccountController::class, 'updateOwner'])->name('accounts.update-owner');

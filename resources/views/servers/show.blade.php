@@ -82,6 +82,23 @@
         </div>
     </div>
 
+    <!-- System tools -->
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+        <h3 class="text-base font-semibold text-gray-800 mb-4">{{ __('servers.system_tools') }}</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            <a href="{{ route('admin.servers.time', $server) }}"
+               class="flex items-center gap-3 p-4 rounded-xl border border-gray-100 hover:border-indigo-200 hover:bg-indigo-50/30 transition group">
+                <div class="w-10 h-10 bg-indigo-50 rounded-lg flex items-center justify-center group-hover:bg-indigo-100 transition shrink-0">
+                    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <div class="min-w-0">
+                    <div class="text-sm font-semibold text-gray-800">{{ __('servers.server_time') }}</div>
+                    <div class="text-xs text-gray-500 truncate">{{ __('servers.server_time_desc') }}</div>
+                </div>
+            </a>
+        </div>
+    </div>
+
     <!-- Danger Zone -->
     <div class="bg-white rounded-xl shadow-sm p-6 border border-red-100">
         <h3 class="text-base font-semibold text-red-600 mb-2">{{ __('common.danger_zone') }}</h3>

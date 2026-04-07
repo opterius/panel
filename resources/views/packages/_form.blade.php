@@ -63,7 +63,10 @@
             @php
                 $availableVersions = config('opterius.php_versions');
                 $currentVersions = old('php_versions', $package?->php_versions ?? $availableVersions);
-                $currentDefault = old('default_php_version', $package?->default_php_version ?? config('opterius.default_php_version'));
+                // System Settings → Domains → "default PHP version" overrides the
+                // hard-coded config default. Existing packages keep their own value.
+                $systemDefault = \App\Models\Setting::get('default_php_version', config('opterius.default_php_version'));
+                $currentDefault = old('default_php_version', $package?->default_php_version ?? $systemDefault);
             @endphp
             <div class="px-6 py-5 space-y-5" x-data="{
                 versions: {{ json_encode($currentVersions) }},
