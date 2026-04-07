@@ -30,9 +30,22 @@
     @else
         <form action="{{ route('user.databases.store') }}" method="POST"
               x-data="{
+                  accountId: '{{ old('account_id', $accounts->first()?->id) }}',
                   dbName: '{{ old('name') }}',
                   dbUser: '{{ old('db_username') }}',
-                  remote: {{ old('remote', false) ? 'true' : 'false' }}
+                  remote: {{ old('remote', false) ? 'true' : 'false' }},
+                  // Map of account.id → username so the prefix updates reactively
+                  // when the user changes the selected account.
+                  accountUsernames: {!! $accounts->mapWithKeys(fn ($a) => [$a->id => $a->username])->toJson() !!},
+                  get prefix() {
+                      return (this.accountUsernames[this.accountId] || '') + '_';
+                  },
+                  get fullDbName() {
+                      return this.prefix + this.dbName;
+                  },
+                  get fullDbUser() {
+                      return this.prefix + this.dbUser;
+                  }
               }">
             @csrf
 
@@ -53,7 +66,7 @@
                     </div>
                     <div class="px-6 py-5">
                         <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.account') }}</label>
-                        <select name="account_id" id="account_id"
+                        <select name="account_id" id="account_id" x-model="accountId"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                             @foreach($accounts as $account)
                                 <option value="{{ $account->id }}" @selected(old('account_id') == $account->id)>
@@ -82,10 +95,16 @@
                     </div>
                     <div class="px-6 py-5">
                         <label for="name" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.database_name') }}</label>
-                        <input type="text" name="name" id="name" x-model="dbName"
-                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            placeholder="e.g. myapp_production">
-                        <p class="mt-1.5 text-xs text-gray-400">{{ __('databases.alphanumeric_underscores') }}</p>
+                        <div class="flex">
+                            <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm font-mono" x-text="prefix"></span>
+                            <input type="text" name="name" id="name" x-model="dbName"
+                                class="flex-1 min-w-0 rounded-r-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
+                                placeholder="myapp">
+                        </div>
+                        <p class="mt-1.5 text-xs text-gray-400">
+                            Final name: <span class="font-mono text-gray-600" x-text="fullDbName || prefix + '…'"></span>
+                            &middot; The prefix is added automatically so databases from different accounts can never collide.
+                        </p>
                         @error('name')
                             <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -108,9 +127,15 @@
                     <div class="px-6 py-5 space-y-5">
                         <div>
                             <label for="db_username" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('databases.db_username') }}</label>
-                            <input type="text" name="db_username" id="db_username" x-model="dbUser"
-                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                placeholder="e.g. myapp_user">
+                            <div class="flex">
+                                <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm font-mono" x-text="prefix"></span>
+                                <input type="text" name="db_username" id="db_username" x-model="dbUser"
+                                    class="flex-1 min-w-0 rounded-r-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
+                                    placeholder="myappuser">
+                            </div>
+                            <p class="mt-1.5 text-xs text-gray-400">
+                                Final username: <span class="font-mono text-gray-600" x-text="fullDbUser || prefix + '…'"></span>
+                            </p>
                             @error('db_username')
                                 <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -141,11 +166,11 @@
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm text-indigo-700">
                         <div>
                             <span class="text-indigo-400 block text-xs mb-0.5">{{ __('databases.database') }}</span>
-                            <span class="font-medium font-mono" x-text="dbName || '—'">—</span>
+                            <span class="font-medium font-mono" x-text="dbName ? fullDbName : '—'">—</span>
                         </div>
                         <div>
                             <span class="text-indigo-400 block text-xs mb-0.5">{{ __('databases.db_user') }}</span>
-                            <span class="font-medium font-mono" x-text="dbUser || '—'">—</span>
+                            <span class="font-medium font-mono" x-text="dbUser ? fullDbUser : '—'">—</span>
                         </div>
                         <div>
                             <span class="text-indigo-400 block text-xs mb-0.5">{{ __('databases.access') }}</span>

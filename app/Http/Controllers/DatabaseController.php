@@ -33,10 +33,12 @@ class DatabaseController extends Controller
 
     public function store(Request $request)
     {
+        // First-pass validation: shape of inputs. Length limits are tightened
+        // below once we know the per-account prefix length.
         $validated = $request->validate([
             'account_id'  => 'required|exists:accounts,id',
-            'name'        => 'required|string|max:64|alpha_dash|unique:databases,name',
-            'db_username' => 'required|string|max:32|alpha_dash',
+            'name'        => 'required|string|alpha_dash',
+            'db_username' => 'required|string|alpha_dash',
             'db_password' => 'required|string|min:8',
             'remote'      => 'boolean',
         ]);
@@ -47,10 +49,35 @@ class DatabaseController extends Controller
             return back()->with('error', __('databases.no_permission'));
         }
 
+        // cPanel-style prefixing: every database/user gets the account username
+        // as a prefix so accounts on the shared MySQL server can never collide.
+        $prefix = $account->dbPrefix();
+        $maxNameLen = 64 - strlen($prefix);  // MySQL db identifier limit
+        $maxUserLen = 32 - strlen($prefix);  // MySQL user identifier limit
+
+        $request->validate([
+            'name'        => "max:{$maxNameLen}",
+            'db_username' => "max:{$maxUserLen}",
+        ], [
+            'name.max'        => "Database name cannot exceed {$maxNameLen} characters (the '{$prefix}' prefix is added automatically).",
+            'db_username.max' => "Database username cannot exceed {$maxUserLen} characters (the '{$prefix}' prefix is added automatically).",
+        ]);
+
+        $fullName = $account->prefixDbIdentifier($validated['name']);
+        $fullUser = $account->prefixDbIdentifier($validated['db_username']);
+
+        // Uniqueness check on the FINAL prefixed name (so two accounts named
+        // "app" don't both get rejected — they'd be opterius_app vs other_app).
+        if (Database::where('name', $fullName)->exists()) {
+            return back()
+                ->withErrors(['name' => "Database '{$fullName}' already exists."])
+                ->withInput();
+        }
+
         $host = $request->boolean('remote') ? '%' : 'localhost';
 
         $response = AgentService::for($account->server)->post('/databases/create', [
-            'name' => $validated['name'],
+            'name' => $fullName,
         ]);
 
         if (!$response || !$response->successful()) {
@@ -59,15 +86,15 @@ class DatabaseController extends Controller
         }
 
         $response = AgentService::for($account->server)->post('/databases/user-create', [
-            'username' => $validated['db_username'],
+            'username' => $fullUser,
             'password' => $validated['db_password'],
-            'database' => $validated['name'],
+            'database' => $fullName,
             'host'     => $host,
         ]);
 
         if (!$response || !$response->successful()) {
             AgentService::for($account->server)->post('/databases/delete', [
-                'name' => $validated['name'],
+                'name' => $fullName,
             ]);
             $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to server agent';
             return back()->with('error', __('databases.failed_to_create_user', ['error' => $error]))->withInput();
@@ -76,8 +103,8 @@ class DatabaseController extends Controller
         $database = Database::create([
             'server_id'   => $account->server_id,
             'account_id'  => $account->id,
-            'name'        => $validated['name'],
-            'db_username' => $validated['db_username'],
+            'name'        => $fullName,
+            'db_username' => $fullUser,
             'status'      => 'active',
         ]);
 

@@ -65,9 +65,10 @@ class WordPressController extends Controller
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
-        // Auto-generate database name and credentials
-        $dbName = 'wp_' . Str::lower(Str::random(8));
-        $dbUser = 'wp_' . Str::lower(Str::random(8));
+        // Auto-generate database name and credentials, prefixed with the account
+        // username (cPanel-style) so they're globally unique on the shared MySQL.
+        $dbName = $domain->account->prefixDbIdentifier('wp_' . Str::lower(Str::random(8)));
+        $dbUser = $domain->account->prefixDbIdentifier('wp_' . Str::lower(Str::random(8)));
         $dbPass = Str::random(24);
 
         // 1. Create database

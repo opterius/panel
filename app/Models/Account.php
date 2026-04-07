@@ -48,6 +48,27 @@ class Account extends Model
         return $this->hasMany(Database::class);
     }
 
+    /**
+     * Per-account MySQL identifier prefix (cPanel-style: "username_").
+     * Ensures databases and users from different accounts can never collide
+     * on the shared MySQL server.
+     */
+    public function dbPrefix(): string
+    {
+        return $this->username . '_';
+    }
+
+    /**
+     * Prefix a user-supplied database/user identifier with the account prefix.
+     * If the input already starts with the prefix, return it unchanged so we
+     * don't double-prefix when callers pass an already-prefixed name.
+     */
+    public function prefixDbIdentifier(string $name): string
+    {
+        $prefix = $this->dbPrefix();
+        return str_starts_with($name, $prefix) ? $name : $prefix . $name;
+    }
+
     public function cronJobs(): HasMany
     {
         return $this->hasMany(CronJob::class);

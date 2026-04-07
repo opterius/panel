@@ -63,10 +63,11 @@ class LaravelInstallerController extends Controller
 
         $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
 
-        // Auto or manual database
+        // Auto or manual database. Both modes prefix with the account username
+        // (cPanel-style) so identifiers are globally unique on shared MySQL.
         if ($validated['db_mode'] === 'auto') {
-            $dbName = 'laravel_' . Str::lower(Str::random(8));
-            $dbUser = 'laravel_' . Str::lower(Str::random(8));
+            $dbName = $domain->account->prefixDbIdentifier('laravel_' . Str::lower(Str::random(8)));
+            $dbUser = $domain->account->prefixDbIdentifier('laravel_' . Str::lower(Str::random(8)));
             $dbPass = Str::random(24);
 
             // Create database
@@ -89,8 +90,8 @@ class LaravelInstallerController extends Controller
                 return back()->with('error', __('servers.failed_to_create_db_user_plain'))->withInput();
             }
         } else {
-            $dbName = $validated['db_name'];
-            $dbUser = $validated['db_user'];
+            $dbName = $domain->account->prefixDbIdentifier($validated['db_name']);
+            $dbUser = $domain->account->prefixDbIdentifier($validated['db_user']);
             $dbPass = $validated['db_password'];
         }
 
