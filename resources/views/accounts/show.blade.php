@@ -255,16 +255,9 @@
                 <p class="text-xs text-gray-500 mt-0.5">Defines disk quota, bandwidth, PHP versions, and feature limits.</p>
                 <div class="mt-2" x-show="!editing">
                     @if($account->package)
-                        <div class="flex items-center space-x-3">
-                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold bg-indigo-100 text-indigo-700">
-                                {{ $account->package->name }}
-                            </span>
-                            <span class="text-xs text-gray-500">
-                                {{ $account->package->diskQuotaLabel() }} disk &middot;
-                                PHP {{ $account->package->default_php_version }} &middot;
-                                {{ $account->package->php_switch_enabled ? 'PHP switching enabled' : 'PHP switching disabled' }}
-                            </span>
-                        </div>
+                        <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold bg-indigo-100 text-indigo-700">
+                            {{ $account->package->name }}
+                        </span>
                     @else
                         <span class="text-sm text-gray-500">No package assigned</span>
                     @endif
@@ -284,7 +277,7 @@
                     <select name="package_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                         @foreach($allPackages as $pkg)
                             <option value="{{ $pkg->id }}" @selected($account->package_id === $pkg->id)>
-                                {{ $pkg->name }} ({{ $pkg->diskQuotaLabel() }}, PHP {{ $pkg->default_php_version }})
+                                {{ $pkg->name }}
                             </option>
                         @endforeach
                     </select>
