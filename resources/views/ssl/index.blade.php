@@ -91,10 +91,55 @@
                                         </button>
                                     </form>
                                 @else
-                                    <form action="{{ route('user.ssl.renew', $info['cert']) }}" method="POST">
-                                        @csrf
-                                        <button type="submit" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Renew</button>
-                                    </form>
+                                    <div x-data="{ open: false, loading: false }">
+                                        <button type="button" @click="open = true"
+                                            class="inline-flex items-center px-3 py-1.5 bg-indigo-600 text-white text-xs font-medium rounded-lg hover:bg-indigo-700 transition">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            Renew
+                                        </button>
+
+                                        <template x-teleport="body">
+                                            <div x-show="open" class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true" x-cloak>
+                                                <div x-show="open"
+                                                    x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                                    x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                                    class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" @click="open = false"></div>
+                                                <div class="fixed inset-0 flex items-center justify-center p-4">
+                                                    <div x-show="open"
+                                                        x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                                                        x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                                                        @click.stop @keydown.escape.window="open = false"
+                                                        class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                                                        <div class="p-6">
+                                                            <div class="flex items-start space-x-4">
+                                                                <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                                                                    <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                                </div>
+                                                                <div>
+                                                                    <h3 class="text-lg font-semibold text-gray-900">Renew SSL Certificate</h3>
+                                                                    <p class="mt-1 text-sm text-gray-500">Renew the Let's Encrypt certificate for <strong class="font-mono text-gray-700">{{ $domain->domain }}</strong>? The new certificate will be valid for 90 days.</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="flex items-center justify-end space-x-3 px-6 py-5 bg-gray-50">
+                                                            <button type="button" @click="open = false"
+                                                                class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                                                Cancel
+                                                            </button>
+                                                            <form action="{{ route('user.ssl.renew', $info['cert']) }}" method="POST" @submit="loading = true">
+                                                                @csrf
+                                                                <button type="submit" :disabled="loading"
+                                                                    class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
+                                                                    <svg x-show="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                                                    <span x-text="loading ? 'Renewing...' : 'Renew Certificate'">Renew Certificate</span>
+                                                                </button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
                                 @endif
                             </div>
                         </div>
@@ -135,10 +180,54 @@
                                                 </button>
                                             </form>
                                         @else
-                                            <form action="{{ route('user.ssl.renew', $subInfo['cert']) }}" method="POST">
-                                                @csrf
-                                                <button type="submit" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">Renew</button>
-                                            </form>
+                                            <div x-data="{ open: false, loading: false }">
+                                                <button type="button" @click="open = true"
+                                                    class="inline-flex items-center px-2.5 py-1 bg-indigo-600 text-white text-xs font-medium rounded hover:bg-indigo-700 transition">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                    Renew
+                                                </button>
+                                                <template x-teleport="body">
+                                                    <div x-show="open" class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true" x-cloak>
+                                                        <div x-show="open"
+                                                            x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+                                                            x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+                                                            class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" @click="open = false"></div>
+                                                        <div class="fixed inset-0 flex items-center justify-center p-4">
+                                                            <div x-show="open"
+                                                                x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100"
+                                                                x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95"
+                                                                @click.stop @keydown.escape.window="open = false"
+                                                                class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                                                                <div class="p-6">
+                                                                    <div class="flex items-start space-x-4">
+                                                                        <div class="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center shrink-0">
+                                                                            <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                                                        </div>
+                                                                        <div>
+                                                                            <h3 class="text-lg font-semibold text-gray-900">Renew SSL Certificate</h3>
+                                                                            <p class="mt-1 text-sm text-gray-500">Renew the Let's Encrypt certificate for <strong class="font-mono text-gray-700">{{ $sub->domain }}</strong>? The new certificate will be valid for 90 days.</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex items-center justify-end space-x-3 px-6 py-5 bg-gray-50">
+                                                                    <button type="button" @click="open = false"
+                                                                        class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                                                        Cancel
+                                                                    </button>
+                                                                    <form action="{{ route('user.ssl.renew', $subInfo['cert']) }}" method="POST" @submit="loading = true">
+                                                                        @csrf
+                                                                        <button type="submit" :disabled="loading"
+                                                                            class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition disabled:opacity-50">
+                                                                            <svg x-show="loading" class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                                                            <span x-text="loading ? 'Renewing...' : 'Renew Certificate'">Renew Certificate</span>
+                                                                        </button>
+                                                                    </form>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
