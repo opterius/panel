@@ -101,9 +101,12 @@ class SubdomainController extends Controller
             return back()->with('error', __('domains.subdomain_already_exists', ['domain' => $fullDomain]))->withInput();
         }
 
-        // Default document root: inside parent domain's directory
+        // Default document root: inside parent domain's public_html, named with the
+        // FULL subdomain (e.g. /home/user/opterius.com/public_html/get.opterius.com)
+        // — not just the leaf label — so it's visually obvious which folder belongs
+        // to which subdomain when listing public_html.
         $parentDir = dirname($domain->document_root);
-        $documentRoot = $validated['document_root'] ?: $parentDir . '/public_html/' . $validated['subdomain'];
+        $documentRoot = $validated['document_root'] ?: $parentDir . '/public_html/' . $fullDomain;
 
         // Ensure document root is within the account's home directory
         $homeDir = $domain->account->home_directory;
