@@ -4,8 +4,9 @@
     </x-slot>
 
     @php
-        $accountIds = auth()->user()->accessibleAccountIds();
-        $accounts = auth()->user()->accessibleAccounts()->with('server', 'domains', 'databases', 'package')->get();
+        // Switch to "current account" mode - only show data for the actively selected account
+        $primaryAccount = auth()->user()->currentAccount();
+        $accountIds = $primaryAccount ? [$primaryAccount->id] : [];
         $myDomains = \App\Models\Domain::whereIn('account_id', $accountIds)->whereNull('parent_id')->get();
         $mySubdomains = \App\Models\Domain::whereIn('account_id', $accountIds)->whereNotNull('parent_id')->count();
         $myDatabases = \App\Models\Database::whereIn('account_id', $accountIds)->count();
@@ -13,9 +14,8 @@
         $myCrons = \App\Models\CronJob::whereIn('account_id', $accountIds)->count();
         $myEmails = \App\Models\EmailAccount::whereHas('domain', fn($q) => $q->whereIn('account_id', $accountIds))->count();
 
-        // Get stats from agent for the first account
+        // Get stats from agent for the current account
         $stats = null;
-        $primaryAccount = $accounts->first();
         if ($primaryAccount) {
             $response = \App\Services\AgentService::for($primaryAccount->server)->post('/stats/account', [
                 'username'  => $primaryAccount->username,

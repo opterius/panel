@@ -189,6 +189,16 @@ Route::middleware([
             return view('user.dashboard');
         })->name('dashboard');
 
+        // Switch active account in Hosting Mode (cPanel-style: one account at a time)
+        Route::post('/switch-account', function (\Illuminate\Http\Request $request) {
+            $accountId = (int) $request->input('account_id');
+            $allowed = auth()->user()->accessibleAccountIds();
+            if (in_array($accountId, $allowed)) {
+                session(['current_account_id' => $accountId]);
+            }
+            return back();
+        })->name('switch-account');
+
         // Return to admin (if impersonating)
         Route::post('/return-to-admin', function () {
             $adminId = session()->pull('admin_id');

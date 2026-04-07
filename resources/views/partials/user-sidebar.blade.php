@@ -23,6 +23,43 @@
         </div>
     @endif
 
+    @php
+        $userAccounts = Auth::user()->accessibleAccounts()->with('server', 'domains')->get();
+        $currentAcct = Auth::user()->currentAccount();
+    @endphp
+
+    <!-- Account Switcher (only if user has multiple accounts) -->
+    @if($userAccounts->count() > 1 && $currentAcct)
+        <div class="px-3 py-3 border-b border-gray-800" x-data="{ open: false }">
+            <button @click="open = !open" class="w-full bg-gray-800 hover:bg-gray-700 rounded-lg px-3 py-2 text-left transition">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2 min-w-0">
+                        <svg class="w-4 h-4 text-indigo-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3" /></svg>
+                        <div class="min-w-0 flex-1">
+                            <div class="text-xs text-gray-500 leading-tight">Active Account</div>
+                            <div class="text-sm font-medium text-white truncate">{{ $currentAcct->domains->whereNull('parent_id')->first()?->domain ?? $currentAcct->username }}</div>
+                        </div>
+                    </div>
+                    <svg class="w-4 h-4 text-gray-400 transition-transform shrink-0" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                </div>
+            </button>
+
+            <div x-show="open" x-collapse class="mt-2 space-y-1">
+                @foreach($userAccounts as $acct)
+                    <form method="POST" action="{{ route('user.switch-account') }}">
+                        @csrf
+                        <input type="hidden" name="account_id" value="{{ $acct->id }}">
+                        <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-sm transition
+                            {{ $currentAcct->id === $acct->id ? 'bg-indigo-600 text-white' : 'text-gray-300 hover:bg-gray-800' }}">
+                            <div class="font-medium truncate">{{ $acct->domains->whereNull('parent_id')->first()?->domain ?? $acct->username }}</div>
+                            <div class="text-xs opacity-75 truncate">{{ $acct->username }}</div>
+                        </button>
+                    </form>
+                @endforeach
+            </div>
+        </div>
+    @endif
+
     <!-- Navigation -->
     <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
         <x-sidebar-link href="{{ route('user.dashboard') }}" :active="request()->routeIs('user.dashboard')">

@@ -174,6 +174,23 @@ class User extends Authenticatable
         return $this->accessibleAccounts()->pluck('id')->toArray();
     }
 
+    /**
+     * Get the currently selected account from session, or default to first accessible.
+     * Used in Hosting Mode where the user is "inside" one specific account at a time (cPanel-style).
+     */
+    public function currentAccount(): ?Account
+    {
+        $selectedId = session('current_account_id');
+        $accounts = $this->accessibleAccounts()->with('server', 'package')->get();
+
+        if ($selectedId) {
+            $account = $accounts->firstWhere('id', $selectedId);
+            if ($account) return $account;
+        }
+
+        return $accounts->first();
+    }
+
     public function packages(): HasMany
     {
         return $this->hasMany(Package::class, 'owner_id');
