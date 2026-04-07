@@ -30,13 +30,11 @@
     @else
         <form action="{{ route('user.databases.store') }}" method="POST"
               x-data="{
-                  accountId: '{{ old('account_id', $accounts->first()?->id) }}',
-                  dbName: '{{ old('name') }}',
-                  dbUser: '{{ old('db_username') }}',
-                  remote: {{ old('remote', false) ? 'true' : 'false' }},
-                  // Map of account.id → username so the prefix updates reactively
-                  // when the user changes the selected account.
-                  accountUsernames: {!! $accounts->mapWithKeys(fn ($a) => [$a->id => $a->username])->toJson() !!},
+                  accountId: @js((string) old('account_id', $accounts->first()?->id)),
+                  dbName: @js(old('name', '')),
+                  dbUser: @js(old('db_username', '')),
+                  remote: @js((bool) old('remote', false)),
+                  accountUsernames: @js($accounts->pluck('username', 'id')->mapWithKeys(fn ($u, $id) => [(string) $id => $u])->all()),
                   get prefix() {
                       return (this.accountUsernames[this.accountId] || '') + '_';
                   },
