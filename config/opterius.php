@@ -59,7 +59,9 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'phpmyadmin_url' => env('OPTERIUS_PHPMYADMIN_URL', 'https://SERVER_IP:8081'),
+    // The installer sets up phpMyAdmin on plain HTTP at port 8081. If you put
+    // it behind SSL, override via OPTERIUS_PHPMYADMIN_URL=https://your-host in .env
+    'phpmyadmin_url' => env('OPTERIUS_PHPMYADMIN_URL', 'http://SERVER_IP:8081'),
 
     /*
     |--------------------------------------------------------------------------
