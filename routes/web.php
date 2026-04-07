@@ -81,6 +81,7 @@ Route::middleware([
         Route::post('/accounts/{account}/suspend', [AccountController::class, 'suspend'])->name('accounts.suspend');
         Route::post('/accounts/{account}/update-owner', [AccountController::class, 'updateOwner'])->name('accounts.update-owner');
         Route::post('/accounts/{account}/change-password', [AccountController::class, 'changePassword'])->name('accounts.change-password');
+        Route::post('/accounts/{account}/change-package', [AccountController::class, 'changePackage'])->name('accounts.change-package');
         Route::get('/accounts/{account}/collaborators', [CollaboratorController::class, 'index'])->name('collaborators.index');
         Route::post('/accounts/{account}/collaborators', [CollaboratorController::class, 'store'])->name('collaborators.store');
         Route::post('/accounts/{account}/collaborators/{user}/role', [CollaboratorController::class, 'updateRole'])->name('collaborators.update-role');

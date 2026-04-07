@@ -246,6 +246,62 @@
         </div>
     </div>
 
+    <!-- Package -->
+    @php $allPackages = \App\Models\Package::orderBy('name')->get(); @endphp
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-8" x-data="{ editing: false }">
+        <div class="flex items-center justify-between">
+            <div>
+                <h3 class="text-base font-semibold text-gray-800">Package</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Defines disk quota, bandwidth, PHP versions, and feature limits.</p>
+                <div class="mt-2" x-show="!editing">
+                    @if($account->package)
+                        <div class="flex items-center space-x-3">
+                            <span class="inline-flex items-center px-3 py-1 rounded-lg text-sm font-semibold bg-indigo-100 text-indigo-700">
+                                {{ $account->package->name }}
+                            </span>
+                            <span class="text-xs text-gray-500">
+                                {{ $account->package->diskQuotaLabel() }} disk &middot;
+                                PHP {{ $account->package->default_php_version }} &middot;
+                                {{ $account->package->php_switch_enabled ? 'PHP switching enabled' : 'PHP switching disabled' }}
+                            </span>
+                        </div>
+                    @else
+                        <span class="text-sm text-gray-500">No package assigned</span>
+                    @endif
+                </div>
+            </div>
+            <button type="button" @click="editing = !editing" x-show="!editing"
+                class="text-sm font-medium text-indigo-600 hover:text-indigo-800 transition">
+                Change
+            </button>
+        </div>
+
+        <div x-show="editing" x-collapse class="mt-4">
+            <form action="{{ route('admin.accounts.change-package', $account) }}" method="POST" class="space-y-4">
+                @csrf
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Select Package</label>
+                    <select name="package_id" class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                        @foreach($allPackages as $pkg)
+                            <option value="{{ $pkg->id }}" @selected($account->package_id === $pkg->id)>
+                                {{ $pkg->name }} ({{ $pkg->diskQuotaLabel() }}, PHP {{ $pkg->default_php_version }})
+                            </option>
+                        @endforeach
+                    </select>
+                    <p class="mt-1.5 text-xs text-gray-400">Changing the package updates disk quota and feature limits. Existing files are not affected.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
+                        Save Package
+                    </button>
+                    <button type="button" @click="editing = false" class="text-sm text-gray-500 hover:text-gray-700 transition">
+                        {{ __('common.cancel') }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Team Access -->
     <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
         <div class="flex items-center justify-between">

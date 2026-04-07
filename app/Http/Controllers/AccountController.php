@@ -180,6 +180,26 @@ class AccountController extends Controller
         return redirect()->route('admin.accounts.show', $account)->with('success', __('accounts.account_owner_updated'));
     }
 
+    public function changePackage(Request $request, Account $account)
+    {
+        $validated = $request->validate([
+            'package_id' => 'required|exists:packages,id',
+        ]);
+
+        $package = Package::findOrFail($validated['package_id']);
+        $oldPackage = $account->package?->name ?? 'none';
+
+        $account->update([
+            'package_id' => $package->id,
+            'disk_quota' => $package->disk_quota,
+        ]);
+
+        ActivityLogger::log('account.package_changed', 'account', $account->id, $account->username,
+            "Changed package from {$oldPackage} to {$package->name}", ['server_id' => $account->server_id]);
+
+        return back()->with('success', "Package changed to {$package->name}.");
+    }
+
     public function changePassword(Request $request, Account $account)
     {
         $validated = $request->validate([
