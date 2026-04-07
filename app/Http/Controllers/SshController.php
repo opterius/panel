@@ -19,10 +19,19 @@ class SshController extends Controller
         $keys = [];
         $sshEnabled = false;
 
-        if ($request->has('account_id')) {
+        if ($request->has('account')) {
+            $selectedAccount = auth()->user()->accessibleAccounts()
+                ->with('server')
+                ->where('username', $request->input('account'))
+                ->firstOrFail();
+        } elseif ($request->has('account_id')) {
+            // Backwards compatibility
             $selectedAccount = auth()->user()->accessibleAccounts()
                 ->with('server')
                 ->findOrFail($request->account_id);
+        }
+
+        if ($selectedAccount) {
 
             // Fetch keys from agent
             $response = AgentService::for($selectedAccount->server)->post('/ssh/list-keys', [
@@ -100,7 +109,7 @@ class SshController extends Controller
                 "Imported SSH key for {$account->username}", ['server_id' => $account->server_id]);
 
             return redirect()
-                ->route('user.ssh.index', ['account_id' => $account->id])
+                ->route('user.ssh.index', ['account' => $account->username])
                 ->with('success', __('ssh.key_imported'));
         }
 
@@ -131,7 +140,7 @@ class SshController extends Controller
                 "Deleted SSH key for {$account->username}", ['server_id' => $account->server_id, 'fingerprint' => $validated['fingerprint']]);
 
             return redirect()
-                ->route('user.ssh.index', ['account_id' => $account->id])
+                ->route('user.ssh.index', ['account' => $account->username])
                 ->with('success', __('ssh.key_removed'));
         }
 
@@ -166,7 +175,7 @@ class SshController extends Controller
 
             $successKey = $validated['enabled'] ? 'ssh.ssh_access_enabled' : 'ssh.ssh_access_disabled';
             return redirect()
-                ->route('user.ssh.index', ['account_id' => $account->id])
+                ->route('user.ssh.index', ['account' => $account->username])
                 ->with('success', __($successKey, ['username' => $account->username]));
         }
 
