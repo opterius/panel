@@ -50,19 +50,32 @@ class SubdomainController extends Controller
             return back()->with('error', __('domains.no_permission'));
         }
 
-        // Tell agent to remove vhost + DNS record
+        $parent = $subdomain->parent;
+
+        // 1. Remove Nginx vhost + FPM pool + SSL cert (file content NOT touched)
         \App\Services\AgentService::for($subdomain->account->server)->post('/domains/delete', [
             'domain'      => $subdomain->domain,
             'username'    => $subdomain->account->username,
             'php_version' => $subdomain->php_version,
         ]);
 
-        \App\Services\ActivityLogger::log('subdomain.deleted', 'domain', $subdomain->id, $subdomain->domain,
-            "Deleted subdomain {$subdomain->domain}");
+        // 2. Remove DNS A record from parent zone
+        if ($parent) {
+            \App\Services\AgentService::for($subdomain->account->server)->post('/dns/delete-record', [
+                'domain' => $parent->domain,
+                'name'   => $subdomain->domain,
+                'type'   => 'A',
+            ]);
+        }
 
+        \App\Services\ActivityLogger::log('subdomain.deleted', 'domain', $subdomain->id, $subdomain->domain,
+            "Deleted subdomain {$subdomain->domain} (files preserved at {$subdomain->document_root})");
+
+        $domain = $subdomain->domain;
         $subdomain->delete();
 
-        return redirect()->route('user.subdomains.index')->with('success', "Subdomain {$subdomain->domain} removed.");
+        return redirect()->route('user.subdomains.index')
+            ->with('success', "Subdomain {$domain} removed. Files at the document root were not deleted.");
     }
 
     public function store(Request $request, Domain $domain)
