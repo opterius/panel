@@ -43,7 +43,7 @@
                         <div class="flex">
                             <input type="text" name="source" placeholder="info or @ for catch-all"
                                 class="flex-1 rounded-l-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-xs font-mono">@{{ $selectedDomain->domain }}</span>
+                            <span class="inline-flex items-center px-3 rounded-r-lg border border-l-0 border-gray-300 bg-gray-50 text-gray-500 text-xs font-mono">{{ '@' . $selectedDomain->domain }}</span>
                         </div>
                     </div>
                     <div class="sm:col-span-1 flex items-end justify-center pb-2.5">
