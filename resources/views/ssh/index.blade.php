@@ -25,13 +25,17 @@
             @if($accounts->isEmpty())
                 <p class="text-sm text-gray-500">{{ __('ssh.no_accounts_available') }}</p>
             @else
-                <form method="GET" action="{{ route('user.ssh.index') }}" class="flex items-end gap-4">
+                <form method="GET" action="{{ route('user.ssh.index') }}" class="flex items-end gap-4" autocomplete="off">
                     <div class="flex-1">
                         <label for="account_id" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('cron.account') }}</label>
-                        <select name="account_id" id="account_id"
+                        <select name="account_id" id="account_id" autocomplete="off"
+                            onchange="this.form.submit()"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            @if(!$selectedAccount)
+                                <option value="" disabled selected>{{ __('ssh.select_account') }}</option>
+                            @endif
                             @foreach($accounts as $account)
-                                <option value="{{ $account->id }}" @selected($selectedAccount && $selectedAccount->id === $account->id)>
+                                <option value="{{ $account->id }}" @selected($selectedAccount && $selectedAccount->id == $account->id)>
                                     {{ $account->username }} ({{ $account->server->name }} &mdash; {{ $account->server->ip_address }})
                                 </option>
                             @endforeach
