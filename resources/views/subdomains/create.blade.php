@@ -17,17 +17,21 @@
     <form action="{{ route('user.subdomains.store', $domain) }}" method="POST"
           x-data="{
               subdomain: '{{ old('subdomain') }}',
+              parentDomain: '{{ $domain->domain }}',
               customPath: false,
               customSuffix: '',
               get cleanSubdomain() {
                   return this.subdomain.replace(/[^a-zA-Z0-9_-]/g, '');
+              },
+              get fullDomain() {
+                  return (this.cleanSubdomain || 'sub') + '.' + this.parentDomain;
               },
               get documentRoot() {
                   const basePath = '{{ dirname($domain->document_root) }}/';
                   if (this.customPath && this.customSuffix) {
                       return basePath + this.customSuffix.replace(/[^a-zA-Z0-9_\-\/\.]/g, '');
                   }
-                  return basePath + 'public_html/' + (this.cleanSubdomain || 'sub');
+                  return basePath + 'public_html/' + this.fullDomain;
               },
               validateSubdomain() {
                   this.subdomain = this.subdomain.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -95,7 +99,7 @@
                                 {{ dirname($domain->document_root) }}/
                             </span>
                             <input type="text"
-                                :value="customPath ? customSuffix : 'public_html/' + (cleanSubdomain || 'sub')"
+                                :value="customPath ? customSuffix : 'public_html/' + fullDomain"
                                 @input="customSuffix = $event.target.value.replace(/[^a-zA-Z0-9_\-\/\.]/g, '')"
                                 :disabled="!customPath"
                                 class="flex-1 min-w-0 rounded-r-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-400"
