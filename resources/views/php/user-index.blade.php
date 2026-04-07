@@ -75,15 +75,20 @@
                                         $isCurrent = $ver === $domain->php_version;
                                     @endphp
                                     @if($allowed)
-                                        <label class="relative">
-                                            <input type="radio" name="new_version" value="{{ $ver }}" class="peer sr-only"
-                                                {{ $isCurrent ? 'disabled' : '' }}>
-                                            <div class="px-4 py-2 border rounded-lg cursor-pointer text-sm font-medium
-                                                {{ $isCurrent ? 'border-indigo-500 bg-indigo-50 text-indigo-700 opacity-60 cursor-default' : 'border-gray-200 peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700 hover:bg-gray-50' }}
-                                                transition">
-                                                PHP {{ $ver }} {{ $isCurrent ? '('.__('php.current').')' : '' }}
+                                        @if($isCurrent)
+                                            <div class="px-4 py-2 border border-gray-300 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium opacity-60 cursor-not-allowed">
+                                                PHP {{ $ver }} ({{ __('php.current') }})
                                             </div>
-                                        </label>
+                                        @else
+                                            <label class="relative">
+                                                <input type="radio" name="new_version" value="{{ $ver }}" class="peer sr-only">
+                                                <div class="px-4 py-2 border border-gray-200 rounded-lg cursor-pointer text-sm font-medium
+                                                    peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700
+                                                    hover:bg-gray-50 transition">
+                                                    PHP {{ $ver }}
+                                                </div>
+                                            </label>
+                                        @endif
                                     @endif
                                 @endforeach
                             </div>
