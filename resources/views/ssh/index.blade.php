@@ -58,7 +58,8 @@
                     <p class="text-sm text-gray-500 mt-1">
                         @if($sshEnabled)
                             {{ __('ssh.ssh_login_enabled_for') }} <span class="text-green-600 font-medium">{{ __('common.enabled') }}</span> {{ __('ssh.for_user') }} <span class="font-mono">{{ $selectedAccount->username }}</span>.
-                            {{ __('ssh.connect_via') }} <span class="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">ssh {{ $selectedAccount->username }}@{{ $selectedAccount->server->ip_address }}</span>
+                            @php $sshConnectCmd = 'ssh ' . $selectedAccount->username . '@' . $selectedAccount->server->ip_address; @endphp
+                            {{ __('ssh.connect_via') }} <span class="font-mono text-xs bg-gray-100 px-1.5 py-0.5 rounded">{{ $sshConnectCmd }}</span>
                         @else
                             {{ __('ssh.ssh_login_enabled_for') }} <span class="text-red-600 font-medium">{{ __('common.disabled') }}</span> {{ __('ssh.for_user') }} <span class="font-mono">{{ $selectedAccount->username }}</span>.
                             {{ __('ssh.shell_set_to_nologin') }}
