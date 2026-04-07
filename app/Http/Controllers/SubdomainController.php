@@ -11,11 +11,58 @@ use Illuminate\Support\Facades\Hash;
 
 class SubdomainController extends Controller
 {
+    public function index()
+    {
+        $domains = Domain::with('account.server', 'subdomains')
+            ->whereIn('account_id', auth()->user()->accessibleAccountIds())
+            ->whereNull('parent_id')
+            ->where('status', 'active')
+            ->get();
+
+        return view('subdomains.index', compact('domains'));
+    }
+
     public function create(Domain $domain)
     {
+        // Authorization
+        if (!in_array($domain->account_id, auth()->user()->accessibleAccountIds())) {
+            abort(404);
+        }
+
         $domain->load('account.server');
 
         return view('subdomains.create', compact('domain'));
+    }
+
+    public function destroy(Request $request, Domain $subdomain)
+    {
+        $subdomain->load('account.server', 'parent');
+
+        if (!in_array($subdomain->account_id, auth()->user()->accessibleAccountIds())) {
+            abort(404);
+        }
+
+        if (!$subdomain->isSubdomain()) {
+            return back()->with('error', __('domains.main_domain_cannot_be_deleted'));
+        }
+
+        if (!$subdomain->account->userCan(auth()->user(), 'settings')) {
+            return back()->with('error', __('domains.no_permission'));
+        }
+
+        // Tell agent to remove vhost + DNS record
+        \App\Services\AgentService::for($subdomain->account->server)->post('/domains/delete', [
+            'domain'      => $subdomain->domain,
+            'username'    => $subdomain->account->username,
+            'php_version' => $subdomain->php_version,
+        ]);
+
+        \App\Services\ActivityLogger::log('subdomain.deleted', 'domain', $subdomain->id, $subdomain->domain,
+            "Deleted subdomain {$subdomain->domain}");
+
+        $subdomain->delete();
+
+        return redirect()->route('user.subdomains.index')->with('success', "Subdomain {$subdomain->domain} removed.");
     }
 
     public function store(Request $request, Domain $domain)

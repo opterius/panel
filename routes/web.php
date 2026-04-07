@@ -258,8 +258,10 @@ Route::middleware([
         Route::delete('/redirects/{redirect}', [RedirectController::class, 'destroy'])->name('redirects.destroy');
 
         // Subdomains
+        Route::get('/subdomains', [SubdomainController::class, 'index'])->name('subdomains.index');
         Route::get('/subdomains/{domain}/create', [SubdomainController::class, 'create'])->name('subdomains.create');
         Route::post('/subdomains/{domain}', [SubdomainController::class, 'store'])->name('subdomains.store');
+        Route::delete('/subdomains/{subdomain}', [SubdomainController::class, 'destroy'])->name('subdomains.destroy');
 
         // DNS Zone Editor
         Route::get('/dns/{domain}', [DnsController::class, 'index'])->name('dns.index');
