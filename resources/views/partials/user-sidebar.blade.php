@@ -241,6 +241,20 @@
             Node.js
         </x-sidebar-link>
 
+        <x-sidebar-link href="{{ route('user.composer.index') }}" :active="request()->routeIs('user.composer.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            </x-slot>
+            Composer
+        </x-sidebar-link>
+
+        <x-sidebar-link href="{{ route('user.git.index') }}" :active="request()->routeIs('user.git.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg>
+            </x-slot>
+            Git
+        </x-sidebar-link>
+
         {{-- Advanced --}}
         <div class="pt-4 pb-2 px-3">
             <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">{{ __('common.advanced') }}</span>

@@ -27,6 +27,8 @@ use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ForwarderController;
 use App\Http\Controllers\FtpController;
 use App\Http\Controllers\CmsInstallerController;
+use App\Http\Controllers\ComposerController;
+use App\Http\Controllers\GitController;
 use App\Http\Controllers\LaravelInstallerController;
 use App\Http\Controllers\NodeController;
 use App\Http\Controllers\PostgresController;
@@ -266,6 +268,15 @@ Route::middleware([
         Route::get('/postgres/{postgresDatabase}', [PostgresController::class, 'show'])->name('postgres.show');
         Route::post('/postgres/{postgresDatabase}/password', [PostgresController::class, 'changePassword'])->name('postgres.password');
         Route::post('/postgres/{postgresDatabase}/delete', [PostgresController::class, 'destroy'])->name('postgres.destroy');
+
+        // Composer
+        Route::get('/composer', [ComposerController::class, 'index'])->name('composer.index');
+        Route::post('/composer/run', [ComposerController::class, 'run'])->name('composer.run');
+
+        // Git
+        Route::get('/git', [GitController::class, 'index'])->name('git.index');
+        Route::post('/git/clone', [GitController::class, 'clone'])->name('git.clone');
+        Route::post('/git/pull', [GitController::class, 'pull'])->name('git.pull');
 
         // Domains (create/store removed — domain is created with the account)
         Route::resource('domains', DomainController::class)->only(['index', 'destroy']);
