@@ -110,6 +110,7 @@ Route::middleware([
         // Monitor
         Route::get('/monitor', [MonitorController::class, 'index'])->name('monitor.index');
         Route::get('/monitor/realtime', [MonitorController::class, 'realtime'])->name('monitor.realtime');
+        Route::get('/monitor/history', [MonitorController::class, 'history'])->name('monitor.history');
         Route::post('/monitor/processes', [MonitorController::class, 'topProcesses'])->name('monitor.processes');
 
         // Security

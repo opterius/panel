@@ -9,3 +9,7 @@ Artisan::command('inspire', function () {
 
 // Check alert rules every minute
 Schedule::command('alerts:check')->everyMinute();
+
+// Collect server metrics from each agent every minute. Powers the historical
+// charts on the server monitor page.
+Schedule::command('monitor:collect')->everyMinute()->withoutOverlapping();

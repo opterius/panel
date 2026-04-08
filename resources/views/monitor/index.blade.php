@@ -92,14 +92,66 @@
                 </div>
             </div>
 
-            <!-- Charts -->
+            <!-- History range selector + stats summary -->
+            <div class="bg-white rounded-xl shadow-sm p-5 mb-6">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-800">Historical Metrics</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">Aggregated from data collected every minute by the panel scheduler.</p>
+                    </div>
+                    <div class="inline-flex rounded-lg border border-gray-200 overflow-hidden">
+                        <template x-for="r in ranges" :key="r.key">
+                            <button type="button" @click="setRange(r.key)"
+                                    :class="range === r.key ? 'bg-indigo-600 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
+                                    class="px-4 py-2 text-xs font-semibold border-r border-gray-200 last:border-r-0 transition"
+                                    x-text="r.label"></button>
+                        </template>
+                    </div>
+                </div>
+
+                <!-- Statistics summary -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3" x-show="historyStats.sample_count > 0">
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">CPU avg / peak</div>
+                        <div class="mt-1 text-lg font-bold text-gray-900">
+                            <span x-text="historyStats.cpu_avg + '%'"></span>
+                            <span class="text-sm text-gray-400 font-normal">/ <span x-text="historyStats.cpu_peak + '%'"></span></span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">Memory avg / peak</div>
+                        <div class="mt-1 text-lg font-bold text-gray-900">
+                            <span x-text="historyStats.mem_avg + '%'"></span>
+                            <span class="text-sm text-gray-400 font-normal">/ <span x-text="historyStats.mem_peak + '%'"></span></span>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">Peak load (1m)</div>
+                        <div class="mt-1 text-lg font-bold text-gray-900" x-text="historyStats.load_peak"></div>
+                    </div>
+                    <div class="bg-gray-50 rounded-lg p-3">
+                        <div class="text-xs text-gray-500 uppercase tracking-wide">Network avg (KB/s)</div>
+                        <div class="mt-1 text-lg font-bold text-gray-900">
+                            ↓<span x-text="historyStats.network_in_avg"></span>
+                            <span class="text-sm text-gray-400 font-normal mx-1">·</span>
+                            ↑<span x-text="historyStats.network_out_avg"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div x-show="historyStats.sample_count === 0" class="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+                    No historical data yet for this range. The collector runs every minute — wait a few minutes after first install for data to appear.
+                </div>
+            </div>
+
+            <!-- Historical Charts -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
                 <div class="bg-white rounded-xl shadow-sm p-6">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">CPU Usage</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">CPU Usage (%)</h3>
                     <div class="relative h-48"><canvas id="cpuChart"></canvas></div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Memory Usage</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-4">Memory Usage (%)</h3>
                     <div class="relative h-48"><canvas id="memChart"></canvas></div>
                 </div>
                 <div class="bg-white rounded-xl shadow-sm p-6">
@@ -148,22 +200,64 @@
                     lastUpdate: 'never',
                     charts: {},
 
+                    // History range state
+                    range: '1h',
+                    ranges: [
+                        { key: '1h',  label: '1 Hour'  },
+                        { key: '6h',  label: '6 Hours' },
+                        { key: '24h', label: '24 Hours'},
+                        { key: '7d',  label: '7 Days'  },
+                        { key: '30d', label: '30 Days' },
+                    ],
+                    historyStats: { cpu_avg: 0, cpu_peak: 0, mem_avg: 0, mem_peak: 0, load_peak: 0, network_in_avg: 0, network_out_avg: 0, sample_count: 0 },
+
                     startPolling() {
                         this.initCharts();
-                        this.fetchMetrics();
+                        // Live cards refresh every 5 seconds
+                        this.fetchLive();
                         this.fetchProcesses();
-                        setInterval(() => this.fetchMetrics(), 5000);
+                        setInterval(() => this.fetchLive(), 5000);
                         setInterval(() => this.fetchProcesses(), 10000);
+
+                        // History loads on range change. Auto-refresh every minute
+                        // for the 1h view (matches the collector cadence). Longer
+                        // ranges refresh every 5 minutes.
+                        this.fetchHistory();
+                        setInterval(() => this.fetchHistory(), this.range === '1h' ? 60000 : 300000);
                     },
 
-                    async fetchMetrics() {
+                    setRange(r) {
+                        this.range = r;
+                        this.fetchHistory();
+                    },
+
+                    /**
+                     * Live values for the four cards at the top — pulled directly
+                     * from the agent's in-memory buffer. Always current to within
+                     * a few seconds.
+                     */
+                    async fetchLive() {
                         try {
                             const resp = await fetch(`/admin/monitor/realtime?server_id=${this.serverId}`);
                             const data = await resp.json();
                             if (data.snapshots && data.snapshots.length > 0) {
                                 this.latest = data.snapshots[data.snapshots.length - 1];
                                 this.lastUpdate = new Date().toLocaleTimeString();
-                                this.updateCharts(data.snapshots);
+                            }
+                        } catch (e) {}
+                    },
+
+                    /**
+                     * Historical aggregated metrics for the selected range, from
+                     * the panel's database. The collector populates this every minute.
+                     */
+                    async fetchHistory() {
+                        try {
+                            const resp = await fetch(`/admin/monitor/history?server_id=${this.serverId}&range=${this.range}`);
+                            const data = await resp.json();
+                            if (data.points) {
+                                this.historyStats = data.stats || this.historyStats;
+                                this.updateCharts(data.points);
                             }
                         } catch (e) {}
                     },
@@ -185,69 +279,73 @@
                                 x: { display: false },
                                 y: { beginAtZero: true, max: 100 }
                             },
-                            plugins: { legend: { display: false } },
-                            elements: { point: { radius: 0 }, line: { borderWidth: 2, tension: 0.3 } }
+                            plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                            elements: { point: { radius: 0, hoverRadius: 4 }, line: { borderWidth: 2, tension: 0.3 } }
                         };
 
                         this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
                             type: 'line',
-                            data: { labels: [], datasets: [{ data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true }] },
+                            data: { labels: [], datasets: [{ label: 'CPU %', data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true }] },
                             options: { ...opts }
                         });
 
                         this.charts.mem = new Chart(document.getElementById('memChart'), {
                             type: 'line',
-                            data: { labels: [], datasets: [{ data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true }] },
+                            data: { labels: [], datasets: [{ label: 'Memory %', data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true }] },
                             options: { ...opts }
                         });
 
                         this.charts.net = new Chart(document.getElementById('netChart'), {
                             type: 'line',
                             data: { labels: [], datasets: [
-                                { label: 'In', data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true },
+                                { label: 'In',  data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true },
                                 { label: 'Out', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true }
                             ]},
-                            options: { ...opts, scales: { x: { display: false }, y: { beginAtZero: true } }, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                            options: { ...opts, scales: { x: { display: false }, y: { beginAtZero: true } }, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { mode: 'index', intersect: false } } }
                         });
 
                         this.charts.load = new Chart(document.getElementById('loadChart'), {
                             type: 'line',
                             data: { labels: [], datasets: [
-                                { label: '1m', data: [], borderColor: '#ef4444' },
-                                { label: '5m', data: [], borderColor: '#f59e0b' },
+                                { label: '1m',  data: [], borderColor: '#ef4444' },
+                                { label: '5m',  data: [], borderColor: '#f59e0b' },
                                 { label: '15m', data: [], borderColor: '#22c55e' }
                             ]},
-                            options: { ...opts, scales: { x: { display: false }, y: { beginAtZero: true } }, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } } }
+                            options: { ...opts, scales: { x: { display: false }, y: { beginAtZero: true } }, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { mode: 'index', intersect: false } } }
                         });
                     },
 
-                    updateCharts(snapshots) {
-                        const labels = snapshots.map((_, i) => i);
-                        const cpu = snapshots.map(s => s.cpu_percent);
-                        const mem = snapshots.map(s => s.mem_percent);
-                        const netIn = snapshots.map(s => s.network_in_kb);
-                        const netOut = snapshots.map(s => s.network_out_kb);
-                        const load1 = snapshots.map(s => s.load_avg_1);
-                        const load5 = snapshots.map(s => s.load_avg_5);
-                        const load15 = snapshots.map(s => s.load_avg_15);
+                    /**
+                     * Update charts with historical data points (each has a timestamp).
+                     * Labels are formatted relative to the range so 1h shows HH:MM
+                     * and 30d shows MM/DD.
+                     */
+                    updateCharts(points) {
+                        const showDate = ['7d', '30d'].includes(this.range);
+                        const labels = points.map(p => {
+                            const d = new Date(p.timestamp);
+                            return showDate
+                                ? `${d.getMonth()+1}/${d.getDate()} ${String(d.getHours()).padStart(2,'0')}:00`
+                                : `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+                        });
 
                         this.charts.cpu.data.labels = labels;
-                        this.charts.cpu.data.datasets[0].data = cpu;
+                        this.charts.cpu.data.datasets[0].data = points.map(p => p.cpu_percent);
                         this.charts.cpu.update('none');
 
                         this.charts.mem.data.labels = labels;
-                        this.charts.mem.data.datasets[0].data = mem;
+                        this.charts.mem.data.datasets[0].data = points.map(p => p.mem_percent);
                         this.charts.mem.update('none');
 
                         this.charts.net.data.labels = labels;
-                        this.charts.net.data.datasets[0].data = netIn;
-                        this.charts.net.data.datasets[1].data = netOut;
+                        this.charts.net.data.datasets[0].data = points.map(p => p.network_in_kb);
+                        this.charts.net.data.datasets[1].data = points.map(p => p.network_out_kb);
                         this.charts.net.update('none');
 
                         this.charts.load.data.labels = labels;
-                        this.charts.load.data.datasets[0].data = load1;
-                        this.charts.load.data.datasets[1].data = load5;
-                        this.charts.load.data.datasets[2].data = load15;
+                        this.charts.load.data.datasets[0].data = points.map(p => p.load_avg_1);
+                        this.charts.load.data.datasets[1].data = points.map(p => p.load_avg_5);
+                        this.charts.load.data.datasets[2].data = points.map(p => p.load_avg_15);
                         this.charts.load.update('none');
                     }
                 };
