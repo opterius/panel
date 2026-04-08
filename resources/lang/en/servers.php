@@ -84,6 +84,18 @@ return [
     // Laravel Installer
     'laravel_installed'         => 'Laravel :version installed on :domain',
     'laravel_install_failed'    => 'Laravel installation failed: :error',
+    // Joomla
+    'joomla_installed'          => 'Joomla :version installed on :domain',
+    'joomla_install_failed'     => 'Joomla installation failed: :error',
+    // Drupal
+    'drupal_installed'          => 'Drupal :version installed on :domain',
+    'drupal_install_failed'     => 'Drupal installation failed: :error',
+    // Magento
+    'magento_installed'         => 'Magento :version installed on :domain',
+    'magento_install_failed'    => 'Magento installation failed: :error',
+    // PrestaShop
+    'prestashop_installed'      => 'PrestaShop :version installed on :domain',
+    'prestashop_install_failed' => 'PrestaShop installation failed: :error',
     'failed_to_create_database' => 'Failed to create database.',
     'failed_to_create_db_user_plain' => 'Failed to create database user.',
     // File Manager

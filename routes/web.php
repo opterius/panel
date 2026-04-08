@@ -26,7 +26,10 @@ use App\Http\Controllers\EmailSettingsController;
 use App\Http\Controllers\FileManagerController;
 use App\Http\Controllers\ForwarderController;
 use App\Http\Controllers\FtpController;
+use App\Http\Controllers\CmsInstallerController;
 use App\Http\Controllers\LaravelInstallerController;
+use App\Http\Controllers\NodeController;
+use App\Http\Controllers\PostgresController;
 use App\Http\Controllers\LicenseController;
 use App\Http\Controllers\MonitorController;
 use App\Http\Controllers\PackageController;
@@ -241,6 +244,28 @@ Route::middleware([
         Route::get('/laravel', [LaravelInstallerController::class, 'index'])->name('laravel.index');
         Route::get('/laravel/install', [LaravelInstallerController::class, 'create'])->name('laravel.create');
         Route::post('/laravel/install', [LaravelInstallerController::class, 'store'])->name('laravel.store');
+
+        // CMS installers (Joomla, Drupal, Magento, PrestaShop)
+        Route::get('/cms/{type}', [CmsInstallerController::class, 'index'])->name('cms.index');
+        Route::get('/cms/{type}/install', [CmsInstallerController::class, 'create'])->name('cms.create');
+        Route::post('/cms/{type}/install', [CmsInstallerController::class, 'store'])->name('cms.store');
+
+        // Node.js / PM2
+        Route::get('/nodejs', [NodeController::class, 'index'])->name('nodejs.index');
+        Route::get('/nodejs/create', [NodeController::class, 'create'])->name('nodejs.create');
+        Route::post('/nodejs', [NodeController::class, 'store'])->name('nodejs.store');
+        Route::get('/nodejs/{nodeApp}', [NodeController::class, 'show'])->name('nodejs.show');
+        Route::post('/nodejs/{nodeApp}/restart', [NodeController::class, 'restart'])->name('nodejs.restart');
+        Route::post('/nodejs/{nodeApp}/stop', [NodeController::class, 'stop'])->name('nodejs.stop');
+        Route::post('/nodejs/{nodeApp}/delete', [NodeController::class, 'destroy'])->name('nodejs.destroy');
+
+        // PostgreSQL
+        Route::get('/postgres', [PostgresController::class, 'index'])->name('postgres.index');
+        Route::get('/postgres/create', [PostgresController::class, 'create'])->name('postgres.create');
+        Route::post('/postgres', [PostgresController::class, 'store'])->name('postgres.store');
+        Route::get('/postgres/{postgresDatabase}', [PostgresController::class, 'show'])->name('postgres.show');
+        Route::post('/postgres/{postgresDatabase}/password', [PostgresController::class, 'changePassword'])->name('postgres.password');
+        Route::post('/postgres/{postgresDatabase}/delete', [PostgresController::class, 'destroy'])->name('postgres.destroy');
 
         // Domains (create/store removed — domain is created with the account)
         Route::resource('domains', DomainController::class)->only(['index', 'destroy']);
