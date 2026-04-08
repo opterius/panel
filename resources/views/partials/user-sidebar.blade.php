@@ -280,6 +280,25 @@
             </x-slot>
             {{ __('cron.cron_jobs') }}
         </x-sidebar-link>
+
+        {{-- Security --}}
+        <div class="pt-4 pb-2 px-3">
+            <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Security</span>
+        </div>
+
+        <x-sidebar-link href="{{ route('user.security.directories.index') }}" :active="request()->routeIs('user.security.directories.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </x-slot>
+            Directory Protection
+        </x-sidebar-link>
+
+        <x-sidebar-link href="{{ route('user.security.hotlink.index') }}" :active="request()->routeIs('user.security.hotlink.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+            </x-slot>
+            Hotlink Protection
+        </x-sidebar-link>
     </nav>
 
     <div class="px-4 py-3 border-t border-gray-800 text-xs text-gray-500">

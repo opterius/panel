@@ -283,6 +283,17 @@ Route::middleware([
         Route::resource('domains', DomainController::class)->only(['index', 'destroy']);
         Route::post('/domains/{domain}/toggle-htaccess', [HtaccessController::class, 'toggle'])->name('domains.toggle-htaccess');
 
+        // Directory password protection
+        Route::get('/security/directory-protection',                  [\App\Http\Controllers\User\ProtectedDirectoryController::class, 'index'])->name('security.directories.index');
+        Route::post('/security/directory-protection',                 [\App\Http\Controllers\User\ProtectedDirectoryController::class, 'store'])->name('security.directories.store');
+        Route::delete('/security/directory-protection/{directory}',   [\App\Http\Controllers\User\ProtectedDirectoryController::class, 'destroy'])->name('security.directories.destroy');
+        Route::post('/security/directory-protection/{directory}/users', [\App\Http\Controllers\User\ProtectedDirectoryController::class, 'addUser'])->name('security.directories.users.store');
+        Route::delete('/security/directory-protection/users/{user}',  [\App\Http\Controllers\User\ProtectedDirectoryController::class, 'removeUser'])->name('security.directories.users.destroy');
+
+        // Hotlink protection
+        Route::get('/security/hotlink-protection',          [\App\Http\Controllers\User\HotlinkProtectionController::class, 'index'])->name('security.hotlink.index');
+        Route::patch('/security/hotlink-protection/{domain}', [\App\Http\Controllers\User\HotlinkProtectionController::class, 'update'])->name('security.hotlink.update');
+
         // Email Forwarders
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
         Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');

@@ -61,4 +61,14 @@ class Domain extends Model
     {
         return $this->hasOne(NginxDirective::class);
     }
+
+    public function protectedDirectories(): HasMany
+    {
+        return $this->hasMany(ProtectedDirectory::class);
+    }
+
+    public function hotlinkProtection(): HasOne
+    {
+        return $this->hasOne(HotlinkProtection::class);
+    }
 }
