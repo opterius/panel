@@ -71,11 +71,16 @@ class UserPhpController extends Controller
 
         $oldVersion = $domain->php_version;
 
+        $workingDir = dirname($domain->document_root);
+
         $response = AgentService::for($domain->account->server)->post('/php/switch-version', [
-            'domain'      => $domain->domain,
-            'username'    => $domain->account->username,
-            'old_version' => $oldVersion,
-            'new_version' => $validated['new_version'],
+            'domain'           => $domain->domain,
+            'username'         => $domain->account->username,
+            'old_version'      => $oldVersion,
+            'new_version'      => $validated['new_version'],
+            'htaccess_enabled' => (bool) $domain->htaccess_enabled,
+            'document_root'    => $domain->document_root,
+            'logs_dir'         => $workingDir . '/logs',
         ]);
 
         if ($response && $response->successful()) {

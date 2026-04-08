@@ -10,7 +10,11 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Domain extends Model
 {
     protected $fillable = [
-        'server_id', 'account_id', 'parent_id', 'domain', 'document_root', 'php_version', 'status',
+        'server_id', 'account_id', 'parent_id', 'domain', 'document_root', 'php_version', 'htaccess_enabled', 'status',
+    ];
+
+    protected $casts = [
+        'htaccess_enabled' => 'boolean',
     ];
 
     public function server(): BelongsTo

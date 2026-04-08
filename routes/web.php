@@ -29,6 +29,7 @@ use App\Http\Controllers\FtpController;
 use App\Http\Controllers\CmsInstallerController;
 use App\Http\Controllers\ComposerController;
 use App\Http\Controllers\GitController;
+use App\Http\Controllers\HtaccessController;
 use App\Http\Controllers\LaravelInstallerController;
 use App\Http\Controllers\NodeController;
 use App\Http\Controllers\PostgresController;
@@ -280,6 +281,7 @@ Route::middleware([
 
         // Domains (create/store removed — domain is created with the account)
         Route::resource('domains', DomainController::class)->only(['index', 'destroy']);
+        Route::post('/domains/{domain}/toggle-htaccess', [HtaccessController::class, 'toggle'])->name('domains.toggle-htaccess');
 
         // Email Forwarders
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');

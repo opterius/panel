@@ -143,6 +143,40 @@
                         </div>
                     </div>
 
+                    <!-- .htaccess / Apache toggle -->
+                    <div class="px-6 py-3 border-t border-gray-100 flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div>
+                                <p class="text-xs font-medium text-gray-700">.htaccess support</p>
+                                <p class="text-xs text-gray-400 mt-0.5">
+                                    @if($domain->htaccess_enabled)
+                                        Apache backend active — full mod_rewrite / .htaccess support
+                                    @else
+                                        Nginx direct (faster) — enable for WordPress, Joomla, legacy apps
+                                    @endif
+                                </p>
+                            </div>
+                        </div>
+                        <form method="POST" action="{{ route('user.domains.toggle-htaccess', $domain) }}"
+                              x-data="{ loading: false }" @submit="loading = true">
+                            @csrf
+                            <button type="submit" :disabled="loading"
+                                class="relative inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium transition disabled:opacity-50
+                                    {{ $domain->htaccess_enabled
+                                        ? 'bg-orange-100 text-orange-700 hover:bg-orange-200'
+                                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }}">
+                                <span class="w-7 h-4 rounded-full transition-colors flex items-center px-0.5
+                                    {{ $domain->htaccess_enabled ? 'bg-orange-500' : 'bg-gray-300' }}">
+                                    <span class="w-3 h-3 bg-white rounded-full shadow transition-transform
+                                        {{ $domain->htaccess_enabled ? 'translate-x-3' : 'translate-x-0' }}"></span>
+                                </span>
+                                <span x-text="loading ? 'Applying…' : '{{ $domain->htaccess_enabled ? 'Enabled' : 'Disabled' }}'">
+                                    {{ $domain->htaccess_enabled ? 'Enabled' : 'Disabled' }}
+                                </span>
+                            </button>
+                        </form>
+                    </div>
+
                     <!-- Subdomains List -->
                     @if($domain->subdomains->isNotEmpty())
                         <div class="px-6 py-3">
