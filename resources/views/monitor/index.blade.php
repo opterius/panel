@@ -255,11 +255,14 @@
                         try {
                             const resp = await fetch(`/admin/monitor/history?server_id=${this.serverId}&range=${this.range}`);
                             const data = await resp.json();
-                            if (data.points) {
-                                this.historyStats = data.stats || this.historyStats;
-                                this.updateCharts(data.points);
-                            }
-                        } catch (e) {}
+                            // Always update both stats and charts so if the controller
+                            // returns points but no stats (or vice versa) we still
+                            // render whatever's available.
+                            if (data.stats)  this.historyStats = data.stats;
+                            if (data.points) this.updateCharts(data.points || []);
+                        } catch (e) {
+                            console.error('fetchHistory failed:', e);
+                        }
                     },
 
                     async fetchProcesses() {
@@ -280,7 +283,9 @@
                                 y: { beginAtZero: true, max: 100 }
                             },
                             plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-                            elements: { point: { radius: 0, hoverRadius: 4 }, line: { borderWidth: 2, tension: 0.3 } }
+                            // Visible dots (radius 2.5) so a single data point still
+                            // renders. Without this, ranges with one sample look empty.
+                            elements: { point: { radius: 2.5, hoverRadius: 5 }, line: { borderWidth: 2, tension: 0.3 } }
                         };
 
                         this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
