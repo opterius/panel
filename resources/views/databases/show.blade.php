@@ -66,6 +66,29 @@
                     <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('databases.db_username') }}</dt>
                     <dd class="mt-1 text-sm font-mono text-gray-800">{{ $database->db_username }}</dd>
                 </div>
+                <div x-data="{ revealed: false }">
+                    <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">Database Password</dt>
+                    @if($database->encrypted_password)
+                        <dd class="mt-1 text-sm flex items-center gap-2">
+                            <code class="font-mono text-gray-800 bg-gray-50 border border-gray-200 px-2 py-1 rounded select-all"
+                                  x-text="revealed ? '{{ $database->encrypted_password }}' : '••••••••••••'"></code>
+                            <button type="button" @click="revealed = !revealed"
+                                    class="text-xs font-semibold text-indigo-600 hover:text-indigo-700">
+                                <span x-text="revealed ? 'Hide' : 'Reveal'"></span>
+                            </button>
+                            <button type="button"
+                                    @click="navigator.clipboard.writeText('{{ $database->encrypted_password }}')"
+                                    title="Copy to clipboard"
+                                    class="text-xs font-semibold text-gray-500 hover:text-gray-700">
+                                Copy
+                            </button>
+                        </dd>
+                    @else
+                        <dd class="mt-1 text-sm text-gray-400 italic">
+                            Not stored — use the form below to set a new password.
+                        </dd>
+                    @endif
+                </div>
                 <div>
                     <dt class="text-xs font-medium text-gray-400 uppercase tracking-wide">{{ __('servers.server') }}</dt>
                     <dd class="mt-1 text-sm text-gray-800">{{ $database->account->server->name }} ({{ $database->account->server->ip_address }})</dd>

@@ -102,6 +102,49 @@
             </div>
         </template>
 
+        {{-- Database credentials — visible only after a successful import.
+             Customers need to know the password the migration generated for
+             their imported database users so they can update wp-config.php /
+             .env / etc. --}}
+        <template x-if="result?.databases?.details?.length">
+            <div class="bg-amber-50 border border-amber-200 rounded-xl overflow-hidden">
+                <div class="px-6 py-4 border-b border-amber-200">
+                    <h3 class="font-bold text-amber-900 flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                        Database Credentials
+                    </h3>
+                    <p class="text-xs text-amber-800 mt-1">
+                        Update the application's config file (wp-config.php / .env / etc) with these new credentials.
+                        These passwords are also stored encrypted in the panel and can be revealed later from each database's detail page.
+                    </p>
+                </div>
+                <div class="divide-y divide-amber-200">
+                    <template x-for="db in result.databases.details" :key="db.name">
+                        <template x-if="db.status === 'success' && db.db_password">
+                            <div class="px-6 py-3">
+                                <div class="font-semibold text-amber-900 mb-1.5" x-text="db.name"></div>
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+                                    <div>
+                                        <div class="text-amber-700 font-semibold uppercase">User</div>
+                                        <code class="font-mono text-gray-800 bg-white border border-amber-200 px-2 py-1 rounded mt-0.5 block select-all" x-text="db.db_user"></code>
+                                    </div>
+                                    <div class="sm:col-span-2">
+                                        <div class="text-amber-700 font-semibold uppercase">Password</div>
+                                        <div class="flex items-center gap-1 mt-0.5">
+                                            <code class="font-mono text-gray-800 bg-white border border-amber-200 px-2 py-1 rounded flex-1 select-all" x-text="db.db_password"></code>
+                                            <button type="button"
+                                                    @click="navigator.clipboard.writeText(db.db_password)"
+                                                    class="text-xs font-semibold text-amber-700 hover:text-amber-900 px-2">Copy</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                    </template>
+                </div>
+            </div>
+        </template>
+
         {{-- Completed actions --}}
         <template x-if="status === 'completed' || status === 'partial'">
             <div class="flex items-center space-x-3">

@@ -158,13 +158,20 @@ class MigrationService
             return ['status' => 'skipped', 'reason' => 'No databases found'];
         }
 
-        $dbList = [];
+        // Pre-generate fresh passwords for each DB user and remember them in
+        // memory so we can persist them in the panel after the agent confirms
+        // the database was created. Without this, the user has no way to ever
+        // discover the password the migration generated for them.
+        $dbList    = [];
+        $generated = []; // db_name => plaintext password
         foreach ($databases as $db) {
+            $password = bin2hex(random_bytes(12));
             $dbList[] = [
                 'name'     => $db['name'],
                 'username' => $db['name'], // cPanel uses same name for user
-                'password' => bin2hex(random_bytes(12)),
+                'password' => $password,
             ];
+            $generated[$db['name']] = $password;
         }
 
         $response = AgentService::for($server)->postLong('/migration/restore-databases', [
@@ -176,16 +183,22 @@ class MigrationService
         if ($response && $response->successful()) {
             $imported = $response->json('databases', []);
             foreach ($imported as $db) {
-                // Create the database record in Opterius
                 if (($db['status'] ?? '') === 'success') {
                     Database::create([
-                        'account_id'  => $account->id,
-                        'server_id'   => $account->server_id,
-                        'name'        => $db['name'],
-                        'db_username' => $db['username'] ?? $db['name'],
-                        'remote'      => false,
-                        'status'      => 'active',
+                        'account_id'         => $account->id,
+                        'server_id'          => $account->server_id,
+                        'name'               => $db['name'],
+                        'db_username'        => $db['username'] ?? $db['name'],
+                        'encrypted_password' => $generated[$db['name']] ?? null,
+                        'remote'             => false,
+                        'status'             => 'active',
                     ]);
+
+                    // Surface the credentials in the import result so the user
+                    // sees them on the migration result screen and can update
+                    // their app's config file.
+                    $db['db_user']     = $db['username'] ?? $db['name'];
+                    $db['db_password'] = $generated[$db['name']] ?? null;
                 }
                 $details[] = $db;
             }

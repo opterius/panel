@@ -101,11 +101,12 @@ class DatabaseController extends Controller
         }
 
         $database = Database::create([
-            'server_id'   => $account->server_id,
-            'account_id'  => $account->id,
-            'name'        => $fullName,
-            'db_username' => $fullUser,
-            'status'      => 'active',
+            'server_id'          => $account->server_id,
+            'account_id'         => $account->id,
+            'name'               => $fullName,
+            'db_username'        => $fullUser,
+            'encrypted_password' => $validated['db_password'],
+            'status'             => 'active',
         ]);
 
         ActivityLogger::log('database.created', 'database', $database->id, $database->name,
@@ -149,6 +150,10 @@ class DatabaseController extends Controller
         ]);
 
         if ($response && $response->successful()) {
+            // Keep the panel's encrypted copy in sync with the live MySQL value
+            // so the "Reveal password" button always shows the current value.
+            $database->update(['encrypted_password' => $validated['db_password']]);
+
             ActivityLogger::log('database.password_changed', 'database', $database->id, $database->name,
                 "Changed password for database user {$database->db_username}", ['db_username' => $database->db_username]);
 
