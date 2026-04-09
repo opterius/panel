@@ -57,6 +57,10 @@ Route::get('/', function () {
 Route::get('/setup', [App\Http\Controllers\SetupController::class, 'index'])->name('setup.index');
 Route::post('/setup', [App\Http\Controllers\SetupController::class, 'store'])->name('setup.store');
 
+// Public endpoint that the agent's cron runner POSTs to. Auth is via the
+// shared agent_token in the body — no session/CSRF (excluded in bootstrap/app.php).
+Route::post('/api/cron/report', [CronJobController::class, 'report'])->name('api.cron.report');
+
 Route::middleware([
     'auth:sanctum',
     config('jetstream.auth_session'),
@@ -131,6 +135,8 @@ Route::middleware([
         Route::get('/backups', [BackupController::class, 'index'])->name('backups.index');
         Route::post('/backups/create', [BackupController::class, 'create'])->name('backups.create');
         Route::post('/backups/{backup}/restore', [BackupController::class, 'restore'])->name('backups.restore');
+        Route::get('/backups/{backup}/browse', [BackupController::class, 'browse'])->name('backups.browse');
+        Route::post('/backups/{backup}/restore-files', [BackupController::class, 'restoreFiles'])->name('backups.restore-files');
         Route::get('/backups/{backup}/download', [BackupController::class, 'download'])->name('backups.download');
         Route::delete('/backups/{backup}', [BackupController::class, 'destroy'])->name('backups.destroy');
 
@@ -295,6 +301,15 @@ Route::middleware([
         Route::get('/security/hotlink-protection',          [\App\Http\Controllers\User\HotlinkProtectionController::class, 'index'])->name('security.hotlink.index');
         Route::patch('/security/hotlink-protection/{domain}', [\App\Http\Controllers\User\HotlinkProtectionController::class, 'update'])->name('security.hotlink.update');
 
+        // Real-time log viewer
+        Route::get('/logs',       [\App\Http\Controllers\User\LogViewerController::class, 'index'])->name('logs.index');
+        Route::post('/logs/tail', [\App\Http\Controllers\User\LogViewerController::class, 'tail'])->name('logs.tail');
+
+        // Staging environments
+        Route::get('/staging',             [\App\Http\Controllers\User\StagingController::class, 'index'])->name('staging.index');
+        Route::post('/staging/{domain}',   [\App\Http\Controllers\User\StagingController::class, 'store'])->name('staging.store');
+        Route::delete('/staging/{domain}', [\App\Http\Controllers\User\StagingController::class, 'destroy'])->name('staging.destroy');
+
         // Email Forwarders
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
         Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');
@@ -370,6 +385,7 @@ Route::middleware([
         Route::get('/cron-jobs', [CronJobController::class, 'index'])->name('cronjobs.index');
         Route::get('/cron-jobs/create', [CronJobController::class, 'create'])->name('cronjobs.create');
         Route::post('/cron-jobs', [CronJobController::class, 'store'])->name('cronjobs.store');
+        Route::get('/cron-jobs/{cronJob}', [CronJobController::class, 'show'])->name('cronjobs.show');
         Route::post('/cron-jobs/{cronJob}/toggle', [CronJobController::class, 'toggle'])->name('cronjobs.toggle');
         Route::delete('/cron-jobs/{cronJob}', [CronJobController::class, 'destroy'])->name('cronjobs.destroy');
 

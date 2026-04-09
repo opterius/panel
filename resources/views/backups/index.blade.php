@@ -108,6 +108,11 @@
                                     {{ ucfirst($backup->status) }}
                                 </span>
 
+                                <a href="{{ route('admin.backups.browse', $backup) }}"
+                                    class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-emerald-600 bg-emerald-50 rounded-lg hover:bg-emerald-100 transition">
+                                    Browse
+                                </a>
+
                                 <a href="{{ route('admin.backups.download', $backup) }}" target="_blank"
                                     class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition">
                                     {{ __('common.download') }}

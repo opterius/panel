@@ -23,6 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\LicenseMiddleware::class,
             \App\Http\Middleware\SetLocale::class,
         ]);
+
+        // Exclude the agent → panel callback URLs from CSRF (auth is via
+        // shared token in the request body).
+        $middleware->validateCsrfTokens(except: [
+            'api/cron/report',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

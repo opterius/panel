@@ -39,6 +39,9 @@
         @else
             <div class="divide-y divide-gray-100">
                 @foreach($cronJobs as $cron)
+                    @php
+                        $lastRun = $cron->history()->latest('started_at')->first();
+                    @endphp
                     <div class="flex items-center justify-between px-6 py-4 hover:bg-gray-100 transition">
                         <div class="flex items-center space-x-4">
                             <div class="w-10 h-10 rounded-lg flex items-center justify-center
@@ -49,13 +52,31 @@
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm font-mono text-gray-800">{{ $cron->command }}</div>
-                                <div class="text-xs text-gray-500 mt-0.5">
+                                <a href="{{ route('user.cronjobs.show', $cron) }}" class="text-sm font-semibold text-gray-800 hover:text-indigo-600">
+                                    {{ $cron->description ?: $cron->command }}
+                                </a>
+                                @if ($cron->description)
+                                    <div class="text-xs font-mono text-gray-500 truncate max-w-xl">{{ $cron->command }}</div>
+                                @endif
+                                <div class="text-xs text-gray-500 mt-0.5 flex flex-wrap items-center gap-1.5">
                                     <span class="font-mono bg-gray-100 px-1.5 py-0.5 rounded">{{ $cron->schedule }}</span>
-                                    &middot; {{ $cron->account->username }}
-                                    &middot; {{ $cron->server->name }}
-                                    @if($cron->last_run_at)
-                                        &middot; {{ __('cron.last_run') }}: {{ $cron->last_run_at->diffForHumans() }}
+                                    <span class="text-gray-400">·</span>
+                                    <span>{{ \App\Support\CronSchedule::describe($cron->schedule) }}</span>
+                                    <span class="text-gray-400">·</span>
+                                    <span>{{ $cron->account->username }}</span>
+                                    @if ($lastRun)
+                                        <span class="text-gray-400">·</span>
+                                        @if ($lastRun->isSuccess())
+                                            <span class="inline-flex items-center gap-1 text-green-600 font-semibold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                                                last: success {{ $lastRun->started_at->diffForHumans() }}
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center gap-1 text-red-600 font-semibold">
+                                                <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span>
+                                                last: exit {{ $lastRun->exit_code }} {{ $lastRun->started_at->diffForHumans() }}
+                                            </span>
+                                        @endif
                                     @endif
                                 </div>
                             </div>

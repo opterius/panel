@@ -138,4 +138,86 @@ class BackupController extends Controller
         return redirect()->route('admin.backups.index', ['server_id' => $backup->server_id])
             ->with('success', __('backups.backup_deleted'));
     }
+
+    /**
+     * GET /admin/backups/{backup}/browse?path=...
+     * Show the file browser for a single backup at the given path.
+     */
+    public function browse(Request $request, Backup $backup)
+    {
+        $backup->load('server');
+
+        $path = $request->input('path', '');
+
+        $response = AgentService::for($backup->server)->post('/backup/browse', [
+            'filename' => $backup->filename,
+            'path'     => $path,
+        ]);
+
+        $entries = [];
+        $error   = null;
+
+        if ($response && $response->successful()) {
+            $entries = $response->json('entries') ?? [];
+        } else {
+            $error = $response?->json('error') ?? 'Agent unreachable';
+        }
+
+        // Build breadcrumbs
+        $crumbs = [];
+        if ($path !== '') {
+            $accumulated = '';
+            foreach (explode('/', trim($path, '/')) as $segment) {
+                if ($segment === '') continue;
+                $accumulated = ($accumulated === '' ? $segment : "$accumulated/$segment");
+                $crumbs[] = ['name' => $segment, 'path' => $accumulated . '/'];
+            }
+        }
+
+        return view('backups.browse', compact('backup', 'entries', 'path', 'crumbs', 'error'));
+    }
+
+    /**
+     * POST /admin/backups/{backup}/restore-files
+     * Restore individual files from a backup. Files come from a checkbox list
+     * in the browse view.
+     */
+    public function restoreFiles(Request $request, Backup $backup)
+    {
+        $data = $request->validate([
+            'files'         => 'required|array|min:1|max:200',
+            'files.*'       => 'string|max:1000',
+            'document_root' => 'required|string|max:255',
+            'overwrite'     => 'nullable|boolean',
+        ]);
+
+        $backup->load('server');
+
+        $response = AgentService::for($backup->server)->post('/backup/restore-files', [
+            'filename'      => $backup->filename,
+            'username'      => $backup->username,
+            'document_root' => $data['document_root'],
+            'files'         => $data['files'],
+            'overwrite'     => (bool) ($data['overwrite'] ?? false),
+        ]);
+
+        if (! $response || ! $response->successful()) {
+            $error = $response?->json('error') ?? 'Agent unreachable';
+            return back()->with('error', "Restore failed: {$error}");
+        }
+
+        $result = $response->json();
+        $restored = $result['restored'] ?? 0;
+        $skipped  = $result['skipped'] ?? 0;
+
+        ActivityLogger::log('backup.restored_files', 'account', $backup->account_id, $backup->username,
+            "Restored {$restored} file(s) from backup {$backup->filename}", ['files' => $data['files']]);
+
+        $msg = "Restored {$restored} file(s).";
+        if ($skipped > 0) {
+            $msg .= " Skipped {$skipped} (already existed — tick 'overwrite' to replace).";
+        }
+
+        return back()->with('success', $msg);
+    }
 }

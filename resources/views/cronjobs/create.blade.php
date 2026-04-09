@@ -44,6 +44,27 @@
                           case 'weekly': this.minute='0'; this.hour='0'; this.day='*'; this.month='*'; this.weekday='0'; break;
                           case 'monthly': this.minute='0'; this.hour='0'; this.day='1'; this.month='*'; this.weekday='*'; break;
                       }
+                  },
+                  // Plain-English description of the current schedule. Mirrors
+                  // CronSchedule::describe() in PHP — keeps both sides aligned.
+                  describe() {
+                      const m=this.minute, h=this.hour, d=this.day, mo=this.month, w=this.weekday;
+                      if (m==='*'&&h==='*'&&d==='*'&&mo==='*'&&w==='*') return 'Every minute';
+                      const everyMin = m.match(/^\\*\\/(\\d+)$/);
+                      if (everyMin && h==='*'&&d==='*'&&mo==='*'&&w==='*') return `Every ${everyMin[1]} minutes`;
+                      const everyHour = h.match(/^\\*\\/(\\d+)$/);
+                      if (/^\\d+$/.test(m) && everyHour && d==='*'&&mo==='*'&&w==='*') return `Every ${everyHour[1]} hours at minute ${m}`;
+                      if (/^\\d+$/.test(m) && /^\\d+$/.test(h) && d==='*'&&mo==='*'&&w==='*') {
+                          return `Every day at ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
+                      }
+                      if (/^\\d+$/.test(m) && /^\\d+$/.test(h) && d==='*'&&mo==='*'&&/^[0-6]$/.test(w)) {
+                          const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                          return `Every ${days[parseInt(w)]} at ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
+                      }
+                      if (/^\\d+$/.test(m) && /^\\d+$/.test(h) && /^\\d+$/.test(d) && mo==='*'&&w==='*') {
+                          return `On day ${d} of every month at ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
+                      }
+                      return `${m} ${h} ${d} ${mo} ${w}`;
                   }
               }">
             @csrf
@@ -145,7 +166,11 @@
                                         class="w-full text-center rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
                                 </div>
                             </div>
-                            <p class="mt-2 text-xs text-gray-400 font-mono text-center" x-text="minute + ' ' + hour + ' ' + day + ' ' + month + ' ' + weekday"></p>
+                            <div class="mt-3 rounded-lg bg-indigo-50 border border-indigo-100 px-4 py-3 text-center">
+                                <div class="text-xs text-indigo-500 uppercase tracking-wide font-semibold mb-1">In plain English</div>
+                                <div class="text-sm font-semibold text-indigo-900" x-text="describe()"></div>
+                                <div class="text-xs text-indigo-400 font-mono mt-1" x-text="minute + ' ' + hour + ' ' + day + ' ' + month + ' ' + weekday"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -163,14 +188,24 @@
                             </div>
                         </div>
                     </div>
-                    <div class="px-6 py-5">
-                        <input type="text" name="command" x-model="command"
-                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
-                            placeholder="e.g. /usr/bin/php /home/user/domain.com/public_html/artisan schedule:run">
-                        <p class="mt-1.5 text-xs text-gray-400">{{ __('cron.command_full_paths_hint') }}</p>
-                        @error('command')
-                            <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
-                        @enderror
+                    <div class="px-6 py-5 space-y-4">
+                        <div>
+                            <input type="text" name="command" x-model="command"
+                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
+                                placeholder="e.g. /usr/bin/php /home/user/domain.com/public_html/artisan schedule:run">
+                            <p class="mt-1.5 text-xs text-gray-400">{{ __('cron.command_full_paths_hint') }}</p>
+                            @error('command')
+                                <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1.5">Description (optional)</label>
+                            <input type="text" name="description" value="{{ old('description') }}" maxlength="200"
+                                class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                placeholder="e.g. Send out daily newsletter, Run WordPress maintenance">
+                            <p class="mt-1 text-xs text-gray-400">Friendly label shown in the cron list. Helps you remember what each job does.</p>
+                        </div>
                     </div>
                 </div>
 

@@ -281,6 +281,20 @@
             {{ __('cron.cron_jobs') }}
         </x-sidebar-link>
 
+        <x-sidebar-link href="{{ route('user.logs.index') }}" :active="request()->routeIs('user.logs.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9h6m-6 4h6"/></svg>
+            </x-slot>
+            Live Logs
+        </x-sidebar-link>
+
+        <x-sidebar-link href="{{ route('user.staging.index') }}" :active="request()->routeIs('user.staging.*')">
+            <x-slot name="icon">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg>
+            </x-slot>
+            Staging
+        </x-sidebar-link>
+
         {{-- Security --}}
         <div class="pt-4 pb-2 px-3">
             <span class="text-xs font-semibold uppercase tracking-wider text-gray-500">Security</span>

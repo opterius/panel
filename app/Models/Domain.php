@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Domain extends Model
 {
     protected $fillable = [
-        'server_id', 'account_id', 'parent_id', 'domain', 'document_root', 'php_version', 'htaccess_enabled', 'status',
+        'server_id', 'account_id', 'parent_id', 'staging_source_id', 'domain', 'document_root', 'php_version', 'htaccess_enabled', 'status',
     ];
 
     protected $casts = [
@@ -70,5 +70,26 @@ class Domain extends Model
     public function hotlinkProtection(): HasOne
     {
         return $this->hasOne(HotlinkProtection::class);
+    }
+
+    /**
+     * If this domain is a staging clone, returns the source production domain.
+     */
+    public function stagingSource(): BelongsTo
+    {
+        return $this->belongsTo(Domain::class, 'staging_source_id');
+    }
+
+    /**
+     * Existing staging clones of this domain (typically 0 or 1).
+     */
+    public function stagingClones(): HasMany
+    {
+        return $this->hasMany(Domain::class, 'staging_source_id');
+    }
+
+    public function isStaging(): bool
+    {
+        return $this->staging_source_id !== null;
     }
 }
