@@ -274,7 +274,12 @@
                     },
 
                     initCharts() {
-                        const opts = {
+                        // Each chart MUST get its own fresh options object — Chart.js
+                        // mutates options internally. Sharing one across multiple
+                        // charts (even via shallow spread) corrupts the second chart
+                        // and crashes chart.update() with "Cannot set properties of
+                        // undefined (setting 'fullSize')".
+                        const percentOpts = () => ({
                             responsive: true,
                             maintainAspectRatio: false,
                             animation: false,
@@ -283,30 +288,44 @@
                                 y: { beginAtZero: true, max: 100 }
                             },
                             plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-                            // Visible dots (radius 2.5) so a single data point still
-                            // renders. Without this, ranges with one sample look empty.
                             elements: { point: { radius: 2.5, hoverRadius: 5 }, line: { borderWidth: 2, tension: 0.3 } }
-                        };
+                        });
+                        const autoOpts = (showLegend = true) => ({
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            animation: false,
+                            scales: {
+                                x: { display: false },
+                                y: { beginAtZero: true }
+                            },
+                            plugins: {
+                                legend: showLegend
+                                    ? { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }
+                                    : { display: false },
+                                tooltip: { mode: 'index', intersect: false }
+                            },
+                            elements: { point: { radius: 2.5, hoverRadius: 5 }, line: { borderWidth: 2, tension: 0.3 } }
+                        });
 
                         this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
                             type: 'line',
-                            data: { labels: [], datasets: [{ label: 'CPU %', data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true }] },
-                            options: { ...opts }
+                            data: { labels: [], datasets: [{ label: 'CPU %', data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.15)', fill: true }] },
+                            options: percentOpts()
                         });
 
                         this.charts.mem = new Chart(document.getElementById('memChart'), {
                             type: 'line',
-                            data: { labels: [], datasets: [{ label: 'Memory %', data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true }] },
-                            options: { ...opts }
+                            data: { labels: [], datasets: [{ label: 'Memory %', data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.15)', fill: true }] },
+                            options: percentOpts()
                         });
 
                         this.charts.net = new Chart(document.getElementById('netChart'), {
                             type: 'line',
                             data: { labels: [], datasets: [
-                                { label: 'In',  data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', fill: true },
-                                { label: 'Out', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', fill: true }
+                                { label: 'In',  data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)', fill: true },
+                                { label: 'Out', data: [], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.15)', fill: true }
                             ]},
-                            options: { ...opts, scales: { x: { display: false }, y: { beginAtZero: true } }, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { mode: 'index', intersect: false } } }
+                            options: autoOpts(true)
                         });
 
                         this.charts.load = new Chart(document.getElementById('loadChart'), {
@@ -316,7 +335,7 @@
                                 { label: '5m',  data: [], borderColor: '#f59e0b' },
                                 { label: '15m', data: [], borderColor: '#22c55e' }
                             ]},
-                            options: { ...opts, scales: { x: { display: false }, y: { beginAtZero: true } }, plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: { size: 11 } } }, tooltip: { mode: 'index', intersect: false } } }
+                            options: autoOpts(true)
                         });
                     },
 
