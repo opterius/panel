@@ -15,6 +15,7 @@
         </div>
     @endif
 
+    {{ dd($status) }}
     <!-- License Status -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
