@@ -39,14 +39,28 @@
                             @if($status['valid'] ?? false)
                                 License Active
                             @else
-                                {{ ucfirst($status['reason'] ?? 'Invalid') }}
+                                {{ ucfirst(is_string($status['reason'] ?? null) ? $status['reason'] : 'Invalid') }}
                             @endif
                         </span>
+                        @php
+                            // The license server may return `plan` as either a plain
+                            // string (old API) or an object with slug/name/etc (new
+                            // API). Normalise to a display string here.
+                            $planRaw = $status['plan'] ?? 'unknown';
+                            if (is_array($planRaw)) {
+                                $planLabel = $planRaw['name']
+                                    ?? $planRaw['slug']
+                                    ?? $planRaw['title']
+                                    ?? 'Unknown';
+                            } else {
+                                $planLabel = (string) $planRaw;
+                            }
+                        @endphp
                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
                             @if($status['valid'] ?? false) bg-green-100 text-green-700
                             @else bg-red-100 text-red-700
                             @endif">
-                            {{ ucfirst($status['plan'] ?? 'Unknown') }}
+                            {{ ucfirst($planLabel) }}
                         </span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">{{ $status['message'] ?? '' }}</p>
@@ -64,7 +78,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
                 <div>
                     <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Plan</span>
-                    <p class="mt-1 text-sm font-semibold text-gray-800">{{ ucfirst($status['plan'] ?? 'Unknown') }}</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-800">{{ ucfirst($planLabel) }}</p>
                 </div>
                 <div>
                     <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Max Domains</span>
