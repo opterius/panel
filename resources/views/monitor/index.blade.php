@@ -193,12 +193,18 @@
         <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
         <script>
             function serverMonitor(serverId) {
+                // Chart.js instances live in a closure variable, NOT on the
+                // Alpine component. Storing them on `this` causes Alpine to
+                // wrap the chart in a reactive Proxy, which corrupts Chart.js
+                // internal state and triggers a stack overflow + cryptic
+                // "Cannot set properties of undefined (setting 'fullSize')".
+                const charts = {};
+
                 return {
                     serverId: serverId,
                     latest: { cpu_percent: 0, mem_used_mb: 0, mem_total_mb: 0, mem_percent: 0, disk_used_gb: 0, disk_total_gb: 0, disk_percent: 0, load_avg_1: 0, load_avg_5: 0, load_avg_15: 0, network_in_kb: 0, network_out_kb: 0 },
                     processes: [],
                     lastUpdate: 'never',
-                    charts: {},
 
                     // History range state
                     range: '1h',
@@ -307,19 +313,29 @@
                             elements: { point: { radius: 2.5, hoverRadius: 5 }, line: { borderWidth: 2, tension: 0.3 } }
                         });
 
-                        this.charts.cpu = new Chart(document.getElementById('cpuChart'), {
+                        // Destroy any pre-existing chart on each canvas to
+                        // protect against Alpine re-running init().
+                        ['cpuChart', 'memChart', 'netChart', 'loadChart'].forEach(id => {
+                            const c = document.getElementById(id);
+                            if (c) {
+                                const existing = Chart.getChart(c);
+                                if (existing) existing.destroy();
+                            }
+                        });
+
+                        charts.cpu = new Chart(document.getElementById('cpuChart'), {
                             type: 'line',
                             data: { labels: [], datasets: [{ label: 'CPU %', data: [], borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.15)', fill: true }] },
                             options: percentOpts()
                         });
 
-                        this.charts.mem = new Chart(document.getElementById('memChart'), {
+                        charts.mem = new Chart(document.getElementById('memChart'), {
                             type: 'line',
                             data: { labels: [], datasets: [{ label: 'Memory %', data: [], borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.15)', fill: true }] },
                             options: percentOpts()
                         });
 
-                        this.charts.net = new Chart(document.getElementById('netChart'), {
+                        charts.net = new Chart(document.getElementById('netChart'), {
                             type: 'line',
                             data: { labels: [], datasets: [
                                 { label: 'In',  data: [], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.15)', fill: true },
@@ -328,7 +344,7 @@
                             options: autoOpts(true)
                         });
 
-                        this.charts.load = new Chart(document.getElementById('loadChart'), {
+                        charts.load = new Chart(document.getElementById('loadChart'), {
                             type: 'line',
                             data: { labels: [], datasets: [
                                 { label: '1m',  data: [], borderColor: '#ef4444' },
@@ -353,24 +369,24 @@
                                 : `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
                         });
 
-                        this.charts.cpu.data.labels = labels;
-                        this.charts.cpu.data.datasets[0].data = points.map(p => p.cpu_percent);
-                        this.charts.cpu.update('none');
+                        charts.cpu.data.labels = labels;
+                        charts.cpu.data.datasets[0].data = points.map(p => p.cpu_percent);
+                        charts.cpu.update('none');
 
-                        this.charts.mem.data.labels = labels;
-                        this.charts.mem.data.datasets[0].data = points.map(p => p.mem_percent);
-                        this.charts.mem.update('none');
+                        charts.mem.data.labels = labels;
+                        charts.mem.data.datasets[0].data = points.map(p => p.mem_percent);
+                        charts.mem.update('none');
 
-                        this.charts.net.data.labels = labels;
-                        this.charts.net.data.datasets[0].data = points.map(p => p.network_in_kb);
-                        this.charts.net.data.datasets[1].data = points.map(p => p.network_out_kb);
-                        this.charts.net.update('none');
+                        charts.net.data.labels = labels;
+                        charts.net.data.datasets[0].data = points.map(p => p.network_in_kb);
+                        charts.net.data.datasets[1].data = points.map(p => p.network_out_kb);
+                        charts.net.update('none');
 
-                        this.charts.load.data.labels = labels;
-                        this.charts.load.data.datasets[0].data = points.map(p => p.load_avg_1);
-                        this.charts.load.data.datasets[1].data = points.map(p => p.load_avg_5);
-                        this.charts.load.data.datasets[2].data = points.map(p => p.load_avg_15);
-                        this.charts.load.update('none');
+                        charts.load.data.labels = labels;
+                        charts.load.data.datasets[0].data = points.map(p => p.load_avg_1);
+                        charts.load.data.datasets[1].data = points.map(p => p.load_avg_5);
+                        charts.load.data.datasets[2].data = points.map(p => p.load_avg_15);
+                        charts.load.update('none');
                     }
                 };
             }

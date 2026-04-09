@@ -270,6 +270,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
     <script>
     function analyticsApp(domains) {
+        // The Chart.js instance lives in a closure variable, NOT on the
+        // Alpine component. If we store it on `this`, Alpine wraps the chart
+        // in a reactive Proxy and Chart.js's internal state corrupts on every
+        // nested access — manifesting as a stack overflow and a cryptic
+        // "Cannot set properties of undefined (setting 'fullSize')" error.
+        let chart = null;
+
         return {
             domains: domains,
             domainId: domains[0]?.id || null,
@@ -289,7 +296,6 @@
             browsers: [],
             os: [],
             statusCodes: {},
-            chart: null,
 
             init() {
                 this.initChart();
@@ -342,18 +348,15 @@
                 const ctx = document.getElementById('visitsChart');
                 if (! ctx) return;
 
-                // Defensive: if a chart is already attached to this canvas
-                // (Alpine sometimes re-runs init() during Livewire patches or
-                // hot reload), destroy it first. Without this we hit
-                // "Canvas is already in use" and the canvas is left in a
-                // corrupted state, cascading into the cryptic Chart.js
-                // "Cannot set properties of undefined (setting 'fullSize')".
+                // Destroy any chart already attached to this canvas before
+                // creating a new one. Alpine may re-run init() during a
+                // Livewire patch or hot reload.
                 const existing = Chart.getChart(ctx);
                 if (existing) {
                     existing.destroy();
                 }
 
-                this.chart = new Chart(ctx, {
+                chart = new Chart(ctx, {
                     type: 'line',
                     data: { labels: [], datasets: [
                         {
@@ -389,7 +392,7 @@
             },
 
             updateChart() {
-                if (! this.chart) return;
+                if (! chart) return;
                 const showHour = this.range === '24h';
                 const showDate = this.range === '7d' || this.range === '30d' || this.range === '90d';
 
@@ -404,10 +407,10 @@
                     return '';
                 });
 
-                this.chart.data.labels = labels;
-                this.chart.data.datasets[0].data = this.timeseries.map(p => p.v);
-                this.chart.data.datasets[1].data = this.timeseries.map(p => p.u);
-                this.chart.update('none');
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = this.timeseries.map(p => p.v);
+                chart.data.datasets[1].data = this.timeseries.map(p => p.u);
+                chart.update('none');
             },
 
             // ── Helpers ────────────────────────────────────────────────
