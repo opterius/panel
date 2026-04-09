@@ -15,7 +15,6 @@
         </div>
     @endif
 
-    {{ dd($status) }}
     <!-- License Status -->
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-5 border-b border-gray-100">
@@ -47,7 +46,7 @@
                             @if($status['valid'] ?? false) bg-green-100 text-green-700
                             @else bg-red-100 text-red-700
                             @endif">
-                            {{ ucfirst($status['plan'] ?? 'Unknown') }}
+                            {{ ucfirst($status['plan']['name'] ?? 'Unknown') }}
                         </span>
                     </div>
                     <p class="text-sm text-gray-500 mt-1">{{ $status['message'] ?? '' }}</p>
