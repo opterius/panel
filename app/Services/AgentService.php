@@ -90,6 +90,55 @@ class AgentService
     }
 
     /**
+     * Multipart file upload to the agent. Used for cPanel backup imports
+     * and any other large file the customer needs to ship to their server.
+     *
+     * Two important details for large files:
+     *
+     *  1. The HMAC signature is computed against an empty body. The agent's
+     *     `requireAuth` middleware has a special case for /files/upload that
+     *     skips body hashing because pre-hashing multi-gigabyte uploads would
+     *     require buffering the entire file in memory on both sides.
+     *
+     *  2. We pass an open *file resource* to attach() instead of reading the
+     *     file into memory with file_get_contents(). Guzzle then streams the
+     *     file from disk as it sends, keeping memory usage bounded regardless
+     *     of file size.
+     */
+    public function upload(string $path, array $fields, \Illuminate\Http\UploadedFile $file, int $timeout = 1800): ?Response
+    {
+        $url = $this->url($path);
+        $timestamp = now()->toRfc3339String();
+
+        // Sign with empty body — the multipart contents are not part of the HMAC.
+        $payload   = $timestamp . 'POST' . $path;
+        $signature = hash_hmac('sha256', $payload, $this->server->agent_token);
+
+        $stream = fopen($file->getRealPath(), 'r');
+        if ($stream === false) {
+            return null;
+        }
+
+        try {
+            return Http::withoutVerifying()
+                ->timeout($timeout)
+                ->withHeaders([
+                    'X-Signature' => $signature,
+                    'X-Timestamp' => $timestamp,
+                ])
+                ->attach('file', $stream, $file->getClientOriginalName())
+                ->post($url, $fields);
+        } catch (ConnectionException) {
+            $this->server->update(['status' => 'offline']);
+            return null;
+        } finally {
+            if (is_resource($stream)) {
+                fclose($stream);
+            }
+        }
+    }
+
+    /**
      * Send an HMAC-signed request to the Go agent.
      */
     private function request(string $method, string $path, array $data = [], ?int $timeout = null): ?Response

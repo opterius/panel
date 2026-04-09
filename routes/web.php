@@ -325,6 +325,16 @@ Route::middleware([
         Route::get('/analytics',        [\App\Http\Controllers\User\AnalyticsController::class, 'index'])->name('analytics.index');
         Route::post('/analytics/query', [\App\Http\Controllers\User\AnalyticsController::class, 'query'])->name('analytics.query');
 
+        // cPanel import (customer self-service)
+        Route::get('/import',                      [\App\Http\Controllers\User\MigrationController::class, 'index'])->name('migrations.index');
+        Route::get('/import/upload',               [\App\Http\Controllers\User\MigrationController::class, 'create'])->name('migrations.create');
+        Route::post('/import',                     [\App\Http\Controllers\User\MigrationController::class, 'store'])->name('migrations.store');
+        Route::get('/import/{migration}/preview',  [\App\Http\Controllers\User\MigrationController::class, 'preview'])->name('migrations.preview');
+        Route::post('/import/{migration}/execute', [\App\Http\Controllers\User\MigrationController::class, 'execute'])->name('migrations.execute');
+        Route::get('/import/{migration}',          [\App\Http\Controllers\User\MigrationController::class, 'show'])->name('migrations.show');
+        Route::get('/import/{migration}/status',   [\App\Http\Controllers\User\MigrationController::class, 'status'])->name('migrations.status');
+        Route::delete('/import/{migration}',       [\App\Http\Controllers\User\MigrationController::class, 'destroy'])->name('migrations.destroy');
+
         // Email Forwarders
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
         Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');

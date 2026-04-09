@@ -199,6 +199,32 @@
                 </div>
             </div>
 
+            {{-- Performance --}}
+            <div class="mb-6">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">Performance</h3>
+                <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-1">
+                    <a href="{{ route('user.cdn.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-orange-50 transition">
+                        <svg class="w-9 h-9 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-orange-700">CDN</span>
+                    </a>
+                    <a href="{{ route('user.analytics.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-blue-50 transition">
+                        <svg class="w-9 h-9 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-blue-700">Analytics</span>
+                    </a>
+                </div>
+            </div>
+
+            {{-- Tools --}}
+            <div class="mb-6">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">Tools</h3>
+                <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-1">
+                    <a href="{{ route('user.migrations.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-emerald-50 transition">
+                        <svg class="w-9 h-9 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-emerald-700">cPanel Import</span>
+                    </a>
+                </div>
+            </div>
+
             {{-- Security --}}
             <div>
                 <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">Security</h3>
