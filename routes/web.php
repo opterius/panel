@@ -96,6 +96,10 @@ Route::middleware([
         Route::get('/system-settings/{category?}', [\App\Http\Controllers\SystemSettingsController::class, 'index'])
             ->where('category', '[a-z_-]+')
             ->name('system-settings.index');
+        // The maxmind-download action must come BEFORE the parameterised update route
+        // so it doesn't get caught as a {category}.
+        Route::post('/system-settings/maxmind-download', [\App\Http\Controllers\SystemSettingsController::class, 'downloadMaxMind'])
+            ->name('system-settings.maxmind-download');
         Route::post('/system-settings/{category}', [\App\Http\Controllers\SystemSettingsController::class, 'update'])
             ->where('category', '[a-z_-]+')
             ->name('system-settings.update');
@@ -316,6 +320,10 @@ Route::middleware([
         Route::post('/cdn/{domain}/disable',     [\App\Http\Controllers\User\CdnController::class, 'disable'])->name('cdn.disable');
         Route::post('/cdn/{domain}/purge',       [\App\Http\Controllers\User\CdnController::class, 'purge'])->name('cdn.purge');
         Route::post('/cdn/{domain}/paths',       [\App\Http\Controllers\User\CdnController::class, 'updatePaths'])->name('cdn.paths');
+
+        // Visitor analytics
+        Route::get('/analytics',        [\App\Http\Controllers\User\AnalyticsController::class, 'index'])->name('analytics.index');
+        Route::post('/analytics/query', [\App\Http\Controllers\User\AnalyticsController::class, 'query'])->name('analytics.query');
 
         // Email Forwarders
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');

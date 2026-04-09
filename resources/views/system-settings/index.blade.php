@@ -87,6 +87,7 @@
                     <form action="{{ route('admin.system-settings.update', ['category' => 'integrations']) }}" method="POST">
                         @csrf
 
+                        {{-- ── BunnyCDN ────────────────────────────────────── --}}
                         <div class="rounded-xl border border-gray-200 p-5 mb-5">
                             <div class="flex items-start justify-between mb-4">
                                 <div>
@@ -125,12 +126,66 @@
                             </div>
                         </div>
 
+                        {{-- ── MaxMind GeoLite2 ─────────────────────────────── --}}
+                        <div class="rounded-xl border border-gray-200 p-5 mb-5">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h4 class="font-bold text-gray-900">MaxMind GeoLite2</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Free IP-to-country database. Powers the country flags in the visitor analytics dashboard. Without this, country stats are blank.</p>
+                                </div>
+                                @if (! empty($settings['maxmind_license_key']))
+                                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-100 px-2.5 py-1 rounded-full">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Configured
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
+                                        Not configured
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Account ID</label>
+                                    <input type="text" name="maxmind_account_id" autocomplete="off"
+                                           value="{{ $settings['maxmind_account_id'] ?? '' }}"
+                                           placeholder="123456"
+                                           class="w-full max-w-sm rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">License Key</label>
+                                    <input type="password" name="maxmind_license_key" autocomplete="off"
+                                           value="{{ $settings['maxmind_license_key'] ?? '' }}"
+                                           placeholder="Paste your MaxMind license key"
+                                           class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Sign up free at <a href="https://www.maxmind.com/en/geolite2/signup" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">maxmind.com/en/geolite2/signup</a>, then generate a license key under Account → Manage License Keys.
+                                    </p>
+                                </div>
+                            </div>
+
+                            <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between gap-3">
+                                <p class="text-xs text-gray-500">After saving credentials, click Download to install the database on every server.</p>
+                                <button type="button"
+                                        onclick="document.getElementById('maxmind-download-form').submit();"
+                                        class="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-sm font-semibold rounded-lg hover:bg-emerald-700 transition">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                                    Download GeoLite2
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="pt-4 border-t border-gray-100">
                             <button type="submit"
                                     class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                                 {{ __('system-settings.save') }}
                             </button>
                         </div>
+                    </form>
+
+                    {{-- Separate form for the download trigger so it doesn't try to save the form fields too --}}
+                    <form id="maxmind-download-form" action="{{ route('admin.system-settings.maxmind-download') }}" method="POST" class="hidden">
+                        @csrf
                     </form>
                 @endif
 

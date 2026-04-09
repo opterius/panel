@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Server;
 use App\Models\Setting;
 use App\Services\ActivityLogger;
+use App\Services\AgentService;
 use Illuminate\Http\Request;
 
 class SystemSettingsController extends Controller
@@ -79,12 +81,16 @@ class SystemSettingsController extends Controller
 
             case 'integrations':
                 $validated = $request->validate([
-                    'bunnycdn_api_key' => 'nullable|string|max:200',
-                    'bunnycdn_prefix'  => 'nullable|string|max:32|regex:/^[a-z0-9-]*$/',
+                    'bunnycdn_api_key'    => 'nullable|string|max:200',
+                    'bunnycdn_prefix'     => 'nullable|string|max:32|regex:/^[a-z0-9-]*$/',
+                    'maxmind_account_id'  => 'nullable|string|max:32',
+                    'maxmind_license_key' => 'nullable|string|max:80',
                 ]);
                 // Empty string clears the key — useful for revoking the integration.
-                Setting::set('integrations_bunnycdn_api_key', $validated['bunnycdn_api_key'] ?? '', 'system_integrations');
-                Setting::set('integrations_bunnycdn_prefix',  $validated['bunnycdn_prefix']  ?? 'opterius', 'system_integrations');
+                Setting::set('integrations_bunnycdn_api_key',    $validated['bunnycdn_api_key']    ?? '', 'system_integrations');
+                Setting::set('integrations_bunnycdn_prefix',     $validated['bunnycdn_prefix']     ?? 'opterius', 'system_integrations');
+                Setting::set('integrations_maxmind_account_id',  $validated['maxmind_account_id']  ?? '', 'system_integrations');
+                Setting::set('integrations_maxmind_license_key', $validated['maxmind_license_key'] ?? '', 'system_integrations');
                 break;
 
             default:
@@ -98,5 +104,49 @@ class SystemSettingsController extends Controller
 
         return redirect()->route('admin.system-settings.index', ['category' => $category])
             ->with('success', __('system-settings.saved'));
+    }
+
+    /**
+     * POST /admin/system-settings/maxmind-download
+     * Trigger every server's agent to download the GeoLite2 file using the
+     * stored MaxMind license key. Used by the "Download" button in the
+     * Integrations panel after the admin saves their credentials.
+     */
+    public function downloadMaxMind()
+    {
+        $accountId  = (string) Setting::get('integrations_maxmind_account_id', '');
+        $licenseKey = (string) Setting::get('integrations_maxmind_license_key', '');
+
+        if ($accountId === '' || $licenseKey === '') {
+            return back()->with('error', 'Save your MaxMind Account ID and License Key first, then click Download.');
+        }
+
+        $servers   = Server::all();
+        $succeeded = 0;
+        $failed    = 0;
+        $errors    = [];
+
+        foreach ($servers as $server) {
+            $response = AgentService::for($server)->postLong('/analytics/geoip-update', [
+                'account_id'  => $accountId,
+                'license_key' => $licenseKey,
+            ]);
+
+            if ($response && $response->successful()) {
+                $succeeded++;
+            } else {
+                $failed++;
+                $errors[] = $server->name . ': ' . ($response?->json('error') ?? 'unreachable');
+            }
+        }
+
+        ActivityLogger::log('settings.maxmind_downloaded', null, null, 'maxmind',
+            "Downloaded GeoLite2 to {$succeeded} server(s)", ['succeeded' => $succeeded, 'failed' => $failed]);
+
+        if ($failed === 0) {
+            return back()->with('success', "GeoLite2 database downloaded to {$succeeded} server(s).");
+        }
+        return back()->with('error',
+            "Downloaded to {$succeeded} server(s), failed on {$failed}: " . implode('; ', $errors));
     }
 }
