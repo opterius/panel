@@ -64,7 +64,7 @@
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
                 <div>
                     <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Plan</span>
-                    <p class="mt-1 text-sm font-semibold text-gray-800">{{ ucfirst($status['plan'] ?? 'Unknown') }}</p>
+                    <p class="mt-1 text-sm font-semibold text-gray-800">{{ ucfirst($status['plan']['name'] ?? 'Unknown') }}</p>
                 </div>
                 <div>
                     <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Max Domains</span>
