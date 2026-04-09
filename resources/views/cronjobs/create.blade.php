@@ -23,50 +23,21 @@
             </div>
         </div>
     @else
+        {{--
+            Alpine state lives in a JS function (defined in the <script> block at
+            the bottom of this view) instead of inline x-data, because the inline
+            attribute parser cannot handle regex literals — backslashes get
+            double-decoded and break the whole expression.
+        --}}
         <form action="{{ route('user.cronjobs.store') }}" method="POST"
-              x-data="{
-                  preset: 'custom',
+              x-data="cronBuilder({
                   minute: '{{ old('minute', '*') }}',
                   hour: '{{ old('hour', '*') }}',
                   day: '{{ old('day', '*') }}',
                   month: '{{ old('month', '*') }}',
                   weekday: '{{ old('weekday', '*') }}',
                   command: '{{ old('command') }}',
-                  setPreset(p) {
-                      this.preset = p;
-                      switch(p) {
-                          case 'every_minute': this.minute='*'; this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
-                          case 'every_5min': this.minute='*/5'; this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
-                          case 'every_15min': this.minute='*/15'; this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
-                          case 'every_30min': this.minute='*/30'; this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
-                          case 'hourly': this.minute='0'; this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
-                          case 'daily': this.minute='0'; this.hour='0'; this.day='*'; this.month='*'; this.weekday='*'; break;
-                          case 'weekly': this.minute='0'; this.hour='0'; this.day='*'; this.month='*'; this.weekday='0'; break;
-                          case 'monthly': this.minute='0'; this.hour='0'; this.day='1'; this.month='*'; this.weekday='*'; break;
-                      }
-                  },
-                  // Plain-English description of the current schedule. Mirrors
-                  // CronSchedule::describe() in PHP — keeps both sides aligned.
-                  describe() {
-                      const m=this.minute, h=this.hour, d=this.day, mo=this.month, w=this.weekday;
-                      if (m==='*'&&h==='*'&&d==='*'&&mo==='*'&&w==='*') return 'Every minute';
-                      const everyMin = m.match(/^\\*\\/(\\d+)$/);
-                      if (everyMin && h==='*'&&d==='*'&&mo==='*'&&w==='*') return `Every ${everyMin[1]} minutes`;
-                      const everyHour = h.match(/^\\*\\/(\\d+)$/);
-                      if (/^\\d+$/.test(m) && everyHour && d==='*'&&mo==='*'&&w==='*') return `Every ${everyHour[1]} hours at minute ${m}`;
-                      if (/^\\d+$/.test(m) && /^\\d+$/.test(h) && d==='*'&&mo==='*'&&w==='*') {
-                          return `Every day at ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
-                      }
-                      if (/^\\d+$/.test(m) && /^\\d+$/.test(h) && d==='*'&&mo==='*'&&/^[0-6]$/.test(w)) {
-                          const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
-                          return `Every ${days[parseInt(w)]} at ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
-                      }
-                      if (/^\\d+$/.test(m) && /^\\d+$/.test(h) && /^\\d+$/.test(d) && mo==='*'&&w==='*') {
-                          return `On day ${d} of every month at ${h.padStart(2,'0')}:${m.padStart(2,'0')}`;
-                      }
-                      return `${m} ${h} ${d} ${mo} ${w}`;
-                  }
-              }">
+              })">
             @csrf
 
             <div class="max-w-2xl space-y-6">
@@ -222,4 +193,68 @@
             </div>
         </form>
     @endif
+
+    <script>
+        // Cron schedule visual builder. Defined here so the regex literals work
+        // — Alpine's inline x-data parser can't handle them.
+        function cronBuilder(initial) {
+            return {
+                preset: 'custom',
+                minute:  initial.minute  || '*',
+                hour:    initial.hour    || '*',
+                day:     initial.day     || '*',
+                month:   initial.month   || '*',
+                weekday: initial.weekday || '*',
+                command: initial.command || '',
+
+                setPreset(p) {
+                    this.preset = p;
+                    switch (p) {
+                        case 'every_minute': this.minute='*';    this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
+                        case 'every_5min':   this.minute='*/5';  this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
+                        case 'every_15min':  this.minute='*/15'; this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
+                        case 'every_30min':  this.minute='*/30'; this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
+                        case 'hourly':       this.minute='0';    this.hour='*'; this.day='*'; this.month='*'; this.weekday='*'; break;
+                        case 'daily':        this.minute='0';    this.hour='0'; this.day='*'; this.month='*'; this.weekday='*'; break;
+                        case 'weekly':       this.minute='0';    this.hour='0'; this.day='*'; this.month='*'; this.weekday='0'; break;
+                        case 'monthly':      this.minute='0';    this.hour='0'; this.day='1'; this.month='*'; this.weekday='*'; break;
+                    }
+                },
+
+                /**
+                 * Plain-English description of the current schedule. Mirrors
+                 * App\Support\CronSchedule::describe() — keeps both sides aligned.
+                 */
+                describe() {
+                    const m = this.minute, h = this.hour, d = this.day, mo = this.month, w = this.weekday;
+                    if (m==='*' && h==='*' && d==='*' && mo==='*' && w==='*') return 'Every minute';
+
+                    const everyMin = m.match(/^\*\/(\d+)$/);
+                    if (everyMin && h==='*' && d==='*' && mo==='*' && w==='*') {
+                        return 'Every ' + everyMin[1] + ' minutes';
+                    }
+
+                    const everyHour = h.match(/^\*\/(\d+)$/);
+                    if (/^\d+$/.test(m) && everyHour && d==='*' && mo==='*' && w==='*') {
+                        return 'Every ' + everyHour[1] + ' hours at minute ' + m;
+                    }
+
+                    if (/^\d+$/.test(m) && /^\d+$/.test(h) && d==='*' && mo==='*' && w==='*') {
+                        return 'Every day at ' + h.padStart(2,'0') + ':' + m.padStart(2,'0');
+                    }
+
+                    if (/^\d+$/.test(m) && /^\d+$/.test(h) && d==='*' && mo==='*' && /^[0-6]$/.test(w)) {
+                        const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+                        return 'Every ' + days[parseInt(w)] + ' at ' + h.padStart(2,'0') + ':' + m.padStart(2,'0');
+                    }
+
+                    if (/^\d+$/.test(m) && /^\d+$/.test(h) && /^\d+$/.test(d) && mo==='*' && w==='*') {
+                        return 'On day ' + d + ' of every month at ' + h.padStart(2,'0') + ':' + m.padStart(2,'0');
+                    }
+
+                    return m + ' ' + h + ' ' + d + ' ' + mo + ' ' + w;
+                },
+            };
+        }
+    </script>
 </x-user-layout>
