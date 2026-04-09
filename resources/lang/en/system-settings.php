@@ -14,6 +14,7 @@ return [
     'cat_ssl'           => 'SSL',
     'cat_php'           => 'PHP',
     'cat_notifications' => 'Notifications',
+    'cat_integrations'  => 'Integrations',
     'cat_system'        => 'System',
 
     // Common

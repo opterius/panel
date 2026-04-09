@@ -72,6 +72,11 @@ class Domain extends Model
         return $this->hasOne(HotlinkProtection::class);
     }
 
+    public function cdnZone(): HasOne
+    {
+        return $this->hasOne(CdnZone::class);
+    }
+
     /**
      * If this domain is a staging clone, returns the source production domain.
      */

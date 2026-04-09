@@ -23,6 +23,7 @@ class SystemSettingsController extends Controller
         'ssl'           => ['icon' => 'M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z', 'ready' => false],
         'php'           => ['icon' => 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4', 'ready' => false],
         'notifications' => ['icon' => 'M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9', 'ready' => false],
+        'integrations'  => ['icon' => 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1', 'ready' => true],
         'system'        => ['icon' => 'M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z M15 12a3 3 0 11-6 0 3 3 0 016 0z', 'ready' => false],
     ];
 
@@ -74,6 +75,16 @@ class SystemSettingsController extends Controller
                     'default_php_version' => 'required|in:' . implode(',', config('opterius.php_versions', ['8.1', '8.2', '8.3', '8.4'])),
                 ]);
                 Setting::set('default_php_version', $validated['default_php_version'], 'system_domains');
+                break;
+
+            case 'integrations':
+                $validated = $request->validate([
+                    'bunnycdn_api_key' => 'nullable|string|max:200',
+                    'bunnycdn_prefix'  => 'nullable|string|max:32|regex:/^[a-z0-9-]*$/',
+                ]);
+                // Empty string clears the key — useful for revoking the integration.
+                Setting::set('integrations_bunnycdn_api_key', $validated['bunnycdn_api_key'] ?? '', 'system_integrations');
+                Setting::set('integrations_bunnycdn_prefix',  $validated['bunnycdn_prefix']  ?? 'opterius', 'system_integrations');
                 break;
 
             default:

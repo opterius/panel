@@ -310,6 +310,13 @@ Route::middleware([
         Route::post('/staging/{domain}',   [\App\Http\Controllers\User\StagingController::class, 'store'])->name('staging.store');
         Route::delete('/staging/{domain}', [\App\Http\Controllers\User\StagingController::class, 'destroy'])->name('staging.destroy');
 
+        // CDN (BunnyCDN)
+        Route::get('/cdn',                       [\App\Http\Controllers\User\CdnController::class, 'index'])->name('cdn.index');
+        Route::post('/cdn/{domain}/enable',      [\App\Http\Controllers\User\CdnController::class, 'enable'])->name('cdn.enable');
+        Route::post('/cdn/{domain}/disable',     [\App\Http\Controllers\User\CdnController::class, 'disable'])->name('cdn.disable');
+        Route::post('/cdn/{domain}/purge',       [\App\Http\Controllers\User\CdnController::class, 'purge'])->name('cdn.purge');
+        Route::post('/cdn/{domain}/paths',       [\App\Http\Controllers\User\CdnController::class, 'updatePaths'])->name('cdn.paths');
+
         // Email Forwarders
         Route::get('/forwarders', [ForwarderController::class, 'index'])->name('forwarders.index');
         Route::post('/forwarders', [ForwarderController::class, 'store'])->name('forwarders.store');

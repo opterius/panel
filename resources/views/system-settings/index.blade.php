@@ -78,6 +78,60 @@
                             </button>
                         </div>
                     </form>
+
+                @elseif($category === 'integrations')
+                    {{-- ── Integrations category ─────────────────────────── --}}
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">Third-Party Integrations</h3>
+                    <p class="text-sm text-gray-500 mb-6">API credentials for external services that the panel uses on behalf of customers.</p>
+
+                    <form action="{{ route('admin.system-settings.update', ['category' => 'integrations']) }}" method="POST">
+                        @csrf
+
+                        <div class="rounded-xl border border-gray-200 p-5 mb-5">
+                            <div class="flex items-start justify-between mb-4">
+                                <div>
+                                    <h4 class="font-bold text-gray-900">BunnyCDN</h4>
+                                    <p class="text-xs text-gray-500 mt-0.5">Image and asset CDN. Customers can enable per-domain acceleration powered by your BunnyCDN account.</p>
+                                </div>
+                                @if (! empty($settings['bunnycdn_api_key']))
+                                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-green-700 bg-green-100 px-2.5 py-1 rounded-full">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Configured
+                                    </span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 text-xs font-semibold text-gray-600 bg-gray-100 px-2.5 py-1 rounded-full">
+                                        Not configured
+                                    </span>
+                                @endif
+                            </div>
+
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">API Key</label>
+                                    <input type="password" name="bunnycdn_api_key" autocomplete="off"
+                                           value="{{ $settings['bunnycdn_api_key'] ?? '' }}"
+                                           placeholder="Paste your BunnyCDN API key"
+                                           class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500">
+                                    <p class="text-xs text-gray-500 mt-1">
+                                        Get your key from <a href="https://dash.bunny.net/account/api-keys" target="_blank" rel="noopener noreferrer" class="text-indigo-600 hover:underline">dash.bunny.net/account/api-keys</a>. Leave empty to clear.
+                                    </p>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Zone Name Prefix</label>
+                                    <input type="text" name="bunnycdn_prefix" maxlength="32" pattern="[a-z0-9-]*"
+                                           value="{{ $settings['bunnycdn_prefix'] ?? 'opterius' }}"
+                                           class="w-full max-w-sm rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                    <p class="text-xs text-gray-500 mt-1">Used to namespace pull zone names so they don't collide with other BunnyCDN customers. Lowercase letters, digits, and hyphens only.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-gray-100">
+                            <button type="submit"
+                                    class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                                {{ __('system-settings.save') }}
+                            </button>
+                        </div>
+                    </form>
                 @endif
 
             </div>
