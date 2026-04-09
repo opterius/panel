@@ -341,6 +341,18 @@
             initChart() {
                 const ctx = document.getElementById('visitsChart');
                 if (! ctx) return;
+
+                // Defensive: if a chart is already attached to this canvas
+                // (Alpine sometimes re-runs init() during Livewire patches or
+                // hot reload), destroy it first. Without this we hit
+                // "Canvas is already in use" and the canvas is left in a
+                // corrupted state, cascading into the cryptic Chart.js
+                // "Cannot set properties of undefined (setting 'fullSize')".
+                const existing = Chart.getChart(ctx);
+                if (existing) {
+                    existing.destroy();
+                }
+
                 this.chart = new Chart(ctx, {
                     type: 'line',
                     data: { labels: [], datasets: [
@@ -371,7 +383,7 @@
                             y: { beginAtZero: true, ticks: { font: { size: 10 } } },
                         },
                         plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
-                        elements: { point: { radius: 0, hoverRadius: 5 }, line: { borderWidth: 2 } },
+                        elements: { point: { radius: 2.5, hoverRadius: 5 }, line: { borderWidth: 2 } },
                     },
                 });
             },
