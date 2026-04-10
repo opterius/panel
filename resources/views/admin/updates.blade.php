@@ -106,7 +106,16 @@
                 </div>
                 <div>
                     <dt class="text-xs font-medium text-gray-400 uppercase">Server OS</dt>
-                    <dd class="mt-1 text-sm font-mono text-gray-800">{{ php_uname('s') }} {{ php_uname('r') }}</dd>
+                    <dd class="mt-1 text-sm font-mono text-gray-800">
+                        @php
+                            $osRelease = @file_get_contents('/etc/os-release');
+                            $prettyName = 'Unknown';
+                            if ($osRelease && preg_match('/^PRETTY_NAME="?([^"\n]+)"?/m', $osRelease, $m)) {
+                                $prettyName = $m[1];
+                            }
+                        @endphp
+                        {{ $prettyName }}
+                    </dd>
                 </div>
             </dl>
         </div>
