@@ -188,18 +188,28 @@ class SslController extends Controller
             return back()->withErrors(['password' => __('common.password_incorrect')]);
         }
 
-        $certificate->load('domain.account');
+        $certificate->load('domain.account.server');
 
         if (!$certificate->domain->account->userCan(auth()->user(), 'ssl')) {
             return back()->with('error', __('ssl.no_permission'));
         }
 
+        // Tell the agent to delete the actual cert files from the server
+        // (certbot delete + cleanup + rewrite Nginx vhost to HTTP-only).
+        // Without this the panel only deleted its own DB record but the
+        // stale cert stayed on disk and Nginx kept serving it.
+        AgentService::for($certificate->domain->account->server)->post('/ssl/delete', [
+            'domain'   => $certificate->domain->domain,
+            'username' => $certificate->domain->account->username,
+        ]);
+
         ActivityLogger::log('ssl.deleted', 'ssl_certificate', $certificate->id, null,
-            "Deleted SSL certificate record", ['domain_id' => $certificate->domain_id]);
+            "Deleted SSL certificate for " . $certificate->domain->domain,
+            ['domain_id' => $certificate->domain_id]);
 
         $certificate->delete();
 
-        return redirect()->route('user.ssl.index')->with('success', __('ssl.ssl_record_removed'));
+        return redirect()->route('user.ssl.index')->with('success', __('ssl.ssl_deleted'));
     }
 
     /**
