@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\Package;
+use App\Models\Server;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 
 class SetupController extends Controller
 {
@@ -61,6 +63,32 @@ class SetupController extends Controller
                 'ssl_enabled'         => true,
                 'cron_jobs_enabled'   => true,
                 'is_default'          => true,
+            ]);
+        }
+
+        // Auto-register this server so the admin doesn't have to add it manually.
+        // The agent is already running on 127.0.0.1:7443 (installed by the installer).
+        if (Server::count() === 0) {
+            // Detect the server's public IP
+            $publicIp = null;
+            try {
+                $publicIp = trim(Http::timeout(5)->get('https://ifconfig.me')->body());
+            } catch (\Exception $e) {
+                try {
+                    $publicIp = trim(Http::timeout(5)->get('https://api.ipify.org')->body());
+                } catch (\Exception $e) {}
+            }
+
+            $agentToken = config('opterius.agent_secret') ?: env('OPTERIUS_AGENT_SECRET', '');
+
+            Server::create([
+                'user_id'     => $admin->id,
+                'name'        => 'Opterius Server',
+                'ip_address'  => $publicIp ?: '127.0.0.1',
+                'hostname'    => gethostname() ?: 'localhost',
+                'agent_url'   => 'https://127.0.0.1:7443',
+                'agent_token' => $agentToken,
+                'status'      => 'online',
             ]);
         }
 
