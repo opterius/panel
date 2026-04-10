@@ -118,6 +118,50 @@
                         </div>
                     </div>
                 </template>
+
+                {{-- Email account credentials — only shown for mailboxes that
+                     got a NEW password (because the cPanel hash was missing).
+                     For preserved-hash mailboxes, the user keeps their existing
+                     password so there's nothing to display. --}}
+                <template x-if="result?.email?.details?.length">
+                    <div class="bg-blue-50 border border-blue-200 rounded-2xl overflow-hidden">
+                        <div class="px-5 py-4 border-b border-blue-200">
+                            <h3 class="font-bold text-blue-900 flex items-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                                Email Accounts
+                            </h3>
+                            <p class="text-xs text-blue-800 mt-1">
+                                Mailboxes marked <strong>preserved</strong> kept their original cPanel passwords — no action needed.
+                                Mailboxes with new passwords are shown below; update your mail client with the new credentials.
+                            </p>
+                        </div>
+                        <div class="divide-y divide-blue-200">
+                            <template x-for="em in result.email.details" :key="em.email">
+                                <div class="px-5 py-3">
+                                    <div class="flex items-center justify-between gap-3 flex-wrap">
+                                        <div class="flex-1 min-w-0">
+                                            <div class="font-semibold text-blue-900 truncate" x-text="em.email"></div>
+                                        </div>
+                                        <template x-if="em.preserved">
+                                            <span class="text-[10px] uppercase font-bold text-green-700 bg-green-100 px-2 py-0.5 rounded">Preserved</span>
+                                        </template>
+                                        <template x-if="em.new_password">
+                                            <span class="text-[10px] uppercase font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">New password</span>
+                                        </template>
+                                    </div>
+                                    <template x-if="em.new_password">
+                                        <div class="mt-2 flex items-center gap-1">
+                                            <code class="font-mono text-slate-800 bg-white border border-blue-200 px-2 py-1 rounded flex-1 text-xs select-all" x-text="em.new_password"></code>
+                                            <button type="button"
+                                                    @click="navigator.clipboard.writeText(em.new_password)"
+                                                    class="text-xs font-semibold text-blue-700 hover:text-blue-900 px-2">Copy</button>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </template>
             </div>
         </template>
 

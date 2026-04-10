@@ -223,12 +223,28 @@ class MigrationService
             return ['status' => 'failed', 'error' => 'No main domain found'];
         }
 
-        $accountList = [];
+        // Build the request. For each mailbox:
+        //   - If the cPanel backup contained the original password hash, we
+        //     pass it to the agent which re-uses it verbatim. The user's
+        //     existing email password will keep working with no reset.
+        //   - If the hash is missing (old backup, corrupted shadow file),
+        //     we generate a fresh random password and the user is shown
+        //     the credentials on the import result page.
+        $accountList  = [];
+        $generated    = []; // email => plaintext password (only for mailboxes without a hash)
         foreach ($emails as $email) {
+            $hasHash = ! empty($email['password_hash']);
+            $password = $hasHash ? null : bin2hex(random_bytes(12));
+
             $accountList[] = [
-                'email'    => $email['email'],
-                'password' => bin2hex(random_bytes(12)),
+                'email'         => $email['email'],
+                'password'      => $password ?? '',
+                'password_hash' => $email['password_hash'] ?? '',
             ];
+
+            if (! $hasHash) {
+                $generated[$email['email']] = $password;
+            }
         }
 
         $response = AgentService::for($server)->postLong('/migration/restore-email', [
@@ -241,20 +257,28 @@ class MigrationService
         if ($response && $response->successful()) {
             $imported = $response->json('accounts', []);
             $count = 0;
+            $details = [];
             foreach ($imported as $em) {
                 if (($em['status'] ?? '') === 'success') {
-                    $parts = explode('@', $em['email']);
                     EmailAccount::create([
-                        'domain_id' => $mainDomain->id,
-                        'email'     => $em['email'],
-                        'username'  => $parts[0],
-                        'quota'     => 1024,
-                        'status'    => 'active',
+                        'domain_id'          => $mainDomain->id,
+                        'email'              => $em['email'],
+                        'quota'              => 1024,
+                        'encrypted_password' => $generated[$em['email']] ?? null,
+                        'password_preserved' => ! isset($generated[$em['email']]),
+                        'status'             => 'active',
                     ]);
                     $count++;
+
+                    // Surface on the import result page.
+                    $em['preserved']  = ! isset($generated[$em['email']]);
+                    if (isset($generated[$em['email']])) {
+                        $em['new_password'] = $generated[$em['email']];
+                    }
                 }
+                $details[] = $em;
             }
-            return ['status' => 'success', 'count' => $count];
+            return ['status' => 'success', 'count' => $count, 'details' => $details];
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Agent unreachable';
