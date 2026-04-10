@@ -67,11 +67,17 @@
         </div>
     </div>
 
-    @if($updateAvailable && $changelog)
+    @if($changelog)
         <!-- Changelog -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
-                <h3 class="text-base font-semibold text-gray-800">What's New in v{{ $latestVersion }}</h3>
+                <h3 class="text-base font-semibold text-gray-800">
+                    @if($updateAvailable)
+                        What's New in v{{ $latestVersion }}
+                    @else
+                        Current Release Notes (v{{ $latestVersion ?? $currentVersion }})
+                    @endif
+                </h3>
             </div>
             <div class="px-6 py-5 prose prose-sm max-w-none text-gray-600">
                 {!! nl2br(e($changelog)) !!}
