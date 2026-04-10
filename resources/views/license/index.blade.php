@@ -111,9 +111,39 @@
     <div class="bg-white rounded-xl shadow-sm overflow-hidden">
         <div class="px-6 py-5 border-b border-gray-100">
             <h3 class="text-base font-semibold text-gray-800">License Key</h3>
-            <p class="text-sm text-gray-500 mt-1">Enter your Opterius license key. Get one at <a href="https://opterius.com" target="_blank" class="text-indigo-600 hover:text-indigo-800">opterius.com</a>.</p>
         </div>
-        <form action="{{ route('admin.license.update') }}" method="POST" class="px-6 py-5">
+
+        @if(empty(config('opterius.license_key')))
+            {{-- No license — show helper text with registration links --}}
+            <div class="px-6 py-6">
+                <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
+                    <h4 class="font-bold text-blue-900 mb-2">How to get your free license key</h4>
+                    <ol class="list-decimal list-inside space-y-2 text-sm text-blue-800">
+                        <li>Create a free account on <a href="https://opterius.com/register" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 hover:text-blue-800 underline">opterius.com/register</a></li>
+                        <li>Verify your email address</li>
+                        <li>Go to <strong>My Licenses</strong> in your dashboard</li>
+                        <li>Click <strong>Add License</strong> — a free key will be generated</li>
+                        <li>Copy the key and paste it below</li>
+                    </ol>
+                    <div class="mt-4 flex flex-wrap items-center gap-4">
+                        <a href="https://opterius.com/register" target="_blank" rel="noopener noreferrer"
+                           class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
+                            Create Free Account
+                        </a>
+                        <a href="https://opterius.com/login" target="_blank" rel="noopener noreferrer"
+                           class="text-sm font-semibold text-blue-700 hover:text-blue-900 transition">
+                            Already registered? Log in →
+                        </a>
+                    </div>
+                    <p class="mt-4 text-xs text-blue-700">
+                        The free plan includes <strong>5 hosting accounts</strong> with all features enabled. No credit card required.
+                    </p>
+                </div>
+            </div>
+        @endif
+
+        <form action="{{ route('admin.license.update') }}" method="POST" class="px-6 py-5 {{ empty(config('opterius.license_key')) ? 'pt-0' : '' }}">
             @csrf
             @method('PUT')
             <div class="flex items-end gap-4">
