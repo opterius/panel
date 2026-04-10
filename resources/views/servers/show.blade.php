@@ -69,7 +69,9 @@
             </dl>
         </div>
 
-        <!-- Agent Install -->
+        {{-- Only show "Install Agent" for remote servers — the local server
+             already has the agent installed by the installer. --}}
+        @if(! str_contains($server->agent_url ?? '', '127.0.0.1'))
         <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-base font-semibold text-gray-800 mb-3">{{ __('servers.install_agent') }}</h3>
             <p class="text-sm text-gray-500 mb-4">{{ __('servers.install_agent_description') }}</p>
@@ -80,6 +82,7 @@
 
             <p class="text-xs text-gray-400 mt-3">{{ __('servers.install_agent_note') }}</p>
         </div>
+        @endif
     </div>
 
     <!-- System tools -->
