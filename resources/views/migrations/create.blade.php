@@ -12,6 +12,19 @@
         <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">{{ session('error') }}</div>
     @endif
 
+    @if($servers->isEmpty())
+        <div class="max-w-2xl">
+            <div class="bg-white rounded-xl shadow-sm p-8 text-center">
+                <svg class="mx-auto w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 12h14M5 12a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v4a2 2 0 01-2 2M5 12a2 2 0 00-2 2v4a2 2 0 002 2h14a2 2 0 002-2v-4a2 2 0 00-2-2"/></svg>
+                <h3 class="text-base font-semibold text-gray-800 mb-2">No servers available</h3>
+                <p class="text-sm text-gray-500 mb-4">You need to add a server before importing a cPanel backup. Create a hosting account first — the server will be registered automatically.</p>
+                <a href="{{ route('admin.accounts.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                    Create Account
+                </a>
+            </div>
+        </div>
+    @else
+
     <form action="{{ route('admin.migrations.parse') }}" method="POST"
           x-data="{ loading: false }" @submit="loading = true">
         @csrf
@@ -95,4 +108,5 @@
             </div>
         </div>
     </form>
+    @endif
 </x-admin-layout>
