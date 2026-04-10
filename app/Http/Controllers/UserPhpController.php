@@ -13,8 +13,8 @@ class UserPhpController extends Controller
     {
         $domains = Domain::with('account.server', 'account.package')
             ->whereIn('account_id', auth()->user()->currentAccountIds())
-            ->whereNull('parent_id')
             ->where('status', 'active')
+            ->orderByRaw('parent_id IS NOT NULL, domain')
             ->get();
 
         // Get installed PHP versions from the first domain's server
