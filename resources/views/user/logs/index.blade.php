@@ -49,7 +49,7 @@
                 <div class="mt-3 flex items-center gap-4 text-xs text-slate-500">
                     <label class="inline-flex items-center gap-1.5 cursor-pointer">
                         <input type="checkbox" x-model="autoscroll" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
-                        Auto-scroll to bottom
+                        Auto-scroll to top
                     </label>
                     <label class="inline-flex items-center gap-1.5 cursor-pointer">
                         <input type="checkbox" x-model="wrapLines" class="rounded border-slate-300 text-orange-500 focus:ring-orange-500">
@@ -180,17 +180,19 @@
 
                         this.error = null;
                         if (data.data) {
-                            this.content += data.data;
+                            // Prepend new lines at the top so the latest
+                            // entries are always visible without scrolling.
+                            this.content = data.data + this.content;
                             this.byteCount += data.data.length;
 
                             // Cap in-memory buffer at ~256 KB so very long sessions don't crash the browser.
                             if (this.content.length > 262144) {
-                                this.content = this.content.slice(-262144);
+                                this.content = this.content.slice(0, 262144);
                             }
 
                             this.$nextTick(() => {
                                 if (this.autoscroll && this.$refs.output) {
-                                    this.$refs.output.scrollTop = this.$refs.output.scrollHeight;
+                                    this.$refs.output.scrollTop = 0;
                                 }
                             });
                         }
