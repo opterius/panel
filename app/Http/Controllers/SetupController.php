@@ -86,7 +86,7 @@ class SetupController extends Controller
                 'name'        => 'Opterius Server',
                 'ip_address'  => $publicIp ?: '127.0.0.1',
                 'hostname'    => gethostname() ?: 'localhost',
-                'agent_url'   => 'https://127.0.0.1:7443',
+                'agent_url'   => 'http://127.0.0.1:7443',
                 'agent_token' => $agentToken,
                 'status'      => 'online',
             ]);
