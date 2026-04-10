@@ -97,6 +97,10 @@
                     <dd class="mt-1 text-sm font-mono text-gray-800">{{ $currentVersion }}</dd>
                 </div>
                 <div>
+                    <dt class="text-xs font-medium text-gray-400 uppercase">Agent Version</dt>
+                    <dd class="mt-1 text-sm font-mono text-gray-800">{{ $agentVersion ?? '—' }}</dd>
+                </div>
+                <div>
                     <dt class="text-xs font-medium text-gray-400 uppercase">Laravel</dt>
                     <dd class="mt-1 text-sm font-mono text-gray-800">{{ app()->version() }}</dd>
                 </div>

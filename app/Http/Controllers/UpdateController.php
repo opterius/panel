@@ -29,7 +29,19 @@ class UpdateController extends Controller
 
         $updateAvailable = $latestVersion && version_compare($latestVersion, $currentVersion, '>');
 
-        return view('admin.updates', compact('currentVersion', 'latestVersion', 'changelog', 'updateAvailable'));
+        // Get agent version from the first server
+        $agentVersion = null;
+        $server = Server::first();
+        if ($server) {
+            try {
+                $agentResponse = AgentService::for($server)->get('/version');
+                if ($agentResponse && $agentResponse->successful()) {
+                    $agentVersion = $agentResponse->json('agent_version');
+                }
+            } catch (\Exception $e) {}
+        }
+
+        return view('admin.updates', compact('currentVersion', 'latestVersion', 'changelog', 'updateAvailable', 'agentVersion'));
     }
 
     public function run(Request $request)
