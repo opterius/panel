@@ -18,7 +18,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('email_accounts', function (Blueprint $table) {
-            $table->text('encrypted_password')->nullable()->after('username');
+            $table->text('encrypted_password')->nullable()->after('email');
             $table->boolean('password_preserved')->default(false)->after('encrypted_password');
         });
     }
