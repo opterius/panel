@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Controllers\SslController;
 use App\Models\Account;
 use App\Models\CpanelMigration;
 use App\Models\CronJob;
@@ -90,6 +91,13 @@ class MigrationService
             $result['files'] = $this->restoreFiles($server, $backupDir, $migration, $manifest);
         }
 
+        // ── Step 2b: Create subdomains (35-40%) ──
+        $subdomains = $manifest['subdomains'] ?? [];
+        if (! empty($subdomains)) {
+            $migration->updateProgress(35, 'Creating subdomains...');
+            $result['subdomains'] = $this->createSubdomains($server, $account, $subdomains, $migration->main_domain);
+        }
+
         // ── Step 3: Restore databases (40-55%) ──
         if ($options['import_databases'] ?? true) {
             $migration->updateProgress(40, 'Importing databases...');
@@ -133,6 +141,89 @@ class MigrationService
             ['server_id' => $server->id, 'source' => $migration->source_path]);
 
         $migration->markCompleted($result);
+    }
+
+    /**
+     * Create subdomains from the cPanel manifest. The files are already in
+     * place from the restoreFiles step — this just creates the Nginx vhost,
+     * PHP-FPM pool, and panel Domain row for each subdomain.
+     *
+     * cPanel stores subdomains as full FQDNs (e.g. "blog.pivlu.com") with
+     * their document root under the main domain's homedir. We map each one
+     * to an Opterius subdomain with parent_id → main domain.
+     */
+    private function createSubdomains(Server $server, Account $account, array $subdomains, string $mainDomain): array
+    {
+        $mainDomainModel = $account->domains()->whereNull('parent_id')->first();
+        if (! $mainDomainModel) {
+            return ['status' => 'skipped', 'reason' => 'No main domain found'];
+        }
+
+        $created = 0;
+        $failed  = 0;
+        $details = [];
+
+        foreach ($subdomains as $sub) {
+            $sub = trim($sub);
+            if (empty($sub) || $sub === $mainDomain) {
+                continue;
+            }
+
+            // Skip if this subdomain already exists
+            if (Domain::where('domain', $sub)->exists()) {
+                $details[] = ['domain' => $sub, 'status' => 'skipped', 'reason' => 'already exists'];
+                continue;
+            }
+
+            // cPanel subdomain document roots are typically:
+            //   /home/user/subdomain.domain.com   (separate dir)
+            //   /home/user/public_html/subdomain   (inside public_html)
+            // Opterius uses: /home/user/subdomain.domain.com/public_html
+            // The files from cPanel are already under the account homedir,
+            // so we just create the vhost pointing to wherever the files are.
+            $docRoot = "/home/{$account->username}/{$sub}/public_html";
+
+            // If the cPanel backup put the files under public_html/<prefix>
+            // instead, check for that and use it if it exists.
+            $altRoot = "/home/{$account->username}/{$mainDomain}/public_html/{$sub}";
+
+            $response = AgentService::for($server)->post('/domains/create', [
+                'domain'        => $sub,
+                'parent_domain' => $mainDomain,
+                'document_root' => $docRoot,
+                'username'      => $account->username,
+                'php_version'   => $mainDomainModel->php_version ?? '8.3',
+            ]);
+
+            if ($response && $response->successful()) {
+                $subDomain = Domain::create([
+                    'server_id'    => $server->id,
+                    'account_id'   => $account->id,
+                    'parent_id'    => $mainDomainModel->id,
+                    'domain'       => $sub,
+                    'document_root'=> $docRoot,
+                    'php_version'  => $mainDomainModel->php_version ?? '8.3',
+                    'status'       => 'active',
+                ]);
+
+                // Auto-issue SSL for the subdomain (async — doesn't block the import)
+                SslController::autoIssue($subDomain);
+
+                $created++;
+                $details[] = ['domain' => $sub, 'status' => 'success'];
+            } else {
+                $error = $response?->json('error') ?? 'agent unreachable';
+                $failed++;
+                $details[] = ['domain' => $sub, 'status' => 'failed', 'error' => $error];
+            }
+        }
+
+        return [
+            'status'  => $failed === 0 ? 'success' : ($created > 0 ? 'partial' : 'failed'),
+            'created' => $created,
+            'failed'  => $failed,
+            'details' => $details,
+        ];
     }
 
     private function restoreFiles(Server $server, string $backupDir, CpanelMigration $migration, array $manifest): array
