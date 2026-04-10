@@ -32,6 +32,34 @@
         </x-dropdown>
         @endif
 
+        {{-- License status badge — visible to admins --}}
+        @if(Auth::user()->isAdmin())
+            @php
+                $licenseKey = config('opterius.license_key') ?: env('OPTERIUS_LICENSE_KEY', '');
+                $licenseStatus = cache('license_status');
+                $isValid = ! empty($licenseKey) && ($licenseStatus['valid'] ?? false);
+                $planName = is_array($licenseStatus['plan'] ?? null)
+                    ? ($licenseStatus['plan']['name'] ?? 'Free')
+                    : ($licenseStatus['plan'] ?? 'Free');
+            @endphp
+            <a href="{{ route('admin.license.index') }}"
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg transition
+                      {{ $isValid
+                          ? 'text-green-700 bg-green-50 hover:bg-green-100 border border-green-200'
+                          : 'text-amber-700 bg-amber-50 hover:bg-amber-100 border border-amber-200' }}">
+                @if($isValid)
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                    {{ ucfirst($planName) }}
+                @elseif(empty($licenseKey))
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+                    No License
+                @else
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Invalid License
+                @endif
+            </a>
+        @endif
+
         @if(session('admin_id'))
             <form method="POST" action="{{ route('user.return-to-admin') }}">
                 @csrf

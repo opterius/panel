@@ -18,6 +18,32 @@
         </div>
     @endif
 
+    {{-- License warning — shown when no license key is configured --}}
+    @php
+        $licenseKey = config('opterius.license_key') ?: env('OPTERIUS_LICENSE_KEY', '');
+    @endphp
+    @if(empty($licenseKey))
+        <div class="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-5 flex items-start gap-4">
+            <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
+            </div>
+            <div class="flex-1">
+                <h3 class="font-bold text-amber-900">License required</h3>
+                <p class="text-sm text-amber-800 mt-1">
+                    You need to activate a license before creating hosting accounts. Get a free license key (5 accounts included) from opterius.com.
+                </p>
+                <div class="mt-3 flex flex-wrap items-center gap-3">
+                    <a href="{{ route('admin.license.index') }}" class="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold px-4 py-2 rounded-lg transition">
+                        Activate License
+                    </a>
+                    <a href="https://opterius.com/register" target="_blank" rel="noopener noreferrer" class="text-sm font-semibold text-amber-700 hover:text-amber-900 transition">
+                        Get a free license →
+                    </a>
+                </div>
+            </div>
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm">
         <!-- Header -->
         <div class="flex justify-between items-center px-6 py-5 border-b border-gray-100">
