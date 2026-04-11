@@ -156,7 +156,7 @@ class EmailController extends Controller
         $emailAccount->load('domain.account');
 
         if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
-            abort(403);
+            abort(404);
         }
 
         $url = WebmailSsoService::loginUrl($emailAccount->email);
