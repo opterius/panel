@@ -36,6 +36,13 @@ class AccountController extends Controller
 
     public function create()
     {
+        // Block account creation if no license key is configured
+        $licenseKey = config('opterius.license_key') ?: env('OPTERIUS_LICENSE_KEY', '');
+        if (empty($licenseKey)) {
+            return redirect()->route('admin.license.index')
+                ->with('error', 'Please activate a license key before creating hosting accounts.');
+        }
+
         $servers = Server::all();
         $packages = Package::orderByDesc('is_default')->orderBy('name')->get();
         $defaultPackage = $packages->firstWhere('is_default', true);
