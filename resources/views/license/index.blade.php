@@ -75,13 +75,14 @@
             </div>
 
             <!-- Details grid -->
+            @if($status['valid'] ?? false)
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-6 border-t border-gray-100">
                 <div>
                     <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Plan</span>
                     <p class="mt-1 text-sm font-semibold text-gray-800">{{ ucfirst($planLabel) }}</p>
                 </div>
                 <div>
-                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Max Domains</span>
+                    <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Max Accounts</span>
                     <p class="mt-1 text-sm font-semibold text-gray-800">
                         {{ ($status['max_domains'] ?? 1) === 0 ? 'Unlimited' : ($status['max_domains'] ?? 1) }}
                     </p>
@@ -92,18 +93,16 @@
                         @if(!empty($status['expires_at']))
                             {{ \Carbon\Carbon::parse($status['expires_at'])->format('M d, Y') }}
                         @else
-                            —
+                            Never
                         @endif
                     </p>
                 </div>
                 <div>
                     <span class="text-xs font-medium text-gray-400 uppercase tracking-wide">Status</span>
-                    <p class="mt-1 text-sm font-semibold
-                        @if($status['valid'] ?? false) text-green-600 @else text-red-600 @endif">
-                        {{ ($status['valid'] ?? false) ? 'Valid' : 'Invalid' }}
-                    </p>
+                    <p class="mt-1 text-sm font-semibold text-green-600">Valid</p>
                 </div>
             </div>
+            @endif
         </div>
     </div>
 
