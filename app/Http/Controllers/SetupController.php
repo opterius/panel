@@ -69,13 +69,20 @@ class SetupController extends Controller
         // Auto-register this server so the admin doesn't have to add it manually.
         // The agent is already running on 127.0.0.1:7443 (installed by the installer).
         if (Server::count() === 0) {
-            // Detect the server's public IP
+            // Detect the server's public IP.
+            // Use ipify.org first (always returns plain text).
+            // Fall back to ifconfig.me with a plain-text Accept header.
             $publicIp = null;
+            $ipValidate = fn($v) => filter_var(trim($v), FILTER_VALIDATE_IP) ? trim($v) : null;
             try {
-                $publicIp = trim(Http::timeout(5)->get('https://ifconfig.me')->body());
-            } catch (\Exception $e) {
+                $publicIp = $ipValidate(Http::timeout(5)->get('https://api.ipify.org')->body());
+            } catch (\Exception $e) {}
+            if (!$publicIp) {
                 try {
-                    $publicIp = trim(Http::timeout(5)->get('https://api.ipify.org')->body());
+                    $publicIp = $ipValidate(Http::timeout(5)
+                        ->withHeaders(['Accept' => 'text/plain'])
+                        ->get('https://ifconfig.me/ip')
+                        ->body());
                 } catch (\Exception $e) {}
             }
 
