@@ -15,7 +15,8 @@
         </div>
     @endif
 
-    <!-- Webmail Button -->
+    <!-- Webmail Button (generic fallback when SSO is not configured) -->
+    @if(!config('opterius.webmail_sso_secret'))
     <div class="mb-6 flex justify-end">
         <a href="{{ str_replace('SERVER_IP', request()->getHost(), config('opterius.webmail_url')) }}"
            target="_blank"
@@ -24,6 +25,7 @@
             {{ __('emails.open_webmail') }}
         </a>
     </div>
+    @endif
 
     <!-- Create Email Account -->
     @if($domains->isNotEmpty())
@@ -226,6 +228,14 @@
                             </div>
                         </div>
                         <div class="flex items-center space-x-3">
+                            @if($account->status === 'active')
+                                <a href="{{ route('user.emails.webmail', $account) }}"
+                                   @click.stop
+                                   class="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition">
+                                    <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                    {{ __('emails.open_webmail') }}
+                                </a>
+                            @endif
                             <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
                                 @if($account->status === 'active') bg-green-100 text-green-700 @else bg-red-100 text-red-700 @endif">
                                 {{ ucfirst($account->status) }}

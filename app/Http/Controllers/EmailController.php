@@ -6,6 +6,7 @@ use App\Models\Domain;
 use App\Models\EmailAccount;
 use App\Services\ActivityLogger;
 use App\Services\AgentService;
+use App\Services\WebmailSsoService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -148,6 +149,24 @@ class EmailController extends Controller
             ]);
 
         return redirect()->route('user.emails.index')->with('success', __('emails.restrictions_updated', ['email' => $emailAccount->email]));
+    }
+
+    public function openWebmail(EmailAccount $emailAccount)
+    {
+        $emailAccount->load('domain.account');
+
+        if (!$emailAccount->domain->account->userCan(auth()->user(), 'email')) {
+            abort(403);
+        }
+
+        $url = WebmailSsoService::loginUrl($emailAccount->email);
+
+        if (!$url) {
+            // SSO not configured or failed — fall back to plain webmail URL
+            $url = str_replace('SERVER_IP', request()->getHost(), config('opterius.webmail_url'));
+        }
+
+        return redirect($url);
     }
 
     public function destroy(Request $request, EmailAccount $emailAccount)

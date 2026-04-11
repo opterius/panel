@@ -390,6 +390,7 @@ Route::middleware([
         // Email Accounts
         Route::get('/emails', [EmailController::class, 'index'])->name('emails.index');
         Route::post('/emails', [EmailController::class, 'store'])->name('emails.store');
+        Route::get('/emails/{emailAccount}/webmail', [EmailController::class, 'openWebmail'])->name('emails.webmail');
         Route::post('/emails/{emailAccount}/password', [EmailController::class, 'changePassword'])->name('emails.password');
         Route::post('/emails/{emailAccount}/quota', [EmailController::class, 'updateQuota'])->name('emails.quota');
         Route::post('/emails/{emailAccount}/restrictions', [EmailController::class, 'updateRestrictions'])->name('emails.restrictions');

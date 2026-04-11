@@ -51,7 +51,12 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'webmail_url' => env('OPTERIUS_WEBMAIL_URL', 'http://SERVER_IP:8080'),
+    'webmail_url'         => env('OPTERIUS_WEBMAIL_URL', 'http://SERVER_IP:8090'),
+
+    // Shared secret for one-click SSO into the Opterius Mail webmail.
+    // Must match PANEL_SSO_SECRET in the webmail's .env.
+    // Leave empty to disable SSO (webmail link will open the login page instead).
+    'webmail_sso_secret'  => env('OPTERIUS_WEBMAIL_SSO_SECRET'),
 
     /*
     |--------------------------------------------------------------------------
