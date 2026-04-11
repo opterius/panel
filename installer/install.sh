@@ -511,7 +511,13 @@ chmod -R 755 ${PMA_DIR}
 chmod 770 ${PMA_DIR}/tmp
 
 # Configure Nginx for phpMyAdmin (port 8081)
-cat > /etc/nginx/sites-available/phpmyadmin.conf <<EONGINX_PMA
+if [[ "$PKG_MANAGER" == "apt" ]]; then
+    PMA_VHOST="/etc/nginx/sites-available/phpmyadmin.conf"
+else
+    PMA_VHOST="/etc/nginx/conf.d/phpmyadmin.conf"
+fi
+
+cat > ${PMA_VHOST} <<EONGINX_PMA
 server {
     listen 8081;
     listen [::]:8081;
@@ -536,10 +542,8 @@ server {
 }
 EONGINX_PMA
 
-if [[ -d /etc/nginx/sites-enabled ]]; then
+if [[ "$PKG_MANAGER" == "apt" ]]; then
     ln -sf /etc/nginx/sites-available/phpmyadmin.conf /etc/nginx/sites-enabled/
-else
-    cp /etc/nginx/sites-available/phpmyadmin.conf /etc/nginx/conf.d/phpmyadmin.conf
 fi
 
 nginx -t && systemctl reload nginx
@@ -660,7 +664,13 @@ else
 fi
 
 # Configure Nginx for Opterius Mail (webmail on port 8090)
-cat > /etc/nginx/sites-available/opterius-mail.conf <<EONGINX_MAIL
+if [[ "$PKG_MANAGER" == "apt" ]]; then
+    MAIL_VHOST="/etc/nginx/sites-available/opterius-mail.conf"
+else
+    MAIL_VHOST="/etc/nginx/conf.d/opterius-mail.conf"
+fi
+
+cat > ${MAIL_VHOST} <<EONGINX_MAIL
 server {
     listen 8090;
     listen [::]:8090;
@@ -687,10 +697,8 @@ EONGINX_MAIL
 
 # Enable site (remove old roundcube config if present)
 rm -f /etc/nginx/sites-enabled/roundcube.conf /etc/nginx/conf.d/roundcube.conf
-if [[ -d /etc/nginx/sites-enabled ]]; then
+if [[ "$PKG_MANAGER" == "apt" ]]; then
     ln -sf /etc/nginx/sites-available/opterius-mail.conf /etc/nginx/sites-enabled/
-else
-    cp /etc/nginx/sites-available/opterius-mail.conf /etc/nginx/conf.d/opterius-mail.conf
 fi
 
 nginx -t && systemctl reload nginx
@@ -865,7 +873,15 @@ else
     PANEL_SCHEME="http"
 fi
 
-cat > /etc/nginx/sites-available/opterius-panel.conf <<EONGINX
+# On Debian/Ubuntu use sites-available + symlink; on RHEL/Rocky write directly to conf.d
+if [[ "$PKG_MANAGER" == "apt" ]]; then
+    NGINX_VHOST="/etc/nginx/sites-available/opterius-panel.conf"
+    mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
+else
+    NGINX_VHOST="/etc/nginx/conf.d/opterius-panel.conf"
+fi
+
+cat > ${NGINX_VHOST} <<EONGINX
 server {
     ${PANEL_SSL_BLOCK}
     server_name ${PANEL_HOSTNAME} _;
@@ -889,12 +905,9 @@ server {
 }
 EONGINX
 
-# Enable site
-if [[ -d /etc/nginx/sites-enabled ]]; then
+# Enable site (Debian/Ubuntu only — symlink into sites-enabled)
+if [[ "$PKG_MANAGER" == "apt" ]]; then
     ln -sf /etc/nginx/sites-available/opterius-panel.conf /etc/nginx/sites-enabled/
-else
-    # RHEL/Alma: include from conf.d
-    cp /etc/nginx/sites-available/opterius-panel.conf /etc/nginx/conf.d/opterius-panel.conf
 fi
 
 nginx -t && systemctl reload nginx
