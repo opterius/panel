@@ -1,18 +1,25 @@
 <x-admin-layout>
     <x-slot name="header">
-        <div class="flex items-center space-x-3">
-            <a href="{{ route('admin.servers.index') }}" class="text-gray-400 hover:text-gray-600 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+        <div class="flex items-center justify-between w-full">
+            <div class="flex items-center space-x-3">
+                <a href="{{ route('admin.servers.index') }}" class="text-gray-400 hover:text-gray-600 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                </a>
+                <h2 class="text-lg font-semibold text-gray-800">{{ $server->name }}</h2>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
+                    @if($server->status === 'online') bg-green-100 text-green-700
+                    @elseif($server->status === 'offline') bg-red-100 text-red-700
+                    @elseif($server->status === 'error') bg-red-100 text-red-700
+                    @else bg-gray-100 text-gray-600
+                    @endif">
+                    {{ ucfirst($server->status) }}
+                </span>
+            </div>
+            <a href="{{ route('admin.servers.edit', $server) }}"
+               class="inline-flex items-center gap-1.5 px-3.5 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                {{ __('servers.edit_server') }}
             </a>
-            <h2 class="text-lg font-semibold text-gray-800">{{ $server->name }}</h2>
-            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium
-                @if($server->status === 'online') bg-green-100 text-green-700
-                @elseif($server->status === 'offline') bg-red-100 text-red-700
-                @elseif($server->status === 'error') bg-red-100 text-red-700
-                @else bg-gray-100 text-gray-600
-                @endif">
-                {{ ucfirst($server->status) }}
-            </span>
         </div>
     </x-slot>
 

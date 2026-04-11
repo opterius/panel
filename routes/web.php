@@ -87,7 +87,7 @@ Route::middleware([
             return view('admin.dashboard');
         })->name('dashboard');
 
-        Route::resource('servers', ServerController::class)->except(['edit', 'update']);
+        Route::resource('servers', ServerController::class);
         Route::get('/servers/{server}/time', [\App\Http\Controllers\ServerTimeController::class, 'show'])->name('servers.time');
         Route::post('/servers/{server}/time/timezone', [\App\Http\Controllers\ServerTimeController::class, 'updateTimezone'])->name('servers.time.timezone');
         Route::post('/servers/{server}/time/sync', [\App\Http\Controllers\ServerTimeController::class, 'syncNow'])->name('servers.time.sync');

@@ -61,6 +61,35 @@ class ServerController extends Controller
         return view('servers.show', compact('server', 'agentHealth', 'serverStats'));
     }
 
+    public function edit(Server $server)
+    {
+        try {
+            $agentToken = $server->agent_token;
+        } catch (\Illuminate\Contracts\Encryption\DecryptException) {
+            $agentToken = null;
+        }
+
+        return view('servers.edit', compact('server', 'agentToken'));
+    }
+
+    public function update(Request $request, Server $server)
+    {
+        $validated = $request->validate([
+            'name'        => 'required|string|max:255',
+            'ip_address'  => 'required|ip',
+            'hostname'    => 'nullable|string|max:255',
+            'agent_url'   => 'required|url|max:255',
+            'agent_token' => 'required|string|max:255',
+        ]);
+
+        $server->update($validated);
+
+        ActivityLogger::log('server.updated', 'server', $server->id, $server->name,
+            "Updated server {$server->name}", ['ip_address' => $server->ip_address]);
+
+        return redirect()->route('admin.servers.show', $server)->with('success', __('servers.server_updated'));
+    }
+
     public function destroy(Request $request, Server $server)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {

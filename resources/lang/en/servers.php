@@ -37,6 +37,8 @@ return [
     'databases'                     => 'Databases',
     'cron_jobs'                     => 'Cron Jobs',
     'never'                         => 'Never',
+    'edit_server'                   => 'Edit Server',
+    'agent_token_hint'              => 'Must match the secret in /etc/opterius/agent.conf on the server.',
     // Flash messages
     'server_added'          => 'Server added.',
     'server_updated'        => 'Server updated.',
