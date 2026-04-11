@@ -81,6 +81,9 @@ AGENT_SECRET=$(openssl rand -hex 32)
 GITHUB_PANEL="https://github.com/opterius/panel"
 AGENT_DOWNLOAD_URL="https://get.opterius.com/agent/opterius-agent-linux-amd64"
 
+# Detect public IP early — used in .env and Opterius Mail config
+SERVER_IP=$(curl -s4 --max-time 10 ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
+
 # ============================================================
 # Prompt for admin credentials
 # ============================================================
@@ -473,140 +476,6 @@ systemctl enable --now dovecot
 
 ok "Mail server installed (Postfix + Dovecot)"
 
-# ============================================================
-# Step 5d: Install Opterius Mail (webmail)
-# ============================================================
-info "Installing Opterius Mail webmail..."
-
-MAIL_DIR="/opt/opterius-mail"
-MAIL_DB="opterius_mail"
-MAIL_DB_PASS=$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 24)
-MAIL_APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
-MAIL_SSO_SECRET=$(openssl rand -hex 32)
-
-# Clone Opterius Mail (remove any leftover from a previous run)
-rm -rf ${MAIL_DIR}
-git clone --depth=1 https://github.com/opterius/mail.git ${MAIL_DIR}
-git -C ${MAIL_DIR} config --global --add safe.directory ${MAIL_DIR}
-
-# Create database
-mysql -u root <<EOSQL_MAIL
-CREATE DATABASE IF NOT EXISTS ${MAIL_DB} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '${MAIL_DB}'@'localhost' IDENTIFIED BY '${MAIL_DB_PASS}';
-ALTER USER '${MAIL_DB}'@'localhost' IDENTIFIED BY '${MAIL_DB_PASS}';
-GRANT ALL PRIVILEGES ON ${MAIL_DB}.* TO '${MAIL_DB}'@'localhost';
-FLUSH PRIVILEGES;
-EOSQL_MAIL
-
-# Install Composer dependencies
-composer install --no-dev --optimize-autoloader --no-interaction --working-dir=${MAIL_DIR}
-
-# Write .env
-cat > ${MAIL_DIR}/.env <<EOENV_MAIL
-APP_NAME="Opterius Mail"
-APP_ENV=production
-APP_KEY=${MAIL_APP_KEY}
-APP_DEBUG=false
-APP_URL=http://${PUBLIC_IP}:8090
-
-LOG_CHANNEL=stack
-LOG_LEVEL=error
-
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=${MAIL_DB}
-DB_USERNAME=${MAIL_DB}
-DB_PASSWORD=${MAIL_DB_PASS}
-
-SESSION_DRIVER=database
-SESSION_LIFETIME=120
-CACHE_STORE=database
-
-IMAP_HOST=127.0.0.1
-IMAP_PORT=143
-IMAP_ENCRYPTION=none
-IMAP_VALIDATE_CERT=false
-IMAP_TIMEOUT=15
-
-SMTP_HOST=127.0.0.1
-SMTP_PORT=587
-SMTP_ENCRYPTION=tls
-SMTP_VALIDATE_CERT=false
-
-MAIL_ADMIN=false
-
-MAIL_UI_TEMPLATE=default
-
-PANEL_SSO_ENABLED=true
-PANEL_SSO_SECRET=${MAIL_SSO_SECRET}
-EOENV_MAIL
-
-# Run migrations
-php ${MAIL_DIR}/artisan migrate --force
-
-# Set permissions
-chown -R www-data:www-data ${MAIL_DIR}
-chmod -R 755 ${MAIL_DIR}
-chmod -R 775 ${MAIL_DIR}/storage ${MAIL_DIR}/bootstrap/cache
-
-# Determine PHP-FPM socket
-if [[ "$PKG_MANAGER" == "apt" ]]; then
-    MAIL_FPM_SOCK="/run/php/php${PHP_VERSION}-fpm.sock"
-else
-    MAIL_FPM_SOCK="/run/php-fpm/www.sock"
-fi
-
-# Configure Nginx for Opterius Mail (webmail on port 8090)
-cat > /etc/nginx/sites-available/opterius-mail.conf <<EONGINX_MAIL
-server {
-    listen 8090;
-    listen [::]:8090;
-    server_name _;
-
-    root ${MAIL_DIR}/public;
-    index index.php;
-
-    location / {
-        try_files \$uri \$uri/ /index.php?\$query_string;
-    }
-
-    location ~ \.php\$ {
-        fastcgi_pass unix:${MAIL_FPM_SOCK};
-        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
-        include fastcgi_params;
-    }
-
-    location ~ /\.(ht|git|svn) {
-        deny all;
-    }
-}
-EONGINX_MAIL
-
-# Enable site (remove old roundcube config if present)
-rm -f /etc/nginx/sites-enabled/roundcube.conf /etc/nginx/conf.d/roundcube.conf
-if [[ -d /etc/nginx/sites-enabled ]]; then
-    ln -sf /etc/nginx/sites-available/opterius-mail.conf /etc/nginx/sites-enabled/
-else
-    cp /etc/nginx/sites-available/opterius-mail.conf /etc/nginx/conf.d/opterius-mail.conf
-fi
-
-nginx -t && systemctl reload nginx
-
-# Write SSO secret into the Panel .env so it can issue SSO tokens
-PANEL_ENV="${PANEL_DIR}/.env"
-if grep -q "OPTERIUS_WEBMAIL_SSO_SECRET" "${PANEL_ENV}"; then
-    sed -i "s|OPTERIUS_WEBMAIL_SSO_SECRET=.*|OPTERIUS_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}|" "${PANEL_ENV}"
-else
-    echo "OPTERIUS_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}" >> "${PANEL_ENV}"
-fi
-if grep -q "OPTERIUS_WEBMAIL_URL" "${PANEL_ENV}"; then
-    sed -i "s|OPTERIUS_WEBMAIL_URL=.*|OPTERIUS_WEBMAIL_URL=http://127.0.0.1:8090|" "${PANEL_ENV}"
-else
-    echo "OPTERIUS_WEBMAIL_URL=http://127.0.0.1:8090" >> "${PANEL_ENV}"
-fi
-
-ok "Opterius Mail webmail installed (port 8090)"
 
 # ============================================================
 # Step 5e: Install phpMyAdmin
@@ -707,7 +576,129 @@ curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
 ok "Composer installed"
 
 # ============================================================
-# Step 7b: Install WP-CLI
+# Step 7b: Install Opterius Mail (webmail) — needs Composer
+# ============================================================
+info "Installing Opterius Mail webmail..."
+
+MAIL_DIR="/opt/opterius-mail"
+MAIL_DB="opterius_mail"
+MAIL_DB_PASS=$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 24)
+MAIL_APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
+MAIL_SSO_SECRET=$(openssl rand -hex 32)
+
+# Clone Opterius Mail (remove any leftover from a previous run)
+rm -rf ${MAIL_DIR}
+git clone --depth=1 https://github.com/opterius/mail.git ${MAIL_DIR}
+git config --global --add safe.directory ${MAIL_DIR}
+
+# Create database
+mysql -u root <<EOSQL_MAIL
+CREATE DATABASE IF NOT EXISTS ${MAIL_DB} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '${MAIL_DB}'@'localhost' IDENTIFIED BY '${MAIL_DB_PASS}';
+ALTER USER '${MAIL_DB}'@'localhost' IDENTIFIED BY '${MAIL_DB_PASS}';
+GRANT ALL PRIVILEGES ON ${MAIL_DB}.* TO '${MAIL_DB}'@'localhost';
+FLUSH PRIVILEGES;
+EOSQL_MAIL
+
+# Install Composer dependencies
+composer install --no-dev --optimize-autoloader --no-interaction --working-dir=${MAIL_DIR}
+
+# Write .env
+cat > ${MAIL_DIR}/.env <<EOENV_MAIL
+APP_NAME="Opterius Mail"
+APP_ENV=production
+APP_KEY=${MAIL_APP_KEY}
+APP_DEBUG=false
+APP_URL=http://${SERVER_IP}:8090
+
+LOG_CHANNEL=stack
+LOG_LEVEL=error
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=${MAIL_DB}
+DB_USERNAME=${MAIL_DB}
+DB_PASSWORD=${MAIL_DB_PASS}
+
+SESSION_DRIVER=database
+SESSION_LIFETIME=120
+CACHE_STORE=database
+
+IMAP_HOST=127.0.0.1
+IMAP_PORT=143
+IMAP_ENCRYPTION=none
+IMAP_VALIDATE_CERT=false
+IMAP_TIMEOUT=15
+
+SMTP_HOST=127.0.0.1
+SMTP_PORT=587
+SMTP_ENCRYPTION=tls
+SMTP_VALIDATE_CERT=false
+
+MAIL_ADMIN=false
+
+MAIL_UI_TEMPLATE=default
+
+PANEL_SSO_ENABLED=true
+PANEL_SSO_SECRET=${MAIL_SSO_SECRET}
+EOENV_MAIL
+
+# Run migrations
+php ${MAIL_DIR}/artisan migrate --force
+
+# Set permissions
+chown -R www-data:www-data ${MAIL_DIR} 2>/dev/null || chown -R nginx:nginx ${MAIL_DIR}
+chmod -R 755 ${MAIL_DIR}
+chmod -R 775 ${MAIL_DIR}/storage ${MAIL_DIR}/bootstrap/cache
+
+# Determine PHP-FPM socket
+if [[ "$PKG_MANAGER" == "apt" ]]; then
+    MAIL_FPM_SOCK="/run/php/php${PHP_VERSION}-fpm.sock"
+else
+    MAIL_FPM_SOCK="/run/php-fpm/www.sock"
+fi
+
+# Configure Nginx for Opterius Mail (webmail on port 8090)
+cat > /etc/nginx/sites-available/opterius-mail.conf <<EONGINX_MAIL
+server {
+    listen 8090;
+    listen [::]:8090;
+    server_name _;
+
+    root ${MAIL_DIR}/public;
+    index index.php;
+
+    location / {
+        try_files \$uri \$uri/ /index.php?\$query_string;
+    }
+
+    location ~ \.php\$ {
+        fastcgi_pass unix:${MAIL_FPM_SOCK};
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+        include fastcgi_params;
+    }
+
+    location ~ /\.(ht|git|svn) {
+        deny all;
+    }
+}
+EONGINX_MAIL
+
+# Enable site (remove old roundcube config if present)
+rm -f /etc/nginx/sites-enabled/roundcube.conf /etc/nginx/conf.d/roundcube.conf
+if [[ -d /etc/nginx/sites-enabled ]]; then
+    ln -sf /etc/nginx/sites-available/opterius-mail.conf /etc/nginx/sites-enabled/
+else
+    cp /etc/nginx/sites-available/opterius-mail.conf /etc/nginx/conf.d/opterius-mail.conf
+fi
+
+nginx -t && systemctl reload nginx
+
+ok "Opterius Mail webmail installed (port 8090)"
+
+# ============================================================
+# Step 7c: Install WP-CLI
 # ============================================================
 info "Installing WP-CLI..."
 curl -sL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar -o /usr/local/bin/wp
@@ -754,6 +745,21 @@ sed -i "s|OPTERIUS_AGENT_SECRET=.*|OPTERIUS_AGENT_SECRET=${AGENT_SECRET}|" .env 
 
 php artisan key:generate --force
 php artisan migrate --force
+
+# Wire up Opterius Mail SSO into the Panel .env (MAIL_SSO_SECRET set in Step 7b)
+if [[ -n "${MAIL_SSO_SECRET:-}" ]]; then
+    if grep -q "OPTERIUS_WEBMAIL_SSO_SECRET" .env; then
+        sed -i "s|OPTERIUS_WEBMAIL_SSO_SECRET=.*|OPTERIUS_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}|" .env
+    else
+        echo "OPTERIUS_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}" >> .env
+    fi
+    if grep -q "OPTERIUS_WEBMAIL_URL" .env; then
+        sed -i "s|OPTERIUS_WEBMAIL_URL=.*|OPTERIUS_WEBMAIL_URL=http://127.0.0.1:8090|" .env
+    else
+        echo "OPTERIUS_WEBMAIL_URL=http://127.0.0.1:8090" >> .env
+    fi
+fi
+
 php artisan config:cache
 php artisan route:cache
 php artisan view:cache
