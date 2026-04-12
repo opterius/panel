@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    <!-- Current Version -->
+    {{-- ── Panel update ─────────────────────────────────────────────────── --}}
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-6">
             <div class="flex items-center justify-between">
@@ -42,33 +42,36 @@
                     </div>
                 </div>
 
-                @if($updateAvailable)
-                    <form action="{{ route('admin.updates.run') }}" method="POST"
-                          x-data="{ updating: false }" @submit="updating = true">
-                        @csrf
-                        <button type="submit" :disabled="updating"
-                            class="inline-flex items-center px-5 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                            <template x-if="!updating">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                            </template>
-                            <template x-if="updating">
-                                <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                            </template>
-                            <span x-text="updating ? 'Updating... Please wait' : 'Update Now'">Update Now</span>
-                        </button>
-                    </form>
-                @else
-                    <a href="{{ route('admin.updates.index') }}" class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                        Check Again
-                    </a>
-                @endif
+                <div class="flex items-center gap-3">
+                    @if($updateAvailable)
+                        <form action="{{ route('admin.updates.run') }}" method="POST"
+                              x-data="{ updating: false }" @submit="updating = true">
+                            @csrf
+                            <button type="submit" :disabled="updating"
+                                class="inline-flex items-center px-5 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                                <template x-if="!updating">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                                </template>
+                                <template x-if="updating">
+                                    <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                                </template>
+                                <span x-text="updating ? 'Updating...' : 'Update Panel Now'">Update Panel Now</span>
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('admin.updates.index') }}"
+                           class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                            Check Again
+                        </a>
+                    @endif
+                </div>
             </div>
         </div>
     </div>
 
     @if($changelog)
-        <!-- Changelog -->
+        {{-- ── Changelog ──────────────────────────────────────────────────── --}}
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
                 <h3 class="text-base font-semibold text-gray-800">
@@ -85,10 +88,26 @@
         </div>
     @endif
 
-    <!-- Version Info -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-        <div class="px-6 py-5 border-b border-gray-100">
+    {{-- ── System info + Force agent update ────────────────────────────── --}}
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
             <h3 class="text-base font-semibold text-gray-800">System Information</h3>
+
+            {{-- Force agent update button --}}
+            <form action="{{ route('admin.updates.agent') }}" method="POST"
+                  x-data="{ busy: false }" @submit="busy = true">
+                @csrf
+                <button type="submit" :disabled="busy"
+                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition disabled:opacity-50 disabled:cursor-not-allowed">
+                    <template x-if="!busy">
+                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    </template>
+                    <template x-if="busy">
+                        <svg class="w-4 h-4 mr-1.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+                    </template>
+                    <span x-text="busy ? 'Triggering...' : 'Force Agent Update'">Force Agent Update</span>
+                </button>
+            </form>
         </div>
         <div class="px-6 py-5">
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
@@ -124,4 +143,62 @@
             </dl>
         </div>
     </div>
+
+    {{-- ── Update log ───────────────────────────────────────────────────── --}}
+    <div class="bg-white rounded-xl shadow-sm overflow-hidden"
+         x-data="updateLog()" x-init="init()">
+        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+            <h3 class="text-base font-semibold text-gray-800">Update Log</h3>
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-gray-400" x-text="lastRefreshed ? 'Last refreshed ' + lastRefreshed : ''"></span>
+                <button @click="refresh()"
+                        class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">
+                    <svg class="w-3.5 h-3.5 mr-1" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                    Refresh
+                </button>
+            </div>
+        </div>
+        <div class="relative">
+            <pre x-ref="logBox"
+                 class="text-xs font-mono text-gray-300 bg-gray-900 p-5 overflow-auto max-h-96 whitespace-pre-wrap leading-relaxed"
+                 x-text="log || 'No log entries yet. The log appears here after the first update check.'"
+            ></pre>
+        </div>
+    </div>
+
+    <script>
+    function updateLog() {
+        return {
+            log: @json($updateLog ?? ''),
+            loading: false,
+            lastRefreshed: null,
+
+            init() {
+                this.scrollToBottom();
+                // Auto-refresh every 10 seconds
+                setInterval(() => this.refresh(), 10000);
+            },
+
+            async refresh() {
+                if (this.loading) return;
+                this.loading = true;
+                try {
+                    const res = await fetch('{{ route('admin.updates.log') }}');
+                    if (res.ok) {
+                        const json = await res.json();
+                        this.log = json.log || '';
+                        this.lastRefreshed = new Date().toLocaleTimeString();
+                        this.$nextTick(() => this.scrollToBottom());
+                    }
+                } catch (e) {}
+                this.loading = false;
+            },
+
+            scrollToBottom() {
+                const box = this.$refs.logBox;
+                if (box) box.scrollTop = box.scrollHeight;
+            }
+        }
+    }
+    </script>
 </x-admin-layout>

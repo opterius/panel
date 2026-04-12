@@ -166,6 +166,8 @@ Route::middleware([
         // Updates
         Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');
         Route::post('/updates/run', [UpdateController::class, 'run'])->name('updates.run');
+        Route::post('/updates/agent', [UpdateController::class, 'forceAgentUpdate'])->name('updates.agent');
+        Route::get('/updates/log', [UpdateController::class, 'log'])->name('updates.log');
 
         // Spam Filter
         Route::get('/spam-filter', [SpamFilterController::class, 'index'])->name('spam-filter.index');
