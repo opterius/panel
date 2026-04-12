@@ -68,6 +68,11 @@ return [
     // it behind SSL, override via OPTERIUS_PHPMYADMIN_URL=https://your-host in .env
     'phpmyadmin_url' => env('OPTERIUS_PHPMYADMIN_URL', 'http://SERVER_IP:8081'),
 
+    // Shared secret for one-click SSO into phpMyAdmin. Must match the value in
+    // /etc/opterius/pma-signon-secret on each managed server.
+    // Leave empty to disable SSO (clicking phpMyAdmin opens the login page instead).
+    'phpmyadmin_sso_secret' => env('OPTERIUS_PMA_SSO_SECRET'),
+
     /*
     |--------------------------------------------------------------------------
     | API

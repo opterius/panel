@@ -182,6 +182,56 @@ class DatabaseController extends Controller
         return back()->with('error', __('databases.action_failed', ['action' => ucfirst($action), 'error' => $error]));
     }
 
+    public function sso(Database $database)
+    {
+        $database->load('account.server');
+
+        if (!in_array($database->account_id, auth()->user()->currentAccountIds())) {
+            abort(403);
+        }
+
+        $secret = config('opterius.phpmyadmin_sso_secret');
+        if (!$secret) {
+            return redirect()->away(
+                str_replace('SERVER_IP', $database->account->server->ip_address,
+                    config('opterius.phpmyadmin_url', 'http://SERVER_IP:8081'))
+            );
+        }
+
+        if (!$database->encrypted_password) {
+            return back()->with('error', __('databases.pma_sso_no_password'));
+        }
+
+        $expiresAt = time() + 60;
+        $user      = $database->db_username;
+        $password  = $database->encrypted_password; // decrypted by the 'encrypted' cast
+        $db        = $database->name;
+
+        $payload  = $user . '|' . $password . '|' . $db . '|' . $expiresAt;
+        $sig      = hash_hmac('sha256', $payload, $secret);
+
+        $tokenJson = json_encode([
+            'user'       => $user,
+            'password'   => $password,
+            'db'         => $db,
+            'expires_at' => $expiresAt,
+            'sig'        => $sig,
+        ]);
+        $tokenB64 = rtrim(strtr(base64_encode($tokenJson), '+/', '-_'), '=');
+
+        $serverIp = $database->account->server->ip_address;
+        $pmaBase  = str_replace('SERVER_IP', $serverIp,
+            config('opterius.phpmyadmin_url', 'http://SERVER_IP:8081'));
+
+        ActivityLogger::log('database.pma_sso', 'database', $database->id, $database->name,
+            "phpMyAdmin SSO login for database {$database->name}", [
+                'db_username' => $user,
+                'server_ip'   => $serverIp,
+            ]);
+
+        return redirect()->away($pmaBase . '/opterius-signon.php?t=' . $tokenB64);
+    }
+
     public function destroy(Request $request, Database $database)
     {
         if (!Hash::check($request->password, auth()->user()->password)) {

@@ -379,6 +379,7 @@ Route::middleware([
         Route::resource('databases', DatabaseController::class)->only(['index', 'create', 'store', 'show', 'destroy']);
         Route::post('/databases/{database}/password', [DatabaseController::class, 'changePassword'])->name('databases.password');
         Route::post('/databases/{database}/repair', [DatabaseController::class, 'repair'])->name('databases.repair');
+        Route::get('/databases/{database}/sso', [DatabaseController::class, 'sso'])->name('databases.sso');
 
         // SSL Certificates
         Route::get('/ssl', [SslController::class, 'index'])->name('ssl.index');
