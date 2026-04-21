@@ -29,7 +29,7 @@
                         @endif
                     </div>
                     <div>
-                        <div class="text-lg font-bold text-gray-900">Opterius Panel v{{ $currentVersion }}</div>
+                        <div class="text-lg font-bold text-gray-900">Opterius v{{ $currentVersion }}</div>
                         <div class="text-sm text-gray-500">
                             @if($updateAvailable)
                                 <span class="text-amber-600 font-medium">Version {{ $latestVersion }} is available</span>
@@ -55,7 +55,7 @@
                                 <template x-if="updating">
                                     <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                                 </template>
-                                <span x-text="updating ? 'Updating...' : 'Update Panel Now'">Update Panel Now</span>
+                                <span x-text="updating ? 'Updating...' : 'Update Opterius'">Update Opterius</span>
                             </button>
                         </form>
                     @else
@@ -83,31 +83,15 @@
                 </h3>
             </div>
             <div class="px-6 py-5 prose prose-sm max-w-none text-gray-600">
-                {!! nl2br(e($changelog)) !!}
+                {!! \Illuminate\Support\Str::markdown($changelog) !!}
             </div>
         </div>
     @endif
 
-    {{-- ── System info + Force agent update ────────────────────────────── --}}
+    {{-- ── System information ──────────────────────────────────────────── --}}
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-        <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+        <div class="px-6 py-5 border-b border-gray-100">
             <h3 class="text-base font-semibold text-gray-800">System Information</h3>
-
-            {{-- Force agent update button --}}
-            <form action="{{ route('admin.updates.agent') }}" method="POST"
-                  x-data="{ busy: false }" @submit="busy = true">
-                @csrf
-                <button type="submit" :disabled="busy"
-                    class="inline-flex items-center px-4 py-2 text-sm font-medium text-indigo-700 bg-indigo-50 border border-indigo-200 rounded-lg hover:bg-indigo-100 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                    <template x-if="!busy">
-                        <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
-                    </template>
-                    <template x-if="busy">
-                        <svg class="w-4 h-4 mr-1.5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                    </template>
-                    <span x-text="busy ? 'Triggering...' : 'Force Agent Update'">Force Agent Update</span>
-                </button>
-            </form>
         </div>
         <div class="px-6 py-5">
             <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4">
@@ -163,6 +147,29 @@
                  class="text-xs font-mono text-gray-300 bg-gray-900 p-5 overflow-auto max-h-96 whitespace-pre-wrap leading-relaxed"
                  x-text="log || 'No log entries yet. The log appears here after the first update check.'"
             ></pre>
+        </div>
+    </div>
+
+    {{-- ── Advanced (collapsed) — for troubleshooting only ─────────────── --}}
+    <div class="mt-6" x-data="{ open: false }">
+        <button type="button" @click="open = !open"
+            class="inline-flex items-center text-xs font-medium text-gray-500 hover:text-gray-700 transition">
+            <svg class="w-3.5 h-3.5 mr-1 transition-transform" :class="{ 'rotate-90': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+            Advanced
+        </button>
+        <div x-show="open" x-collapse class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4">
+            <p class="text-xs text-gray-500 mb-3">
+                These actions are for troubleshooting only. The main <strong>Update Opterius</strong> button above already updates both the panel and the agent together.
+            </p>
+            <form action="{{ route('admin.updates.agent') }}" method="POST"
+                  x-data="{ busy: false }" @submit="busy = true">
+                @csrf
+                <button type="submit" :disabled="busy"
+                    class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-100 transition disabled:opacity-50">
+                    <svg class="w-3.5 h-3.5 mr-1.5" :class="{ 'animate-spin': busy }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                    <span x-text="busy ? 'Triggering...' : 'Force agent binary re-download'">Force agent binary re-download</span>
+                </button>
+            </form>
         </div>
     </div>
 

@@ -8,6 +8,14 @@ Each release ships panel and agent together under the same version number.
 
 ---
 
+## [2.2.4] - 2026-04-21
+
+### Changed
+- Single "Update Opterius" button now updates panel and agent together — no separate "Force Agent Update" needed for normal use
+- Force agent re-download moved to an Advanced section for troubleshooting
+
+---
+
 ## [2.2.3] - 2026-04-21
 
 ### Added

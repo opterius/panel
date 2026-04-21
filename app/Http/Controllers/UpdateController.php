@@ -13,19 +13,20 @@ class UpdateController extends Controller
     {
         $currentVersion = config('opterius.version', '1.0.0');
 
-        // Check for latest version from license server
+        // Check for latest version from license server (for the "update available" banner).
+        // Changelog content always comes from the local CHANGELOG.md below.
         $latestVersion = null;
-        $changelog = null;
         try {
             $response = Http::timeout(5)->get(config('opterius.license_server_url') . '/api/version/latest');
             if ($response->successful()) {
-                $data = $response->json();
-                $latestVersion = $data['version'] ?? null;
-                $changelog = $data['changelog'] ?? null;
+                $latestVersion = $response->json('version');
             }
         } catch (\Exception $e) {
-            // License server unreachable
+            // License server unreachable — treat as "up to date" rather than erroring.
         }
+
+        // Read release notes for the current version from CHANGELOG.md in the panel root.
+        $changelog = $this->readChangelogFor($currentVersion);
 
         $updateAvailable = $latestVersion && version_compare($latestVersion, $currentVersion, '>');
 
@@ -96,6 +97,31 @@ class UpdateController extends Controller
         }
 
         return response()->json(['log' => $log]);
+    }
+
+    /**
+     * Extract the section for a given version from CHANGELOG.md.
+     * Matches headings like "## [2.2.3] - 2026-04-21" and returns all content
+     * until the next "## " heading. Returns null if the file or section is missing.
+     */
+    private function readChangelogFor(string $version): ?string
+    {
+        $path = base_path('CHANGELOG.md');
+        if (!is_file($path)) {
+            return null;
+        }
+
+        $content = @file_get_contents($path);
+        if ($content === false) {
+            return null;
+        }
+
+        $escaped = preg_quote($version, '/');
+        if (!preg_match('/^##\s*\[' . $escaped . '\][^\n]*\n(.*?)(?=^##\s|\z)/ms', $content, $m)) {
+            return null;
+        }
+
+        return trim($m[1]);
     }
 
     /**
