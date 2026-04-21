@@ -76,19 +76,101 @@
             </dl>
         </div>
 
-        {{-- Only show "Install Agent" for remote servers — the local server
-             already has the agent installed by the installer. --}}
-        @if(! str_contains($server->agent_url ?? '', '127.0.0.1'))
-        <div class="bg-white rounded-xl shadow-sm p-6">
-            <h3 class="text-base font-semibold text-gray-800 mb-3">{{ __('servers.install_agent') }}</h3>
-            <p class="text-sm text-gray-500 mb-4">{{ __('servers.install_agent_description') }}</p>
+        @if($server->status === 'online')
+            {{-- Agent is connected — show a confirmation card with an
+                 expandable "reinstall / re-connect agent" section only for admins
+                 who may need to recover after a failure. --}}
+            <div class="bg-white rounded-xl shadow-sm p-6" x-data="{ showReinstall: false, showToken: false, copied: false }">
+                <div class="flex items-start gap-3 mb-3">
+                    <div class="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-800">Agent connected</h3>
+                        <p class="text-xs text-gray-500 mt-0.5">
+                            The Opterius agent on this server is communicating with the panel. No action required.
+                            @if($server->last_ping_at)
+                                Last ping {{ $server->last_ping_at->diffForHumans() }}.
+                            @endif
+                        </p>
+                    </div>
+                </div>
 
-            <div class="relative">
-                <pre class="bg-gray-900 text-green-400 rounded-lg p-4 text-xs font-mono overflow-x-auto">curl -sL https://get.opterius.com/agent | bash -s -- --token={{ $server->agent_token }}</pre>
+                <button type="button" @click="showReinstall = !showReinstall"
+                    class="text-xs font-medium text-gray-500 hover:text-gray-700 transition inline-flex items-center gap-1">
+                    <svg class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-90': showReinstall }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                    Reinstall / reconnect agent
+                </button>
+
+                <div x-show="showReinstall" x-collapse class="mt-3 pt-3 border-t border-gray-100 space-y-3">
+                    <p class="text-xs text-gray-500">Only use this if the agent stopped responding and a fresh install is needed.</p>
+
+                    <div>
+                        <div class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">One-line install command</div>
+                        <pre class="bg-gray-900 text-green-400 rounded-lg p-3 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all">curl -sL https://get.opterius.com/agent | bash -s -- --token={{ $server->agent_token }}</pre>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <div class="text-xs font-medium text-gray-400 uppercase tracking-wide">Agent token</div>
+                            <button type="button" @click="showToken = !showToken" class="text-xs text-indigo-600 hover:text-indigo-800" x-text="showToken ? 'Hide' : 'Show'"></button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="text" readonly
+                                :value="showToken ? '{{ $server->agent_token }}' : '••••••••••••••••••••••••••••••••'"
+                                class="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-md px-3 py-1.5 text-xs font-mono text-gray-700 focus:outline-none">
+                            <button type="button"
+                                @click="navigator.clipboard.writeText('{{ $server->agent_token }}'); copied = true; setTimeout(() => copied = false, 1500)"
+                                class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition">
+                                <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                <svg x-show="copied" class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                <span x-text="copied ? 'Copied' : 'Copy'"></span>
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-1.5">Shared secret the agent uses to authenticate with the panel. Keep it private.</p>
+                    </div>
+                </div>
             </div>
+        @else
+            {{-- Agent has never connected or is offline — install instructions
+                 need to be prominent so the admin can get going. --}}
+            <div class="bg-white rounded-xl shadow-sm p-6" x-data="{ showToken: false, copied: false }">
+                <div class="flex items-start gap-3 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-amber-100 flex items-center justify-center flex-shrink-0">
+                        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+                    </div>
+                    <div>
+                        <h3 class="text-base font-semibold text-gray-800">{{ __('servers.install_agent') }}</h3>
+                        <p class="text-sm text-gray-500 mt-0.5">{{ __('servers.install_agent_description') }}</p>
+                    </div>
+                </div>
 
-            <p class="text-xs text-gray-400 mt-3">{{ __('servers.install_agent_note') }}</p>
-        </div>
+                <div class="mb-4">
+                    <div class="text-xs font-medium text-gray-400 uppercase tracking-wide mb-1.5">One-line install command</div>
+                    <pre class="bg-gray-900 text-green-400 rounded-lg p-3 text-xs font-mono overflow-x-auto whitespace-pre-wrap break-all">curl -sL https://get.opterius.com/agent | bash -s -- --token={{ $server->agent_token }}</pre>
+                </div>
+
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <div class="text-xs font-medium text-gray-400 uppercase tracking-wide">Agent token</div>
+                        <button type="button" @click="showToken = !showToken" class="text-xs text-indigo-600 hover:text-indigo-800" x-text="showToken ? 'Hide' : 'Show'"></button>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <input type="text" readonly
+                            :value="showToken ? '{{ $server->agent_token }}' : '••••••••••••••••••••••••••••••••'"
+                            class="flex-1 min-w-0 bg-gray-50 border border-gray-200 rounded-md px-3 py-1.5 text-xs font-mono text-gray-700 focus:outline-none">
+                        <button type="button"
+                            @click="navigator.clipboard.writeText('{{ $server->agent_token }}'); copied = true; setTimeout(() => copied = false, 1500)"
+                            class="inline-flex items-center gap-1 px-3 py-1.5 text-xs font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition">
+                            <svg x-show="!copied" class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                            <svg x-show="copied" class="w-3.5 h-3.5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            <span x-text="copied ? 'Copied' : 'Copy'"></span>
+                        </button>
+                    </div>
+                </div>
+
+                <p class="text-xs text-gray-400 mt-3">{{ __('servers.install_agent_note') }}</p>
+            </div>
         @endif
     </div>
 

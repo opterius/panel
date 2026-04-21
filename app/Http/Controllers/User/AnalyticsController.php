@@ -29,19 +29,17 @@ class AnalyticsController extends Controller
     public function query(Request $request)
     {
         $data = $request->validate([
-            'domain_id' => 'required|integer',
-            'range'     => 'required|in:24h,7d,30d,90d',
+            'domain_id'    => 'required|integer',
+            'range'        => 'required|in:24h,7d,30d,90d',
+            'offset_hours' => 'nullable|integer|min:0|max:8640',
         ]);
 
-        $domain = Domain::with('account.server')->findOrFail($data['domain_id']);
-
-        if (! in_array($domain->account_id, auth()->user()->currentAccountIds())) {
-            abort(403);
-        }
+        $domain = $this->authorizedDomain($data['domain_id']);
 
         $response = AgentService::for($domain->account->server)->post('/analytics/query', [
-            'domain' => $domain->domain,
-            'range'  => $data['range'],
+            'domain'       => $domain->domain,
+            'range'        => $data['range'],
+            'offset_hours' => (int) ($data['offset_hours'] ?? 0),
         ]);
 
         if (! $response || ! $response->successful()) {
@@ -51,5 +49,40 @@ class AnalyticsController extends Controller
         }
 
         return response()->json($response->json());
+    }
+
+    /**
+     * POST /user/analytics/live — real-time visitor stats (last 5–30 min).
+     */
+    public function live(Request $request)
+    {
+        $data = $request->validate([
+            'domain_id' => 'required|integer',
+        ]);
+
+        $domain = $this->authorizedDomain($data['domain_id']);
+
+        $response = AgentService::for($domain->account->server)->post('/analytics/live', [
+            'domain' => $domain->domain,
+        ]);
+
+        if (! $response || ! $response->successful()) {
+            return response()->json([
+                'error' => $response?->json('error') ?? 'Agent unreachable',
+            ], 502);
+        }
+
+        return response()->json($response->json());
+    }
+
+    private function authorizedDomain(int $id): Domain
+    {
+        $domain = Domain::with('account.server')->findOrFail($id);
+
+        if (! in_array($domain->account_id, auth()->user()->currentAccountIds())) {
+            abort(403);
+        }
+
+        return $domain;
     }
 }

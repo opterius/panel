@@ -16,13 +16,19 @@
     @endif
 
     @php
-        // The phpMyAdmin URL is server-wide, not per-database. Pick the IP of
-        // any database's server to build it — they're all served by the same
-        // pma instance for accounts on this server.
-        $pmaServerIp = optional($databases->first()?->account?->server)->ip_address;
-        $pmaUrl = $pmaServerIp
-            ? str_replace('SERVER_IP', $pmaServerIp, config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081'))
-            : null;
+        // Each server runs its own phpMyAdmin instance. Build one URL per
+        // unique server the user has databases on, so multi-server accounts
+        // can reach every phpMyAdmin, not just the first one.
+        $pmaTemplate = config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081');
+        $pmaServers = $databases
+            ->pluck('account.server')
+            ->filter()
+            ->unique('id')
+            ->values()
+            ->map(fn($server) => [
+                'name' => $server->name,
+                'url'  => str_replace('SERVER_IP', $server->ip_address, $pmaTemplate) . '/?server=2',
+            ]);
         $pmaHasSso = (bool) config('opterius.phpmyadmin_sso_secret');
     @endphp
 
@@ -34,12 +40,32 @@
                 <p class="text-sm text-gray-500 mt-1">{{ __('databases.manage_mysql_databases') }}</p>
             </div>
             <div class="flex items-center gap-2">
-                @if($pmaUrl)
-                    <a href="{{ $pmaUrl }}" target="_blank" rel="noopener noreferrer"
+                @if($pmaServers->count() === 1)
+                    <a href="{{ $pmaServers->first()['url'] }}" target="_blank" rel="noopener noreferrer"
+                       title="Open phpMyAdmin (manual login)"
                        class="inline-flex items-center px-4 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
                         phpMyAdmin
                     </a>
+                @elseif($pmaServers->count() > 1)
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <button type="button" @click="open = !open"
+                            class="inline-flex items-center px-4 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+                            phpMyAdmin
+                            <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                        </button>
+                        <div x-show="open" x-transition class="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-10">
+                            <div class="px-3 py-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wider">Pick a server</div>
+                            @foreach($pmaServers as $s)
+                                <a href="{{ $s['url'] }}" target="_blank" rel="noopener noreferrer"
+                                   class="flex items-center px-3 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                                    <svg class="w-4 h-4 mr-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 12H3l9-9 9 9h-2M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>
+                                    {{ $s['name'] }}
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
                 @endif
                 <a href="{{ route('user.databases.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
                     <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>

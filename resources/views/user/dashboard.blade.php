@@ -7,7 +7,7 @@
         // Switch to "current account" mode - only show data for the actively selected account
         $primaryAccount = auth()->user()->currentAccount();
         $accountIds = $primaryAccount ? [$primaryAccount->id] : [];
-        $myDomains = \App\Models\Domain::whereIn('account_id', $accountIds)->whereNull('parent_id')->get();
+        $myDomains = \App\Models\Domain::with('sslCertificate')->whereIn('account_id', $accountIds)->whereNull('parent_id')->get();
         $mySubdomains = \App\Models\Domain::whereIn('account_id', $accountIds)->whereNotNull('parent_id')->count();
         $myDatabases = \App\Models\Database::whereIn('account_id', $accountIds)->count();
         $myCerts = \App\Models\SslCertificate::whereHas('domain', fn($q) => $q->whereIn('account_id', $accountIds))->count();
@@ -43,10 +43,6 @@
             <div class="mb-6">
                 <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-3 px-1">{{ __('dashboard.domain') }}</h3>
                 <div class="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-1">
-                    <a href="{{ route('user.domains.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-indigo-50 transition">
-                        <svg class="w-9 h-9 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-indigo-700">{{ __('dashboard.domain') }}</span>
-                    </a>
                     @if($myDomains->isNotEmpty())
                         <a href="{{ route('user.subdomains.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-sky-50 transition">
                             <svg class="w-9 h-9 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
@@ -196,6 +192,10 @@
                         <svg class="w-9 h-9 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-teal-700">{{ __('dashboard.cron_jobs') }}</span>
                     </a>
+                    <a href="{{ route('user.htaccess.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-orange-50 transition">
+                        <svg class="w-9 h-9 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01" /></svg>
+                        <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-orange-700">.htaccess</span>
+                    </a>
                 </div>
             </div>
 
@@ -249,13 +249,31 @@
             {{-- Account Info --}}
             @if($primaryAccount)
                 <div class="bg-white rounded-xl shadow-sm p-5">
+                    @php($primaryDomain = $myDomains->first())
                     <div class="flex items-center space-x-3 mb-4">
-                        <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center">
+                        <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center flex-shrink-0">
                             <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
                         </div>
-                        <div>
-                            <div class="text-sm font-semibold text-gray-800">{{ $myDomains->first()?->domain ?? $primaryAccount->username }}</div>
-                            <div class="text-xs text-gray-500">{{ $primaryAccount->server->name }} &middot; PHP {{ $primaryAccount->php_version }}</div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center gap-1.5 flex-wrap">
+                                <span class="text-sm font-semibold text-gray-800 truncate">{{ $primaryDomain?->domain ?? $primaryAccount->username }}</span>
+                                @if($primaryDomain)
+                                    @if($primaryDomain->sslCertificate && $primaryDomain->sslCertificate->status === 'active')
+                                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-green-100 text-green-700">
+                                            <svg class="w-2.5 h-2.5 mr-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+                                            {{ __('domains.ssl') }}
+                                        </span>
+                                    @endif
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium
+                                        @if($primaryDomain->status === 'active') bg-green-100 text-green-700
+                                        @elseif($primaryDomain->status === 'error') bg-red-100 text-red-700
+                                        @elseif($primaryDomain->status === 'suspended') bg-yellow-100 text-yellow-700
+                                        @else bg-gray-100 text-gray-600 @endif">
+                                        {{ ucfirst($primaryDomain->status) }}
+                                    </span>
+                                @endif
+                            </div>
+                            <div class="text-xs text-gray-500 mt-0.5">{{ $primaryAccount->server->name }} &middot; PHP {{ $primaryAccount->php_version }}</div>
                         </div>
                     </div>
 

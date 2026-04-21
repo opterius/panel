@@ -9,6 +9,22 @@ use Illuminate\Http\Request;
 class HtaccessController extends Controller
 {
     /**
+     * List all domains belonging to the user with their current .htaccess state.
+     */
+    public function index()
+    {
+        $accountIds = auth()->user()->currentAccountIds();
+
+        $domains = Domain::with('account.server')
+            ->whereIn('account_id', $accountIds)
+            ->orderBy('parent_id')
+            ->orderBy('domain')
+            ->get();
+
+        return view('htaccess.index', compact('domains'));
+    }
+
+    /**
      * Toggle .htaccess support (Nginx → Apache backend) for a domain.
      */
     public function toggle(Request $request, Domain $domain)

@@ -75,11 +75,7 @@
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
                 <h3 class="text-base font-semibold text-gray-800">
-                    @if($updateAvailable)
-                        What's New in v{{ $latestVersion }}
-                    @else
-                        Current Release Notes (v{{ $latestVersion ?? $currentVersion }})
-                    @endif
+                    Current Release Notes (v{{ $currentVersion }})
                 </h3>
             </div>
             <div class="px-6 py-5 prose prose-sm max-w-none text-gray-600">
@@ -144,7 +140,8 @@
         </div>
         <div class="relative">
             <pre x-ref="logBox"
-                 class="text-xs font-mono text-gray-300 bg-gray-900 p-5 overflow-auto max-h-96 whitespace-pre-wrap leading-relaxed"
+                 class="text-xs font-mono text-gray-300 bg-gray-900 p-5 overflow-y-auto whitespace-pre-wrap leading-relaxed"
+                 style="height: 400px;"
                  x-text="log || 'No log entries yet. The log appears here after the first update check.'"
             ></pre>
         </div>

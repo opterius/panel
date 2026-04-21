@@ -295,6 +295,7 @@ Route::middleware([
         // Domains (create/store removed — domain is created with the account)
         Route::resource('domains', DomainController::class)->only(['index', 'destroy']);
         Route::post('/domains/{domain}/toggle-htaccess', [HtaccessController::class, 'toggle'])->name('domains.toggle-htaccess');
+        Route::get('/htaccess', [HtaccessController::class, 'index'])->name('htaccess.index');
 
         // Directory password protection
         Route::get('/security/directory-protection',                  [\App\Http\Controllers\User\ProtectedDirectoryController::class, 'index'])->name('security.directories.index');
@@ -326,6 +327,7 @@ Route::middleware([
         // Visitor analytics
         Route::get('/analytics',        [\App\Http\Controllers\User\AnalyticsController::class, 'index'])->name('analytics.index');
         Route::post('/analytics/query', [\App\Http\Controllers\User\AnalyticsController::class, 'query'])->name('analytics.query');
+        Route::post('/analytics/live',  [\App\Http\Controllers\User\AnalyticsController::class, 'live'])->name('analytics.live');
 
         // cPanel import (customer self-service)
         Route::get('/import',                      [\App\Http\Controllers\User\MigrationController::class, 'index'])->name('migrations.index');

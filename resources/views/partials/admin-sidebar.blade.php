@@ -2,9 +2,7 @@
     <!-- Logo -->
     <div class="h-16 flex items-center px-6 border-b border-gray-800">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
-            <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center">
-                <span class="text-white font-bold text-sm">O</span>
-            </div>
+            <img src="{{ asset('img/logo.png') }}" alt="Opterius" class="w-8 h-8 rounded-lg object-contain">
             <span class="text-white font-semibold text-lg">Opterius</span>
         </a>
     </div>

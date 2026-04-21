@@ -37,9 +37,28 @@
                   x-data="{
                       username: '',
                       password: '',
+                      showPassword: false,
+                      passwordCopied: false,
                       selectedDomain: '{{ $domains->first()->domain }}',
                       quotaOption: '500',
                       customQuota: '',
+                      generatePassword() {
+                          const charset = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%^&*';
+                          let p = '';
+                          const arr = new Uint32Array(16);
+                          crypto.getRandomValues(arr);
+                          for (const n of arr) p += charset[n % charset.length];
+                          this.password = p;
+                          this.showPassword = true;
+                      },
+                      async copyPassword() {
+                          if (!this.password) return;
+                          try {
+                              await navigator.clipboard.writeText(this.password);
+                              this.passwordCopied = true;
+                              setTimeout(() => this.passwordCopied = false, 1500);
+                          } catch (e) {}
+                      },
                       get cleanUsername() {
                           return this.username.replace(/[^a-zA-Z0-9._-]/g, '').substring(0, 25);
                       },
@@ -115,9 +134,28 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('common.password') }}</label>
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <input type="password" name="password" x-model="password"
-                                    class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
-                                    placeholder="Min 8 characters">
+                                <div class="flex items-stretch gap-1.5">
+                                    <input :type="showPassword ? 'text' : 'password'" name="password" x-model="password"
+                                        class="flex-1 min-w-0 rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        placeholder="Min 8 characters" autocomplete="new-password">
+                                    <button type="button" @click="showPassword = !showPassword"
+                                        class="inline-flex items-center justify-center px-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-gray-600 transition"
+                                        :title="showPassword ? 'Hide password' : 'Show password'">
+                                        <svg x-show="!showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                        <svg x-show="showPassword" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                                    </button>
+                                    <button type="button" @click="generatePassword()"
+                                        class="inline-flex items-center justify-center px-2.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-indigo-700 transition"
+                                        title="Generate random password">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    </button>
+                                    <button type="button" @click="copyPassword()" :disabled="!password"
+                                        class="inline-flex items-center justify-center px-2.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300 rounded-lg text-gray-600 transition"
+                                        :title="passwordCopied ? 'Copied!' : 'Copy password'">
+                                        <svg x-show="!passwordCopied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                        <svg x-show="passwordCopied" class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                    </button>
+                                </div>
                                 @error('password')
                                     <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
@@ -262,12 +300,50 @@
                         <div class="px-6 py-4 border-t border-gray-100 bg-white">
                             {{-- Password Tab --}}
                             <div x-show="tab === 'password'">
-                                <form action="{{ route('user.emails.password', $account) }}" method="POST" class="max-w-md space-y-4">
+                                <form action="{{ route('user.emails.password', $account) }}" method="POST" class="max-w-md space-y-4"
+                                      x-data="{
+                                          pwd: '',
+                                          show: false,
+                                          copied: false,
+                                          gen() {
+                                              const cs = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789!@#$%^&*';
+                                              let p = '';
+                                              const arr = new Uint32Array(16);
+                                              crypto.getRandomValues(arr);
+                                              for (const n of arr) p += cs[n % cs.length];
+                                              this.pwd = p;
+                                              this.show = true;
+                                          },
+                                          async copy() {
+                                              if (!this.pwd) return;
+                                              try { await navigator.clipboard.writeText(this.pwd); this.copied = true; setTimeout(() => this.copied = false, 1500); } catch (e) {}
+                                          }
+                                      }">
                                     @csrf
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('emails.new_password') }}</label>
-                                        <input type="password" name="password" placeholder="Min 8 characters"
-                                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
+                                        <div class="flex items-stretch gap-1.5">
+                                            <input :type="show ? 'text' : 'password'" name="password" x-model="pwd" placeholder="Min 8 characters"
+                                                class="flex-1 min-w-0 rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                                autocomplete="new-password">
+                                            <button type="button" @click="show = !show"
+                                                class="inline-flex items-center justify-center px-2.5 bg-gray-100 hover:bg-gray-200 border border-gray-300 rounded-lg text-gray-600 transition"
+                                                :title="show ? 'Hide' : 'Show'">
+                                                <svg x-show="!show" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                                                <svg x-show="show" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.542 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/></svg>
+                                            </button>
+                                            <button type="button" @click="gen()"
+                                                class="inline-flex items-center justify-center px-2.5 bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 rounded-lg text-indigo-700 transition"
+                                                title="Generate random password">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                            </button>
+                                            <button type="button" @click="copy()" :disabled="!pwd"
+                                                class="inline-flex items-center justify-center px-2.5 bg-gray-100 hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed border border-gray-300 rounded-lg text-gray-600 transition"
+                                                :title="copied ? 'Copied!' : 'Copy'">
+                                                <svg x-show="!copied" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                                                <svg x-show="copied" class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                                            </button>
+                                        </div>
                                     </div>
                                     <button type="submit" class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition">
                                         {{ __('emails.update_password') }}

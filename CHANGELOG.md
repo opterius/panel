@@ -8,11 +8,46 @@ Each release ships panel and agent together under the same version number.
 
 ---
 
-## [2.2.4] - 2026-04-21
+## [2.2.5] - 2026-04-21
+
+### Added — Analytics
+- **Real-time visitors** — live counter at the top of the analytics page, auto-refreshes every 30 seconds
+- **Last 30-minute visit sparkline** — see traffic trends in real time
+- **Hour × Day heatmap** — visualize when visitors arrive (GitHub-style grid)
+- **Bandwidth over time chart** — separate from visits for clearer bandwidth tracking
+- **Traffic source breakdown** — Direct / Search / Social / Referral donut chart
+- **Device type breakdown** — Desktop / Mobile / Tablet donut chart
+- **Top 404 broken links** — helps catch SEO-damaging dead URLs
+- **Top IPs table** — spot abusive clients or misconfigured scrapers
+- **Compare with previous period** — overlay dashed line on visits chart
+- **Exact HTTP status codes** — individual codes like 200, 301, 404 (previously only 2xx/3xx/4xx summaries)
+- **Full-width analytics layout** — makes better use of wide screens
+
+### Added — Dashboard
+- SSL + status badges next to the primary domain in the Account Info card
+- New `.htaccess` management page under Advanced (previously buried in the domains list)
+
+### Added — Branding
+- Opterius logo + favicon everywhere (welcome page, auth pages, sidebars, browser tab)
+- Dark-themed login / password / register pages matching the welcome page
+- Email account password fields now have **Generate random password**, **Show/Hide**, and **Copy** buttons (cryptographically secure, avoids confusing characters)
 
 ### Changed
-- Single "Update Opterius" button now updates panel and agent together — no separate "Force Agent Update" needed for normal use
+- **Brand color everywhere is now #ff6900 (Opterius orange)** — all previously indigo buttons, badges, and highlights now use the brand color
+- Create-account page redesigned as a two-column layout (left: account info/domain/owner; right: package selection + summary)
+- Removed redundant Domain icon from user dashboard (sidebar Domains link replaces it)
+- User sidebar groups are now collapsible with auto-expand for the active page
+- Account switcher: alphabetical sort, search box, scrollable list — for users with many accounts
+- phpMyAdmin: multi-server accounts see a server dropdown (top button previously only reached the first server)
+- phpMyAdmin top button now uses cookie auth (`?server=2`) — fixes "Missing token" error
+- Single "Update Opterius" button updates panel and agent together
 - Force agent re-download moved to an Advanced section for troubleshooting
+- Server details page: shows "Agent connected" state with collapsible reinstall instructions when the agent is online, or a prominent install card when it's offline; agent token is now displayed as a masked copyable field
+
+### Fixed
+- Updates page shows current version in release notes title
+- Update log viewer has a proper scrollable box
+- Panel auto-update logs each step individually for better visibility
 
 ---
 
