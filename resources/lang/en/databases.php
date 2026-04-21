@@ -35,6 +35,9 @@ return [
     'remote_percent'            => 'Remote (%)',
     // Show page
     'open_phpmyadmin'           => 'Open phpMyAdmin',
+    'pma_manual_login'          => 'Open phpMyAdmin (manual login)',
+    'pma_sso_set_password'      => 'Update this database password to enable one-click auto-login.',
+    'pma_sso_no_password'       => 'Auto-login requires a stored password. Use "Change Password" below to enable it.',
     'repair'                    => 'Repair',
     'optimize'                  => 'Optimize',
     'change_user_password'      => 'Change User Password',

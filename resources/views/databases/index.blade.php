@@ -100,9 +100,9 @@
                                     phpMyAdmin
                                 </a>
                             @else
-                                @php $rowPmaUrl = str_replace('SERVER_IP', $database->account->server->ip_address, config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081')); @endphp
+                                @php $rowPmaUrl = str_replace('SERVER_IP', $database->account->server->ip_address, config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081')) . '/?server=2'; @endphp
                                 <a href="{{ $rowPmaUrl }}" target="_blank" rel="noopener noreferrer"
-                                   title="Open phpMyAdmin"
+                                   title="{{ __('databases.pma_manual_login') }}"
                                    class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg transition">
                                     <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                                     phpMyAdmin

@@ -33,12 +33,18 @@
                 {{ __('databases.open_phpmyadmin') }}
             </a>
         @else
-            <a href="{{ str_replace('SERVER_IP', $database->account->server->ip_address, config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081')) }}"
+            @php
+                $pmaBase = str_replace('SERVER_IP', $database->account->server->ip_address, config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081'));
+            @endphp
+            <a href="{{ $pmaBase . '/?server=2' }}"
                target="_blank"
                class="inline-flex items-center px-4 py-2.5 bg-purple-600 text-white text-sm font-medium rounded-lg hover:bg-purple-700 transition">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
                 {{ __('databases.open_phpmyadmin') }}
             </a>
+            @if(config('opterius.phpmyadmin_sso_secret'))
+                <p class="text-xs text-amber-600 mt-1">{{ __('databases.pma_sso_set_password') }}</p>
+            @endif
         @endif
 
         <form action="{{ route('user.databases.repair', $database) }}" method="POST">
