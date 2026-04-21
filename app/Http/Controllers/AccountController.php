@@ -219,6 +219,11 @@ class AccountController extends Controller
         }
         $user->save();
 
+        // If the admin just changed their own panel password, keep the session alive.
+        if ($user->id === auth()->id()) {
+            auth()->login($user);
+        }
+
         ActivityLogger::log('account.owner_updated', 'account', $account->id, $account->username,
             "Updated owner info for {$account->username}: {$validated['name']} ({$validated['email']})");
 

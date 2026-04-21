@@ -194,7 +194,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('accounts.new_password') }} <span class="text-gray-400 font-normal">{{ __('accounts.leave_empty_to_keep') }}</span></label>
-                    <input type="password" name="password" placeholder="{{ __('accounts.leave_empty_placeholder') }}"
+                    <input type="password" name="password" placeholder="{{ __('accounts.leave_empty_placeholder') }}" autocomplete="new-password"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                 </div>
                 <div class="flex items-center space-x-3">
