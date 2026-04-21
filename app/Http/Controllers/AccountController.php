@@ -29,7 +29,9 @@ class AccountController extends Controller
         $license = new \App\Services\LicenseService();
         $maxAccounts = $license->maxAccounts();
         $currentAccounts = Account::count();
-        $atLimit = $currentAccounts >= $maxAccounts && $maxAccounts !== PHP_INT_MAX;
+        $atLimit = !auth()->user()->isAdmin()
+            && $currentAccounts >= $maxAccounts
+            && $maxAccounts !== PHP_INT_MAX;
 
         return view('accounts.index', compact('accounts', 'maxAccounts', 'currentAccounts', 'atLimit'));
     }
@@ -52,13 +54,15 @@ class AccountController extends Controller
 
     public function store(Request $request)
     {
-        // Check license account limit
-        $license = new \App\Services\LicenseService();
-        $maxAccounts = $license->maxAccounts();
-        $currentAccounts = Account::count();
+        // Check license account limit (admins are exempt)
+        if (!auth()->user()->isAdmin()) {
+            $license = new \App\Services\LicenseService();
+            $maxAccounts = $license->maxAccounts();
+            $currentAccounts = Account::count();
 
-        if ($currentAccounts >= $maxAccounts) {
-            return back()->with('error', __('accounts.account_limit_reached', ['current' => $currentAccounts, 'max' => $maxAccounts]))->withInput();
+            if ($currentAccounts >= $maxAccounts) {
+                return back()->with('error', __('accounts.account_limit_reached', ['current' => $currentAccounts, 'max' => $maxAccounts]))->withInput();
+            }
         }
 
         // Check reseller ACL and account limit

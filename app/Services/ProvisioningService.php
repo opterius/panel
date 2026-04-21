@@ -22,13 +22,16 @@ class ProvisioningService
      */
     public function createAccount(array $params): array
     {
-        // License check
-        $license = new LicenseService();
-        $maxAccounts = $license->maxAccounts();
-        $currentAccounts = Account::count();
+        // License check (skipped when called on behalf of an admin)
+        $skipLimitCheck = $params['skip_limit_check'] ?? false;
+        if (!$skipLimitCheck) {
+            $license = new LicenseService();
+            $maxAccounts = $license->maxAccounts();
+            $currentAccounts = Account::count();
 
-        if ($currentAccounts >= $maxAccounts) {
-            return ['success' => false, 'account' => null, 'error' => "Account limit reached ({$currentAccounts}/{$maxAccounts})."];
+            if ($currentAccounts >= $maxAccounts) {
+                return ['success' => false, 'account' => null, 'error' => "Account limit reached ({$currentAccounts}/{$maxAccounts})."];
+            }
         }
 
         // Check uniqueness
