@@ -13,16 +13,26 @@ class UpdateController extends Controller
     {
         $currentVersion = config('opterius.version', '1.0.0');
 
-        // Check for latest version from license server (for the "update available" banner).
-        // Changelog content always comes from the local CHANGELOG.md below.
+        // Check for latest version. Authoritative source is
+        // get.opterius.com/agent/version.txt — it's bumped by every release.sh
+        // run, so it always matches what's actually deployed. The old license
+        // server API at /api/version/latest is kept as a fallback only.
         $latestVersion = null;
         try {
-            $response = Http::timeout(5)->get(config('opterius.license_server_url') . '/api/version/latest');
+            $response = Http::timeout(5)->get('https://get.opterius.com/agent/version.txt');
             if ($response->successful()) {
-                $latestVersion = $response->json('version');
+                $latestVersion = trim($response->body());
             }
         } catch (\Exception $e) {
-            // License server unreachable — treat as "up to date" rather than erroring.
+            // get.opterius.com unreachable — try the license server.
+        }
+        if (! $latestVersion) {
+            try {
+                $response = Http::timeout(5)->get(config('opterius.license_server_url') . '/api/version/latest');
+                if ($response->successful()) {
+                    $latestVersion = $response->json('version');
+                }
+            } catch (\Exception $e) {}
         }
 
         // Read release notes for the current version from CHANGELOG.md in the panel root.

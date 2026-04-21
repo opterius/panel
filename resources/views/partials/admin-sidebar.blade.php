@@ -1,9 +1,8 @@
 <aside class="w-64 bg-gray-900 text-gray-300 flex flex-col shrink-0">
     <!-- Logo -->
     <div class="h-16 flex items-center px-6 border-b border-gray-800">
-        <a href="{{ route('admin.dashboard') }}" class="flex items-center space-x-3">
-            <img src="{{ asset('img/logo.png') }}" alt="Opterius" class="w-8 h-8 rounded-lg object-contain">
-            <span class="text-white font-semibold text-lg">Opterius</span>
+        <a href="{{ route('admin.dashboard') }}" class="flex items-center">
+            <img src="{{ asset('img/logo.png') }}" alt="Opterius">
         </a>
     </div>
 

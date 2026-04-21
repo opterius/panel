@@ -1,9 +1,8 @@
 <aside class="w-64 bg-gray-900 text-gray-300 flex flex-col shrink-0">
     <!-- Logo -->
     <div class="h-16 flex items-center px-6 border-b border-gray-800">
-        <a href="{{ route('user.dashboard') }}" class="flex items-center space-x-3">
-            <img src="{{ asset('img/logo.png') }}" alt="Opterius" class="w-8 h-8 rounded-lg object-contain">
-            <span class="text-white font-semibold text-lg">Opterius</span>
+        <a href="{{ route('user.dashboard') }}" class="flex items-center">
+            <img src="{{ asset('img/logo.png') }}" alt="Opterius">
         </a>
     </div>
 
@@ -103,7 +102,7 @@
 
         {{-- ── Domain ────────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['domain']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>{{ __('domains.domain') }}</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -143,7 +142,7 @@
 
         {{-- ── Files ─────────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['files']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>{{ __('common.files') }}</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -177,7 +176,7 @@
 
         {{-- ── Databases ─────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['databases']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>{{ __('databases.databases') }}</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -199,7 +198,7 @@
 
         {{-- ── Email ─────────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['email']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>{{ __('common.email') }}</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -227,7 +226,7 @@
 
         {{-- ── Software ──────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['software']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>{{ __('common.software') }}</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -291,7 +290,7 @@
 
         {{-- ── Advanced ──────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['advanced']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>{{ __('common.advanced') }}</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -337,7 +336,7 @@
 
         {{-- ── Performance ───────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['performance']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>Performance</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -359,7 +358,7 @@
 
         {{-- ── Tools ─────────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['tools']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>Tools</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
@@ -375,7 +374,7 @@
 
         {{-- ── Security ──────────────────────────────────────────────────── --}}
         <div x-data="{ open: @json($active['security']) }" class="pt-3">
-            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-gray-300 transition">
+            <button @click="open = !open" class="w-full flex items-center justify-between px-3 py-1.5 text-xs font-semibold uppercase tracking-wider text-gray-300 hover:text-white transition">
                 <span>Security</span>
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>

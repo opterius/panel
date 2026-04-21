@@ -13,9 +13,8 @@
 
     <!-- Nav -->
     <nav class="flex items-center justify-between px-8 py-5">
-        <div class="flex items-center space-x-3">
-            <img src="{{ asset('img/logo.png') }}" alt="Opterius" class="w-10 h-10 rounded-xl object-contain">
-            <span class="text-xl font-bold">Opterius</span>
+        <div class="flex items-center">
+            <img src="{{ asset('img/logo.png') }}" alt="Opterius">
         </div>
         <div class="flex items-center space-x-4">
             @auth
