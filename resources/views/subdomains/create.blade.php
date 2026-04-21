@@ -27,11 +27,11 @@
                   return (this.cleanSubdomain || 'sub') + '.' + this.parentDomain;
               },
               get documentRoot() {
-                  const basePath = '{{ dirname($domain->document_root) }}/';
+                  const basePath = '{{ $domain->account->home_directory }}/';
                   if (this.customPath && this.customSuffix) {
                       return basePath + this.customSuffix.replace(/[^a-zA-Z0-9_\-\/\.]/g, '');
                   }
-                  return basePath + 'public_html/' + this.fullDomain;
+                  return basePath + this.fullDomain + '/public_html';
               },
               validateSubdomain() {
                   this.subdomain = this.subdomain.replace(/[^a-zA-Z0-9_-]/g, '');
@@ -96,14 +96,14 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1.5">Document Root</label>
                         <div class="flex">
                             <span class="inline-flex items-center px-3 rounded-l-lg border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-xs font-mono">
-                                {{ dirname($domain->document_root) }}/
+                                {{ $domain->account->home_directory }}/
                             </span>
                             <input type="text"
-                                :value="customPath ? customSuffix : 'public_html/' + fullDomain"
+                                :value="customPath ? customSuffix : fullDomain + '/public_html'"
                                 @input="customSuffix = $event.target.value.replace(/[^a-zA-Z0-9_\-\/\.]/g, '')"
                                 :disabled="!customPath"
                                 class="flex-1 min-w-0 rounded-r-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500 disabled:bg-gray-50 disabled:text-gray-400"
-                                placeholder="public_html/blog">
+                                placeholder="blog.domain.com/public_html">
                         </div>
                         <p class="mt-1.5 text-xs text-gray-400">
                             Full path: <span class="font-mono" x-text="documentRoot"></span>
