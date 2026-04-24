@@ -15,39 +15,13 @@
         </div>
     @endif
 
-    <!-- Account Selector -->
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-        <div class="px-6 py-5 border-b border-gray-100">
-            <h3 class="text-base font-semibold text-gray-800">{{ __('ssh.select_account') }}</h3>
-            <p class="text-sm text-gray-500 mt-1">{{ __('ssh.select_account_hint') }}</p>
-        </div>
-        <div class="px-6 py-5">
-            @if($accounts->isEmpty())
+    @if($accounts->isEmpty())
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <div class="px-6 py-5">
                 <p class="text-sm text-gray-500">{{ __('ssh.no_accounts_available') }}</p>
-            @else
-                <form method="GET" action="{{ route('user.ssh.index') }}" class="flex items-end gap-4" autocomplete="off">
-                    <div class="flex-1">
-                        <label for="ssh_account" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('cron.account') }}</label>
-                        <select name="account" id="ssh_account" autocomplete="off"
-                            onchange="this.form.submit()"
-                            class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            @if(!$selectedAccount)
-                                <option value="" disabled selected>{{ __('ssh.select_account') }}</option>
-                            @endif
-                            @foreach($accounts as $account)
-                                <option value="{{ $account->username }}" @selected($selectedAccount && $selectedAccount->username === $account->username)>
-                                    {{ $account->username }} ({{ $account->server->name }} &mdash; {{ $account->server->ip_address }})
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                        {{ __('common.manage') }}
-                    </button>
-                </form>
-            @endif
+            </div>
         </div>
-    </div>
+    @endif
 
     @if($selectedAccount)
         <!-- SSH Access Toggle -->

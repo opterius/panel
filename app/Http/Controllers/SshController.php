@@ -15,21 +15,9 @@ class SshController extends Controller
             ->with('server')
             ->get();
 
-        $selectedAccount = null;
+        $selectedAccount = $accounts->first();
         $keys = [];
         $sshEnabled = false;
-
-        if ($request->has('account')) {
-            $selectedAccount = $accounts->firstWhere('username', $request->input('account'));
-            if (!$selectedAccount) {
-                abort(404);
-            }
-        } elseif ($request->has('account_id')) {
-            $selectedAccount = $accounts->firstWhere('id', (int) $request->input('account_id'));
-            if (!$selectedAccount) {
-                abort(404);
-            }
-        }
 
         if ($selectedAccount) {
 
@@ -109,7 +97,7 @@ class SshController extends Controller
                 "Imported SSH key for {$account->username}", ['server_id' => $account->server_id]);
 
             return redirect()
-                ->route('user.ssh.index', ['account' => $account->username])
+                ->route('user.ssh.index')
                 ->with('success', __('ssh.key_imported'));
         }
 
@@ -140,7 +128,7 @@ class SshController extends Controller
                 "Deleted SSH key for {$account->username}", ['server_id' => $account->server_id, 'fingerprint' => $validated['fingerprint']]);
 
             return redirect()
-                ->route('user.ssh.index', ['account' => $account->username])
+                ->route('user.ssh.index')
                 ->with('success', __('ssh.key_removed'));
         }
 
@@ -175,7 +163,7 @@ class SshController extends Controller
 
             $successKey = $validated['enabled'] ? 'ssh.ssh_access_enabled' : 'ssh.ssh_access_disabled';
             return redirect()
-                ->route('user.ssh.index', ['account' => $account->username])
+                ->route('user.ssh.index')
                 ->with('success', __($successKey, ['username' => $account->username]));
         }
 

@@ -103,7 +103,7 @@
                         <svg class="w-9 h-9 text-blue-500" viewBox="0 0 24 24" fill="currentColor"><path d="M17.128 0a10.134 10.134 0 00-2.755.38 7.124 7.124 0 00-2.016-.291c-1.176.012-2.306.356-3.231.967a9.933 9.933 0 00-1.685-.218l-.032.005c-1.347.013-4.423 1.396-4.423 6.847a12.418 12.418 0 001.161 5.19l.054.12a16.46 16.46 0 00-.55 4.122c.001 2.826.752 4.21 1.684 4.51.387.124.773.186 1.158.186 1.387 0 2.629-.832 3.388-1.678.44.047.896.07 1.362.07 2.32 0 4.49-.647 6.037-1.874a6.5 6.5 0 002.127-2.706 7.3 7.3 0 001.54-2.16c.744-1.668.744-3.622.744-4.514C21.494 2.695 19.451 0 17.128 0z"/></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-blue-700">PostgreSQL</span>
                     </a>
-                    <a href="{{ str_replace('SERVER_IP', $myDomains->first()?->account?->server?->ip_address ?? 'localhost', config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081')) }}" target="_blank" class="group flex flex-col items-center p-3 rounded-xl hover:bg-amber-50 transition">
+                    <a href="{{ route('user.databases.index') }}" class="group flex flex-col items-center p-3 rounded-xl hover:bg-amber-50 transition">
                         <svg class="w-9 h-9 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M3 14h18m-9-4v8m-7 0h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                         <span class="mt-2 text-xs font-medium text-gray-600 group-hover:text-amber-700">{{ __('dashboard.phpmyadmin') }}</span>
                     </a>
