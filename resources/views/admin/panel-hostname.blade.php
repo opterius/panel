@@ -24,6 +24,13 @@
                 <span class="text-gray-500">{{ __('panel_hostname.current_url') }}:</span>
                 <span class="font-mono text-gray-900 ml-2">{{ $currentUrl }}</span>
             </div>
+            @if($configMismatch)
+                <div class="text-xs text-gray-500">
+                    {{ __('panel_hostname.configured_url') }}:
+                    <span class="font-mono">{{ $configuredUrl }}</span>
+                    <span class="text-amber-600">— {{ __('panel_hostname.config_mismatch') }}</span>
+                </div>
+            @endif
             @if($isIpBased)
                 <div class="mt-3 inline-flex items-center px-3 py-1.5 rounded-full bg-amber-50 text-amber-700 text-xs font-medium">
                     <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" /></svg>
@@ -79,6 +86,18 @@
                     <li>{{ __('panel_hostname.checklist_port80') }}</li>
                     <li>{{ __('panel_hostname.checklist_redirect') }}</li>
                 </ul>
+            </div>
+
+            <div class="rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-xs text-amber-900">
+                <div class="flex items-start space-x-2">
+                    <svg class="w-4 h-4 mt-0.5 flex-shrink-0 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <p class="font-semibold">{{ __('panel_hostname.expectation_title') }}</p>
+                        <p class="mt-1 leading-relaxed">{{ __('panel_hostname.expectation_body') }}</p>
+                    </div>
+                </div>
             </div>
 
             <div class="flex items-center justify-end pt-2">

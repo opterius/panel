@@ -7,6 +7,8 @@ return [
     'current_url'         => 'URL',
     'using_ip_warning'    => 'Panel is reachable by IP only — set a hostname to get a valid SSL certificate.',
     'using_hostname'      => 'Hostname configured with valid SSL.',
+    'configured_url'      => 'APP_URL in .env',
+    'config_mismatch'     => 'differs from the live URL; the form below will sync them.',
     'set_new_label'       => 'Set hostname',
     'set_new_hint'        => 'Switch the panel from IP-based access to a real subdomain with a Let’s Encrypt certificate. Everything is handled automatically — DNS verification, certificate issuance, nginx configuration.',
     'hostname_label'      => 'Hostname',
@@ -17,9 +19,19 @@ return [
     'checklist_dns'       => 'Add an A record pointing the hostname to this server’s public IP and wait for DNS propagation (usually a few minutes).',
     'checklist_port80'    => 'Make sure port 80 is open in your firewall — Let’s Encrypt uses it briefly during validation.',
     'checklist_redirect'  => 'After this finishes, the panel URL changes — bookmark the new address.',
+    'expectation_title'   => 'What happens after you click Apply',
+    'expectation_body'    => 'The panel rebinds to the new hostname immediately. Your current browser tab is on the old URL and will likely show "ERR_EMPTY_RESPONSE" or a connection error if you refresh it — this is expected. A success page will load with a button to the new URL; just click it to continue. The panel itself is fine and reachable at the new address.',
     'apply'               => 'Apply hostname & issue SSL',
     'applying'            => 'Issuing certificate, please wait…',
     'success'             => 'Panel hostname configured. Open <a href=":url" class="underline font-semibold">:url</a> to continue.',
     'failed'              => 'Failed to configure panel hostname: :error',
     'no_server'           => 'No server is configured.',
+
+    // Success page (rendered standalone, not inside the admin layout)
+    'success_title'       => 'Panel hostname configured',
+    'success_intro'       => 'Your panel is now serving on :hostname with a valid Let’s Encrypt certificate. You need to open the new URL — this old address (the IP) no longer accepts panel traffic.',
+    'new_url_label'       => 'New panel URL',
+    'open_new_url'        => 'Open the new panel',
+    'success_autoredirect'=> 'Redirecting automatically in 6 seconds…',
+    'success_old_url_note'=> 'The old IP-based URL will show "ERR_EMPTY_RESPONSE" if you reload it. That’s normal — nginx no longer answers there. Use the new URL above.',
 ];

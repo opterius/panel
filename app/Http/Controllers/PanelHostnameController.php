@@ -9,14 +9,22 @@ use Illuminate\Http\Request;
 
 class PanelHostnameController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $currentUrl = config('app.url');
-        $currentHost = parse_url($currentUrl, PHP_URL_HOST) ?: '';
-        $currentPort = parse_url($currentUrl, PHP_URL_PORT) ?: 8443;
-        $isIpBased = (bool) filter_var($currentHost, FILTER_VALIDATE_IP);
+        // Use the URL the user is actually visiting, not the configured APP_URL
+        // (which can be stale or wrong on fresh installs).
+        $currentUrl  = $request->getSchemeAndHttpHost();
+        $currentHost = $request->getHost();
+        $currentPort = $request->getPort() ?: 8443;
+        $isIpBased   = (bool) filter_var($currentHost, FILTER_VALIDATE_IP);
 
-        return view('admin.panel-hostname', compact('currentUrl', 'currentHost', 'currentPort', 'isIpBased'));
+        // Show a hint when the configured APP_URL drifts from the live URL.
+        $configuredUrl = rtrim((string) config('app.url'), '/');
+        $configMismatch = $configuredUrl !== '' && $configuredUrl !== rtrim($currentUrl, '/');
+
+        return view('admin.panel-hostname', compact(
+            'currentUrl', 'currentHost', 'currentPort', 'isIpBased', 'configuredUrl', 'configMismatch'
+        ));
     }
 
     public function update(Request $request)
@@ -46,8 +54,15 @@ class PanelHostnameController extends Controller
                     'url'      => $newUrl,
                 ]);
 
-            return redirect()->route('admin.panel-hostname.index')
-                ->with('success', __('panel_hostname.success', ['url' => $newUrl]));
+            // Redirect to a standalone success page on the OLD URL — the browser
+            // is still on the old hostname/IP, and the new vhost no longer
+            // answers there. Sending the user back to the admin route would
+            // produce ERR_EMPTY_RESPONSE. The success page has a big button +
+            // auto-redirect to the new URL.
+            return view('admin.panel-hostname-success', [
+                'newUrl'   => $newUrl,
+                'hostname' => $validated['hostname'],
+            ]);
         }
 
         $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
