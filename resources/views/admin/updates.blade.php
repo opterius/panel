@@ -72,40 +72,6 @@
         </div>
     </div>
 
-    {{-- ── Webmail update ───────────────────────────────────────────────── --}}
-    @if($mailInstalled)
-    <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
-        <div class="px-6 py-6">
-            <div class="flex items-center justify-between">
-                <div class="flex items-center space-x-4">
-                    <div class="w-14 h-14 rounded-xl flex items-center justify-center bg-blue-100">
-                        <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
-                    </div>
-                    <div>
-                        <div class="text-lg font-bold text-gray-900">Opterius Mail{{ $mailVersion ? ' v'.$mailVersion : '' }}</div>
-                        <div class="text-sm text-gray-500">Webmail — installed on this server</div>
-                    </div>
-                </div>
-                <form action="{{ route('admin.updates.mail') }}" method="POST"
-                      x-data="{ busy: false }" @submit="busy = true">
-                    @csrf
-                    <button type="submit" :disabled="busy"
-                        class="inline-flex items-center px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition disabled:opacity-50 disabled:cursor-not-allowed">
-                        <template x-if="!busy">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                        </template>
-                        <template x-if="busy">
-                            <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
-                        </template>
-                        <span x-text="busy ? 'Updating...' : 'Force Update Webmail'">Force Update Webmail</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-    </div>
-    @endif
 
     @if($changelog)
         {{-- ── Changelog ──────────────────────────────────────────────────── --}}
@@ -138,7 +104,20 @@
                 </div>
                 <div>
                     <dt class="text-xs font-medium text-gray-400 uppercase">Webmail Version</dt>
-                    <dd class="mt-1 text-sm font-mono text-gray-800">{{ $mailVersion ? 'v'.$mailVersion : '—' }}</dd>
+                    <dd class="mt-1 flex items-center gap-3">
+                        <span class="text-sm font-mono text-gray-800">{{ $mailVersion ? 'v'.$mailVersion : '—' }}</span>
+                        @if($mailInstalled)
+                            <form action="{{ route('admin.updates.mail') }}" method="POST"
+                                  x-data="{ busy: false }" @submit="busy = true" class="inline">
+                                @csrf
+                                <button type="submit" :disabled="busy"
+                                    class="inline-flex items-center gap-1 px-2 py-0.5 text-xs text-gray-500 border border-gray-300 rounded hover:bg-gray-50 transition disabled:opacity-50">
+                                    <svg class="w-3 h-3" :class="{ 'animate-spin': busy }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                                    <span x-text="busy ? 'Updating…' : 'Update'">Update</span>
+                                </button>
+                            </form>
+                        @endif
+                    </dd>
                 </div>
                 <div>
                     <dt class="text-xs font-medium text-gray-400 uppercase">Laravel</dt>
