@@ -82,7 +82,7 @@ class UpdateController extends Controller
             return back()->with('error', __('servers.no_server_configured'));
         }
 
-        $response = AgentService::for($server)->post('/update/run', []);
+        $response = AgentService::for($server)->postLong('/update/run', [], 300);
 
         if ($response && $response->successful()) {
             return redirect()->route('admin.updates.index')->with('success', __('servers.update_completed'));
