@@ -290,8 +290,16 @@ PDNS_PASS=$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 24)
 if [[ "$PKG_MANAGER" == "apt" ]]; then
     # Disable systemd-resolved (conflicts with PowerDNS on port 53)
     systemctl disable --now systemd-resolved 2>/dev/null || true
+    # /etc/resolv.conf is normally a symlink to /run/systemd/resolve/stub-resolv.conf,
+    # which is not recreated on reboot once systemd-resolved is disabled. Drop the
+    # symlink, write a real file, and chattr +i so nothing rewrites it on next boot.
+    chattr -i /etc/resolv.conf 2>/dev/null || true
     rm -f /etc/resolv.conf
-    echo "nameserver 8.8.8.8" > /etc/resolv.conf
+    cat > /etc/resolv.conf <<'EOF_RESOLV'
+nameserver 8.8.8.8
+nameserver 1.1.1.1
+EOF_RESOLV
+    chattr +i /etc/resolv.conf 2>/dev/null || true
 
     apt-get install -y -qq pdns-server pdns-backend-mysql
 else
