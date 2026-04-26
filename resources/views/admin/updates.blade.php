@@ -15,7 +15,7 @@
         </div>
     @endif
 
-    @php $mailVersion = $mailVersion ?? null; @endphp
+    @php $mailVersion = $mailVersion ?? null; $mailInstalled = $mailInstalled ?? false; @endphp
 
     {{-- ── Panel update ─────────────────────────────────────────────────── --}}
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
@@ -73,7 +73,7 @@
     </div>
 
     {{-- ── Webmail update ───────────────────────────────────────────────── --}}
-    @if($mailVersion !== null)
+    @if($mailInstalled)
     <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
         <div class="px-6 py-6">
             <div class="flex items-center justify-between">
@@ -84,7 +84,7 @@
                         </svg>
                     </div>
                     <div>
-                        <div class="text-lg font-bold text-gray-900">Opterius Mail v{{ $mailVersion }}</div>
+                        <div class="text-lg font-bold text-gray-900">Opterius Mail{{ $mailVersion ? ' v'.$mailVersion : '' }}</div>
                         <div class="text-sm text-gray-500">Webmail — installed on this server</div>
                     </div>
                 </div>

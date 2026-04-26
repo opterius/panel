@@ -50,8 +50,9 @@ class UpdateController extends Controller
             try {
                 $versionResp = AgentService::for($server)->get('/version');
                 if ($versionResp && $versionResp->successful()) {
-                    $agentVersion = $versionResp->json('agent_version');
-                    $mailVersion  = $versionResp->json('mail_version') ?: null;
+                    $agentVersion  = $versionResp->json('agent_version');
+                    $mailInstalled = (bool) $versionResp->json('mail_installed', false);
+                    $mailVersion   = $versionResp->json('mail_version') ?: null;
                 }
 
                 $logResp = AgentService::for($server)->get('/update/log');
@@ -64,9 +65,10 @@ class UpdateController extends Controller
             break;
         }
 
+        $mailInstalled = $mailInstalled ?? false;
         return view('admin.updates', compact(
             'currentVersion', 'latestVersion', 'changelog',
-            'updateAvailable', 'agentVersion', 'mailVersion', 'updateLog'
+            'updateAvailable', 'agentVersion', 'mailInstalled', 'mailVersion', 'updateLog'
         ));
     }
 
