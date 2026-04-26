@@ -169,6 +169,10 @@ Route::middleware([
         Route::post('/updates/agent', [UpdateController::class, 'forceAgentUpdate'])->name('updates.agent');
         Route::get('/updates/log', [UpdateController::class, 'log'])->name('updates.log');
 
+        // Panel Hostname (one-click switch from IP to subdomain + Let's Encrypt)
+        Route::get('/panel-hostname', [\App\Http\Controllers\PanelHostnameController::class, 'index'])->name('panel-hostname.index');
+        Route::post('/panel-hostname', [\App\Http\Controllers\PanelHostnameController::class, 'update'])->name('panel-hostname.update');
+
         // Spam Filter
         Route::get('/spam-filter', [SpamFilterController::class, 'index'])->name('spam-filter.index');
         Route::post('/spam-filter', [SpamFilterController::class, 'configure'])->name('spam-filter.configure');

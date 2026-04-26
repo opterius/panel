@@ -269,6 +269,8 @@
                             @if($account->status === 'active')
                                 <a href="{{ route('user.emails.webmail', $account) }}"
                                    @click.stop
+                                   target="_blank"
+                                   rel="noopener"
                                    class="inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-medium rounded-lg transition">
                                     <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                     {{ __('emails.open_webmail') }}

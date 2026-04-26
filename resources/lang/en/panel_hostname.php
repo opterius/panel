@@ -1,0 +1,25 @@
+<?php
+
+return [
+    'nav_label'           => 'Panel Hostname',
+    'title'               => 'Panel Hostname',
+    'current_label'       => 'Current panel address',
+    'current_url'         => 'URL',
+    'using_ip_warning'    => 'Panel is reachable by IP only — set a hostname to get a valid SSL certificate.',
+    'using_hostname'      => 'Hostname configured with valid SSL.',
+    'set_new_label'       => 'Set hostname',
+    'set_new_hint'        => 'Switch the panel from IP-based access to a real subdomain with a Let’s Encrypt certificate. Everything is handled automatically — DNS verification, certificate issuance, nginx configuration.',
+    'hostname_label'      => 'Hostname',
+    'hostname_hint'       => 'The DNS A record for this hostname must already point to this server. Example: panel.example.com',
+    'email_label'         => 'Admin email',
+    'email_hint'          => 'Used by Let’s Encrypt for renewal notifications.',
+    'checklist_title'     => 'Before you continue:',
+    'checklist_dns'       => 'Add an A record pointing the hostname to this server’s public IP and wait for DNS propagation (usually a few minutes).',
+    'checklist_port80'    => 'Make sure port 80 is open in your firewall — Let’s Encrypt uses it briefly during validation.',
+    'checklist_redirect'  => 'After this finishes, the panel URL changes — bookmark the new address.',
+    'apply'               => 'Apply hostname & issue SSL',
+    'applying'            => 'Issuing certificate, please wait…',
+    'success'             => 'Panel hostname configured. Open <a href=":url" class="underline font-semibold">:url</a> to continue.',
+    'failed'              => 'Failed to configure panel hostname: :error',
+    'no_server'           => 'No server is configured.',
+];
