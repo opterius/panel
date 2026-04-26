@@ -1,3 +1,7 @@
+## [2.5.0] - 2026-04-26
+
+Add force webmail update button and webmail version display in Updates page
+
 # Changelog
 
 All notable changes to Opterius (panel + agent) are documented here.

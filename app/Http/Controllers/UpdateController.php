@@ -43,13 +43,15 @@ class UpdateController extends Controller
         // Get agent version + update log from each server
         $servers = Server::all();
         $agentVersion = null;
-        $updateLog = null;
+        $mailVersion  = null;
+        $updateLog    = null;
 
         foreach ($servers as $server) {
             try {
                 $versionResp = AgentService::for($server)->get('/version');
                 if ($versionResp && $versionResp->successful()) {
                     $agentVersion = $versionResp->json('agent_version');
+                    $mailVersion  = $versionResp->json('mail_version') ?: null;
                 }
 
                 $logResp = AgentService::for($server)->get('/update/log');
@@ -64,7 +66,7 @@ class UpdateController extends Controller
 
         return view('admin.updates', compact(
             'currentVersion', 'latestVersion', 'changelog',
-            'updateAvailable', 'agentVersion', 'updateLog'
+            'updateAvailable', 'agentVersion', 'mailVersion', 'updateLog'
         ));
     }
 
@@ -132,6 +134,32 @@ class UpdateController extends Controller
         }
 
         return trim($m[1]);
+    }
+
+    /**
+     * Force an immediate webmail (Opterius Mail) git pull + migrate via the agent.
+     */
+    public function forceMailUpdate(Request $request)
+    {
+        $server = Server::first();
+        if (!$server) {
+            return back()->with('error', __('servers.no_server_configured'));
+        }
+
+        $response = AgentService::for($server)->post('/update/mail', []);
+
+        if ($response && $response->successful()) {
+            $status = $response->json('status');
+            if ($status === 'skipped') {
+                return redirect()->route('admin.updates.index')
+                    ->with('success', 'Webmail is not installed on the server — nothing to update.');
+            }
+            return redirect()->route('admin.updates.index')
+                ->with('success', 'Webmail updated successfully.');
+        }
+
+        $error = $response ? $response->json('error', 'Unknown error') : 'Could not connect to agent';
+        return back()->with('error', "Webmail update failed: {$error}");
     }
 
     /**

@@ -167,6 +167,7 @@ Route::middleware([
         Route::get('/updates', [UpdateController::class, 'index'])->name('updates.index');
         Route::post('/updates/run', [UpdateController::class, 'run'])->name('updates.run');
         Route::post('/updates/agent', [UpdateController::class, 'forceAgentUpdate'])->name('updates.agent');
+        Route::post('/updates/mail', [UpdateController::class, 'forceMailUpdate'])->name('updates.mail');
         Route::get('/updates/log', [UpdateController::class, 'log'])->name('updates.log');
 
         // Panel Hostname (one-click switch from IP to subdomain + Let's Encrypt)
