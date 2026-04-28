@@ -418,6 +418,7 @@ Route::middleware([
         // PHP Version
         Route::get('/php', [UserPhpController::class, 'index'])->name('php.index');
         Route::post('/php/switch', [UserPhpController::class, 'switchVersion'])->name('php.switch');
+        Route::post('/php/config', [UserPhpController::class, 'saveConfig'])->name('php.config');
 
         // Cron Jobs
         Route::get('/cron-jobs', [CronJobController::class, 'index'])->name('cronjobs.index');
