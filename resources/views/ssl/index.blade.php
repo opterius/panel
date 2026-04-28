@@ -110,7 +110,7 @@
                                             </button>
                                         </form>
                                         <button type="button" @click="startWildcard()"
-                                            class="inline-flex items-center px-3 py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 transition">
+                                            class="inline-flex items-center px-3 py-1.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-lg hover:bg-violet-200 transition">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/></svg>
                                             Wildcard SSL
                                         </button>
@@ -120,7 +120,7 @@
                                     <div class="flex items-center gap-2">
                                         @if($info['status'] === 'active' && ($info['cert']?->type ?? '') !== 'wildcard')
                                         <button type="button" @click="startWildcard()"
-                                            class="inline-flex items-center px-3 py-1.5 bg-violet-600 text-white text-xs font-medium rounded-lg hover:bg-violet-700 transition">
+                                            class="inline-flex items-center px-3 py-1.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-lg hover:bg-violet-200 transition">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/></svg>
                                             Wildcard SSL
                                         </button>
