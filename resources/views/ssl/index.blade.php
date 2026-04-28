@@ -109,7 +109,7 @@
                                                 <span x-text="loading ? 'Issuing...' : 'Issue SSL'">Issue SSL</span>
                                             </button>
                                         </form>
-                                        <button type="button" @click="startWildcard()"
+                                        <button type="button" @click="confirmOpen = true"
                                             class="inline-flex items-center px-3 py-1.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-lg hover:bg-violet-200 transition">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/></svg>
                                             Wildcard SSL
@@ -119,7 +119,7 @@
                                 <template x-if="certActive && phase === 'idle'">
                                     <div class="flex items-center gap-2">
                                         @if($info['status'] === 'active' && ($info['cert']?->type ?? '') !== 'wildcard')
-                                        <button type="button" @click="startWildcard()"
+                                        <button type="button" @click="confirmOpen = true"
                                             class="inline-flex items-center px-3 py-1.5 bg-violet-100 text-violet-700 text-xs font-medium rounded-lg hover:bg-violet-200 transition">
                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/></svg>
                                             Wildcard SSL
@@ -180,6 +180,38 @@
                                 </template>
                             </div>
                         </div>
+
+                        {{-- Wildcard confirmation modal --}}
+                        <template x-teleport="body">
+                            <div x-show="confirmOpen" class="fixed inset-0 z-50 overflow-y-auto" aria-modal="true" x-cloak>
+                                <div x-show="confirmOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" class="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" @click="confirmOpen = false"></div>
+                                <div class="fixed inset-0 flex items-center justify-center p-4">
+                                    <div x-show="confirmOpen" x-transition:enter="ease-out duration-300" x-transition:enter-start="opacity-0 scale-95" x-transition:enter-end="opacity-100 scale-100" x-transition:leave="ease-in duration-200" x-transition:leave-start="opacity-100 scale-100" x-transition:leave-end="opacity-0 scale-95" @click.stop @keydown.escape.window="confirmOpen = false" class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden">
+                                        <div class="p-6">
+                                            <div class="flex items-start space-x-4">
+                                                <div class="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
+                                                    <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                                                </div>
+                                                <div>
+                                                    <h3 class="text-lg font-semibold text-gray-900">Issue Wildcard SSL</h3>
+                                                    <p class="mt-1 text-sm text-gray-500">
+                                                        Issue a wildcard certificate for <strong class="font-mono text-gray-700">*.{{ $domain->domain }}</strong>?
+                                                        This uses DNS validation via PowerDNS and takes 1–3 minutes.
+                                                        Any existing Let's Encrypt certificates on subdomains will be replaced.
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center justify-end space-x-3 px-6 py-5 bg-gray-50">
+                                            <button type="button" @click="confirmOpen = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
+                                            <button type="button" @click="confirmOpen = false; startWildcard()" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white rounded-lg transition" style="background:#7c3aed">
+                                                Issue Wildcard
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
 
                         {{-- Wildcard progress panel --}}
                         <div x-show="phase === 'running' || phase === 'error'" x-cloak
@@ -358,6 +390,7 @@ function wildcardSsl(domainId, initialPhase) {
         errorMsg: '',
         certActive: false,
         certLabel: '',
+        confirmOpen: false,
         pollTimer: null,
         elapsedTimer: null,
 
