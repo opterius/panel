@@ -67,32 +67,32 @@
 
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">memory_limit</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">memory_limit</label>
                                     <input type="text" name="memory_limit" value="{{ $cfg['memory_limit'] ?? '256M' }}" placeholder="256M"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">max_execution_time</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">max_execution_time</label>
                                     <input type="number" name="max_execution_time" value="{{ $cfg['max_execution_time'] ?? '30' }}" placeholder="30"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">upload_max_filesize</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">upload_max_filesize</label>
                                     <input type="text" name="upload_max_filesize" value="{{ $cfg['upload_max_filesize'] ?? '64M' }}" placeholder="64M"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">post_max_size</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">post_max_size</label>
                                     <input type="text" name="post_max_size" value="{{ $cfg['post_max_size'] ?? '64M' }}" placeholder="64M"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">max_input_vars</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">max_input_vars</label>
                                     <input type="number" name="max_input_vars" value="{{ $cfg['max_input_vars'] ?? '1000' }}" placeholder="1000"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">display_errors</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">display_errors</label>
                                     <select name="display_errors"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                         <option value="Off" @selected(($cfg['display_errors'] ?? 'Off') === 'Off')>Off</option>
@@ -100,7 +100,7 @@
                                     </select>
                                 </div>
                                 <div>
-                                    <label class="block text-xs font-medium text-gray-600 mb-1">allow_url_fopen</label>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">allow_url_fopen</label>
                                     <select name="allow_url_fopen"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                         <option value="On" @selected(($cfg['allow_url_fopen'] ?? 'On') === 'On')>On</option>
@@ -110,7 +110,7 @@
                             </div>
 
                             <div class="mb-4">
-                                <label class="block text-xs font-medium text-gray-600 mb-2">Enabled functions <span class="text-gray-400 font-normal">(check to allow; unchecked = disabled)</span></label>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Enabled functions <span class="text-gray-400 font-normal">(check to allow; unchecked = disabled)</span></label>
                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                                     @foreach($toggleableFuncs as $fn)
                                         <label class="inline-flex items-center text-sm">
