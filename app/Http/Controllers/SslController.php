@@ -282,11 +282,14 @@ class SslController extends Controller
                     'progress_message' => $data['message'] ?? '',
                 ]);
 
-                // Subdomains are now covered by the wildcard — remove their individual cert records
+                // Remove Let's Encrypt subdomain cert records — they're now covered by wildcard.
+                // Custom certs are kept as-is; the agent already skipped those vhosts.
                 $domain->loadMissing('subdomains');
                 $subdomainIds = $domain->subdomains->pluck('id');
                 if ($subdomainIds->isNotEmpty()) {
-                    SslCertificate::whereIn('domain_id', $subdomainIds)->delete();
+                    SslCertificate::whereIn('domain_id', $subdomainIds)
+                        ->where('type', '!=', 'custom')
+                        ->delete();
                 }
             } elseif ($step === 'error') {
                 $cert->update([
