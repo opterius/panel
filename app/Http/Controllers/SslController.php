@@ -281,6 +281,13 @@ class SslController extends Controller
                     'progress_step'    => 'done',
                     'progress_message' => $data['message'] ?? '',
                 ]);
+
+                // Subdomains are now covered by the wildcard — remove their individual cert records
+                $domain->loadMissing('subdomains');
+                $subdomainIds = $domain->subdomains->pluck('id');
+                if ($subdomainIds->isNotEmpty()) {
+                    SslCertificate::whereIn('domain_id', $subdomainIds)->delete();
+                }
             } elseif ($step === 'error') {
                 $cert->update([
                     'status'           => 'error',
