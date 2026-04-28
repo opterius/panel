@@ -9,6 +9,7 @@ class SslCertificate extends Model
 {
     protected $fillable = [
         'domain_id', 'type', 'status', 'expires_at', 'auto_renew',
+        'progress_step', 'progress_message',
     ];
 
     protected function casts(): array

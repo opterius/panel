@@ -212,6 +212,92 @@ class SslController extends Controller
         return redirect()->route('user.ssl.index')->with('success', __('ssl.ssl_deleted'));
     }
 
+    public function issueWildcard(Request $request)
+    {
+        $validated = $request->validate([
+            'domain_id' => 'required|exists:domains,id',
+        ]);
+
+        $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+
+        if (!$domain->account->userCan(auth()->user(), 'ssl')) {
+            return response()->json(['error' => __('ssl.no_permission')], 403);
+        }
+
+        $response = AgentService::for($domain->account->server)->post('/ssl/wildcard/start', [
+            'domain'   => $domain->domain,
+            'email'    => auth()->user()->email,
+            'username' => $domain->account->username,
+        ]);
+
+        if (!$response || (!$response->successful() && $response->status() !== 202)) {
+            $error = $response ? $response->json('error', 'Agent unreachable') : 'Could not connect to server agent';
+            return response()->json(['error' => $error], 500);
+        }
+
+        $cert = SslCertificate::updateOrCreate(
+            ['domain_id' => $domain->id],
+            [
+                'type'             => 'wildcard',
+                'status'           => 'pending',
+                'expires_at'       => now()->addDays(90),
+                'auto_renew'       => true,
+                'progress_step'    => 'starting',
+                'progress_message' => 'Preparing wildcard certificate issuance...',
+            ]
+        );
+
+        ActivityLogger::log('ssl.wildcard_started', 'ssl_certificate', $cert->id, $domain->domain,
+            "Wildcard SSL issuance started for {$domain->domain}", ['domain_id' => $domain->id]);
+
+        return response()->json(['success' => true, 'cert_id' => $cert->id]);
+    }
+
+    public function wildcardProgress(Request $request)
+    {
+        $validated = $request->validate(['domain_id' => 'required|exists:domains,id']);
+
+        $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+
+        $response = AgentService::for($domain->account->server)->get(
+            '/ssl/wildcard/progress?domain=' . urlencode($domain->domain)
+        );
+
+        if (!$response || !$response->successful()) {
+            return response()->json(['step' => 'error', 'message' => 'Agent unreachable']);
+        }
+
+        $data = $response->json();
+        $step = $data['step'] ?? 'error';
+
+        // Sync final state back to DB
+        $cert = $domain->sslCertificate;
+        if ($cert) {
+            if ($step === 'done') {
+                $cert->update([
+                    'status'           => 'active',
+                    'type'             => 'wildcard',
+                    'expires_at'       => now()->addDays(90),
+                    'progress_step'    => 'done',
+                    'progress_message' => $data['message'] ?? '',
+                ]);
+            } elseif ($step === 'error') {
+                $cert->update([
+                    'status'           => 'error',
+                    'progress_step'    => 'error',
+                    'progress_message' => $data['error'] ?? $data['message'] ?? '',
+                ]);
+            } else {
+                $cert->update([
+                    'progress_step'    => $step,
+                    'progress_message' => $data['message'] ?? '',
+                ]);
+            }
+        }
+
+        return response()->json($data);
+    }
+
     /**
      * Auto-issue SSL for a domain (called from domain/account creation).
      */
