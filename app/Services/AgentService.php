@@ -147,8 +147,10 @@ class AgentService
         $body = !empty($data) ? json_encode($data) : '';
         $timestamp = now()->toRfc3339String();
 
-        // HMAC payload: timestamp + method + path + body
-        $payload = $timestamp . $method . $path . $body;
+        // HMAC payload: timestamp + method + path + body. Strip the query
+        // string — the agent verifies against r.URL.Path which excludes it.
+        $pathOnly = strtok($path, '?');
+        $payload = $timestamp . $method . $pathOnly . $body;
         $signature = hash_hmac('sha256', $payload, $this->server->agent_token);
 
         try {
