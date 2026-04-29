@@ -33,12 +33,14 @@ class LicenseService
         }
 
         try {
-            $response = Http::timeout(10)->post($this->serverUrl . '/api/license/verify', [
-                'key'           => $this->licenseKey,
-                'server_ip'     => $this->getServerIp(),
-                'panel_version' => config('opterius.version', '1.0.0'),
-                'os'            => php_uname('s') . ' ' . php_uname('r'),
-            ]);
+            $response = Http::timeout(10)
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->post($this->serverUrl . '/api/license/verify', [
+                    'key'           => $this->licenseKey,
+                    'server_ip'     => $this->getServerIp(),
+                    'panel_version' => config('opterius.version', '1.0.0'),
+                    'os'            => php_uname('s') . ' ' . php_uname('r'),
+                ]);
 
             if ($response->successful()) {
                 $data = $response->json();
@@ -175,10 +177,15 @@ class LicenseService
 
     private function getServerIp(): string
     {
-        // Try to get external IP
+        // Force IPv4 — must match what the agent reports, otherwise the
+        // panel and agent end up with separate activation entries (one per
+        // address family) and exhaust the license's server slot.
         try {
-            $ip = Http::timeout(5)->get('https://api.ipify.org')->body();
-            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+            $ip = Http::timeout(5)
+                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
+                ->get('https://api.ipify.org')
+                ->body();
+            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                 return $ip;
             }
         } catch (\Exception) {
