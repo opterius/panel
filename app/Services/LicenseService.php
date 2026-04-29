@@ -48,11 +48,13 @@ class LicenseService
 
             $data = $response->json();
             $result = [
-                'valid'       => false,
-                'reason'      => $data['reason'] ?? 'unknown',
-                'message'     => $data['message'] ?? 'License check failed.',
-                'max_domains' => $data['max_domains'] ?? 1,
-                'plan'        => $data['plan'] ?? 'trial',
+                'valid'        => false,
+                'reason'       => $data['reason'] ?? 'unknown',
+                'message'      => $data['message'] ?? 'License check failed.',
+                'max_domains'  => $data['max_domains']  ?? 1,
+                'max_accounts' => $data['max_accounts'] ?? 1,
+                'max_servers'  => $data['max_servers']  ?? 1,
+                'plan'         => $data['plan'] ?? 'trial',
             ];
             Cache::put('license_status', $result, now()->addHours(24));
             return $result;
@@ -132,6 +134,16 @@ class LicenseService
     }
 
     /**
+     * Get the maximum number of servers allowed.
+     */
+    public function maxServers(): int
+    {
+        $status = $this->verify();
+        $max = $status['max_servers'] ?? 1;
+        return $max === 0 ? PHP_INT_MAX : $max; // 0 = unlimited
+    }
+
+    /**
      * Get the current license plan.
      */
     public function plan(): string
@@ -151,11 +163,13 @@ class LicenseService
     private function restricted(string $reason, string $message): array
     {
         return [
-            'valid'       => false,
-            'reason'      => $reason,
-            'message'     => $message,
-            'max_domains' => 1,
-            'plan'        => 'restricted',
+            'valid'        => false,
+            'reason'       => $reason,
+            'message'      => $message,
+            'max_domains'  => 1,
+            'max_accounts' => 1,
+            'max_servers'  => 1,
+            'plan'         => 'restricted',
         ];
     }
 

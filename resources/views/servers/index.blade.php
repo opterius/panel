@@ -9,17 +9,36 @@
         </div>
     @endif
 
+    @if(session('error'))
+        <div class="mb-6 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            {{ session('error') }}
+        </div>
+    @endif
+
     <div class="bg-white rounded-xl shadow-sm">
         <!-- Header -->
         <div class="flex justify-between items-center px-6 py-5 border-b border-gray-100">
             <div>
                 <h3 class="text-base font-semibold text-gray-800">{{ __('servers.all_servers') }}</h3>
-                <p class="text-sm text-gray-500 mt-1">{{ __('servers.manage_servers_description') }}</p>
+                <p class="text-sm text-gray-500 mt-1">
+                    {{ __('servers.manage_servers_description') }}
+                    @if(isset($maxServers) && $maxServers !== PHP_INT_MAX)
+                        <span class="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold {{ $atLimit ? 'bg-red-100 text-red-700' : 'bg-indigo-100 text-indigo-700' }}">
+                            {{ $currentServers }} / {{ $maxServers }} servers
+                        </span>
+                    @endif
+                </p>
             </div>
-            <a href="{{ route('admin.servers.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
-                {{ __('servers.add_server') }}
-            </a>
+            @if(isset($atLimit) && $atLimit)
+                <span class="inline-flex items-center px-4 py-2.5 bg-gray-200 text-gray-500 text-sm font-medium rounded-lg cursor-not-allowed" title="Server limit reached — upgrade your plan to add more servers">
+                    {{ __('servers.add_server') }}
+                </span>
+            @else
+                <a href="{{ route('admin.servers.create') }}" class="inline-flex items-center px-4 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" /></svg>
+                    {{ __('servers.add_server') }}
+                </a>
+            @endif
         </div>
 
         <!-- Server List -->

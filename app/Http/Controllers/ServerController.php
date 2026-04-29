@@ -17,16 +17,48 @@ class ServerController extends Controller
             ->latest()
             ->get();
 
-        return view('servers.index', compact('servers'));
+        $license = new \App\Services\LicenseService();
+        $maxServers = $license->maxServers();
+        $currentServers = Server::count();
+        $atLimit = !auth()->user()->isAdmin()
+            && $currentServers >= $maxServers
+            && $maxServers !== PHP_INT_MAX;
+
+        return view('servers.index', compact('servers', 'maxServers', 'currentServers', 'atLimit'));
     }
 
     public function create()
     {
+        // Block server creation if license server limit reached (admins exempt)
+        if (!auth()->user()->isAdmin()) {
+            $license = new \App\Services\LicenseService();
+            $maxServers = $license->maxServers();
+            $currentServers = Server::count();
+
+            if ($currentServers >= $maxServers) {
+                return redirect()->route('admin.servers.index')
+                    ->with('error', "Server limit reached ({$currentServers}/{$maxServers}). Upgrade your plan to add more servers.");
+            }
+        }
+
         return view('servers.create');
     }
 
     public function store(Request $request)
     {
+        // Check license server limit (admins are exempt)
+        if (!auth()->user()->isAdmin()) {
+            $license = new \App\Services\LicenseService();
+            $maxServers = $license->maxServers();
+            $currentServers = Server::count();
+
+            if ($currentServers >= $maxServers) {
+                return back()
+                    ->with('error', "Server limit reached ({$currentServers}/{$maxServers}). Upgrade your plan to add more servers.")
+                    ->withInput();
+            }
+        }
+
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'ip_address' => 'required|ip',
