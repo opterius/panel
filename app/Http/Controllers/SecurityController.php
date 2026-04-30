@@ -157,7 +157,7 @@ class SecurityController extends Controller
         ]);
 
         $server   = Server::findOrFail($validated['server_id']);
-        $response = AgentService::for($server)->post('/security/lockdown', []);
+        $response = AgentService::for($server)->post('/security/lockdown-accounts', []);
 
         if (! $response || ! $response->successful()) {
             return redirect()->route('admin.security.index', ['server_id' => $server->id])
