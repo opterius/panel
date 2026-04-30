@@ -83,7 +83,7 @@ return [
         'rate_limit' => env('OPTERIUS_API_RATE_LIMIT', 60),
     ],
 
-    'version' => '2.8.7',
+    'version' => '2.8.8',
     'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
     'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),
 
