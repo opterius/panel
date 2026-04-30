@@ -146,6 +146,34 @@ class LicenseService
     }
 
     /**
+     * Stripe subscription status of the license owner ('active', 'past_due',
+     * 'trialing', 'canceled', null for free users). Used to drive billing
+     * warning banners in the admin UI.
+     */
+    public function subscriptionStatus(): ?string
+    {
+        return $this->verify()['subscription_status'] ?? null;
+    }
+
+    /**
+     * True if the owner has scheduled cancellation but is still within the
+     * paid period — show "Subscription ends on ..." banner.
+     */
+    public function cancelAtPeriodEnd(): bool
+    {
+        return (bool) ($this->verify()['cancel_at_period_end'] ?? false);
+    }
+
+    /**
+     * ISO timestamp string of the current billing period's end. Null for
+     * free users. Used in banner copy ("ends on Jun 15, 2026").
+     */
+    public function currentPeriodEnd(): ?string
+    {
+        return $this->verify()['current_period_end'] ?? null;
+    }
+
+    /**
      * Get the current license plan.
      */
     public function plan(): string
