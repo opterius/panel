@@ -142,4 +142,38 @@ class SecurityController extends Controller
         return redirect()->route('admin.security.index', ['server_id' => $server->id])
             ->with('success', __('servers.ip_unbanned', ['ip' => $validated['ip'], 'jail' => $validated['jail']]));
     }
+
+    /**
+     * Lock down all hosting accounts on a server: chmod /home to 0711
+     * (so logged-in users can't enumerate other customers' usernames),
+     * apply 0750 perms + www-data ACL to each /home/{user}, and jail any
+     * shell users with jailkit. Runs the agent's /security/lockdown
+     * handler. Idempotent — safe to re-run.
+     */
+    public function lockdown(Request $request)
+    {
+        $validated = $request->validate([
+            'server_id' => 'required|exists:servers,id',
+        ]);
+
+        $server   = Server::findOrFail($validated['server_id']);
+        $response = AgentService::for($server)->post('/security/lockdown', []);
+
+        if (! $response || ! $response->successful()) {
+            return redirect()->route('admin.security.index', ['server_id' => $server->id])
+                ->with('error', 'Lockdown failed: ' . ($response?->json('error') ?? 'agent unreachable'));
+        }
+
+        $locked = $response->json('locked', []);
+        $jailed = $response->json('jailed', []);
+        $msg    = sprintf(
+            'Locked down %d account%s%s. /home now hides usernames from other customers.',
+            count($locked),
+            count($locked) === 1 ? '' : 's',
+            count($jailed) > 0 ? ' (' . count($jailed) . ' shell user' . (count($jailed) === 1 ? '' : 's') . ' jailed)' : ''
+        );
+
+        return redirect()->route('admin.security.index', ['server_id' => $server->id])
+            ->with('success', $msg);
+    }
 }

@@ -128,6 +128,7 @@ Route::middleware([
         Route::post('/security/firewall-remove', [SecurityController::class, 'firewallRemove'])->name('security.firewall-remove');
         Route::post('/security/ip-block', [SecurityController::class, 'ipBlock'])->name('security.ip-block');
         Route::post('/security/fail2ban-unban', [SecurityController::class, 'fail2banUnban'])->name('security.fail2ban-unban');
+        Route::post('/security/lockdown',       [SecurityController::class, 'lockdown'])->name('security.lockdown');
 
         // Alerts
         Route::get('/alerts', [AlertController::class, 'index'])->name('alerts.index');

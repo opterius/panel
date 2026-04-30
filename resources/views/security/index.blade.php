@@ -28,6 +28,26 @@
     </div>
 
     @if($selectedServer)
+        <!-- Account Lockdown -->
+        <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
+            <div class="px-6 py-5 border-b border-gray-100">
+                <h3 class="text-base font-semibold text-gray-800">Account Lockdown</h3>
+                <p class="text-sm text-gray-500 mt-1">
+                    Hardens shared-hosting privacy: prevents one customer's user from listing <code class="bg-gray-100 px-1 py-0.5 rounded text-xs">/home/</code> and seeing other customers' usernames, applies strict perms (0750) to each home, and jails any shell users.
+                    Idempotent — safe to run any time.
+                </p>
+            </div>
+            <form action="{{ route('admin.security.lockdown') }}" method="POST" class="px-6 py-5"
+                  onsubmit="return confirm('Lock down all hosting accounts on this server? This sets /home permissions, applies 0750 to every customer home, and jails any shell users. Existing customer sites and SFTP access keep working — only filesystem visibility changes.')">
+                @csrf
+                <input type="hidden" name="server_id" value="{{ $selectedServer->id }}">
+                <button type="submit" class="inline-flex items-center px-5 py-2.5 bg-amber-600 text-white text-sm font-medium rounded-lg hover:bg-amber-700 transition">
+                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    Lock Down All Accounts
+                </button>
+            </form>
+        </div>
+
         <!-- Malware Scanner -->
         <div class="bg-white rounded-xl shadow-sm overflow-hidden mb-6">
             <div class="px-6 py-5 border-b border-gray-100">
