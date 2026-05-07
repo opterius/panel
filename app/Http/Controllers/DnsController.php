@@ -46,8 +46,8 @@ class DnsController extends Controller
             'name'     => $validated['name'],
             'type'     => $validated['type'],
             'content'  => $validated['content'],
-            'ttl'      => $validated['ttl'],
-            'priority' => $validated['priority'] ?? 0,
+            'ttl'      => (int) $validated['ttl'],
+            'priority' => (int) ($validated['priority'] ?? 0),
         ]);
 
         if ($response && $response->successful()) {

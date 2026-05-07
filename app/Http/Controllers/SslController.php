@@ -253,6 +253,25 @@ class SslController extends Controller
         return response()->json(['success' => true, 'cert_id' => $cert->id]);
     }
 
+    public function wildcardCancel(Request $request)
+    {
+        $validated = $request->validate(['domain_id' => 'required|exists:domains,id']);
+        $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+
+        if (!$domain->account->userCan(auth()->user(), 'ssl')) {
+            return response()->json(['error' => __('ssl.no_permission')], 403);
+        }
+
+        $cert = $domain->sslCertificate;
+        if ($cert && $cert->status === 'pending') {
+            $cert->delete();
+            ActivityLogger::log('ssl.wildcard_cancelled', 'ssl_certificate', $cert->id, $domain->domain,
+                "Wildcard SSL issuance cancelled for {$domain->domain}", ['domain_id' => $domain->id]);
+        }
+
+        return response()->json(['success' => true]);
+    }
+
     public function wildcardProgress(Request $request)
     {
         $validated = $request->validate(['domain_id' => 'required|exists:domains,id']);

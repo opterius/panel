@@ -399,6 +399,7 @@ Route::middleware([
         Route::delete('/ssl/{certificate}', [SslController::class, 'destroy'])->name('ssl.destroy');
         Route::post('/ssl/wildcard/issue', [SslController::class, 'issueWildcard'])->name('ssl.wildcard.issue');
         Route::get('/ssl/wildcard/progress', [SslController::class, 'wildcardProgress'])->name('ssl.wildcard.progress');
+        Route::post('/ssl/wildcard/cancel', [SslController::class, 'wildcardCancel'])->name('ssl.wildcard.cancel');
 
         // Email Accounts
         Route::get('/emails', [EmailController::class, 'index'])->name('emails.index');

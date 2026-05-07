@@ -96,6 +96,14 @@
                                 </span>
                             </div>
                             <div class="flex items-center space-x-2 ml-4">
+                                {{-- Cancel button: visible while issuing (so users can abort stuck wildcard jobs) --}}
+                                <template x-if="phase === 'running'">
+                                    <button type="button" @click="cancelWildcard({{ $domain->id }})"
+                                        class="inline-flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-xs font-medium rounded-lg hover:bg-red-100 transition">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                                        Cancel
+                                    </button>
+                                </template>
                                 {{-- Buttons: only show when not actively issuing --}}
                                 <template x-if="phase === 'idle' && !certActive">
                                     <div class="flex items-center gap-2">
@@ -475,6 +483,24 @@ function wildcardSsl(domainId, initialPhase) {
             this.phase = 'idle';
             this.errorMsg = '';
             this.elapsed = 0;
+        },
+
+        async cancelWildcard(domainId) {
+            this.stopPolling();
+            try {
+                await fetch(`{{ route('user.ssl.wildcard.cancel') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    },
+                    body: JSON.stringify({ domain_id: domainId }),
+                });
+            } catch {}
+            this.phase = 'idle';
+            this.elapsed = 0;
+            this.errorMsg = '';
         },
     };
 }
