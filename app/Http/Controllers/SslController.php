@@ -272,6 +272,32 @@ class SslController extends Controller
         return response()->json(['success' => true]);
     }
 
+    /**
+     * GET /user/ssl/progress?domain_id=...
+     *
+     * Proxies the agent's /ssl/progress endpoint so the panel can poll a
+     * standard SSL issuance and show the live action log (similar UX to
+     * the wildcard flow). Returns { step, message, logs[], elapsed, error? }.
+     */
+    public function progress(Request $request)
+    {
+        $validated = $request->validate(['domain_id' => 'required|exists:domains,id']);
+        $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+
+        if (!$domain->account->userCan(auth()->user(), 'ssl')) {
+            return response()->json(['error' => __('ssl.no_permission')], 403);
+        }
+
+        $response = AgentService::for($domain->account->server)->get(
+            '/ssl/progress?domain=' . urlencode($domain->domain)
+        );
+
+        if (!$response || !$response->successful()) {
+            return response()->json(['step' => 'error', 'message' => 'Agent unreachable', 'logs' => []]);
+        }
+        return response()->json($response->json());
+    }
+
     public function wildcardProgress(Request $request)
     {
         $validated = $request->validate(['domain_id' => 'required|exists:domains,id']);

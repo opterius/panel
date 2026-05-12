@@ -94,6 +94,17 @@
                                     <svg class="w-3 h-3 mr-1 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
                                     Issuing...
                                 </span>
+                                {{-- Standard SSL live indicator + details toggle --}}
+                                <span x-show="sslPhase === 'running'" x-cloak class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-700">
+                                    <svg class="w-3 h-3 mr-1 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                                    Issuing... <span class="ml-1 opacity-75" x-text="sslElapsed + 's'"></span>
+                                </span>
+                                <button type="button" x-show="sslPhase !== 'idle'" x-cloak
+                                        @click="sslLogsOpen = !sslLogsOpen"
+                                        class="inline-flex items-center px-2 py-1 text-sm font-medium text-gray-600 bg-gray-100 hover:bg-gray-200 rounded transition">
+                                    <span x-text="sslLogsOpen ? 'Hide details' : 'View details'"></span>
+                                    <svg class="w-3 h-3 ml-1 transition-transform" :class="sslLogsOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
                             </div>
                             <div class="flex items-center space-x-2 ml-4">
                                 {{-- Cancel button: visible while issuing (so users can abort stuck wildcard jobs) --}}
@@ -105,16 +116,16 @@
                                     </button>
                                 </template>
                                 {{-- Buttons: only show when not actively issuing --}}
-                                <template x-if="phase === 'idle' && !certActive">
+                                <template x-if="phase === 'idle' && !certActive && sslPhase === 'idle'">
                                     <div class="flex items-center gap-2">
-                                        <form action="{{ route('user.ssl.issue') }}" method="POST" x-data="{ loading: false }" @submit="loading = true">
+                                        <form action="{{ route('user.ssl.issue') }}" method="POST"
+                                              @submit.prevent="issueSSL($el)">
                                             @csrf
                                             <input type="hidden" name="domain_id" value="{{ $domain->id }}">
                                             <input type="hidden" name="email" value="{{ auth()->user()->email }}">
-                                            <button type="submit" :disabled="loading"
+                                            <button type="submit"
                                                 class="inline-flex items-center px-3 py-1.5 bg-green-600 text-white text-xs font-medium rounded-lg hover:bg-green-700 transition disabled:opacity-50">
-                                                <svg x-show="loading" class="w-3 h-3 mr-1 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
-                                                <span x-text="loading ? 'Issuing...' : 'Issue SSL'">Issue SSL</span>
+                                                Issue SSL
                                             </button>
                                         </form>
                                         <button type="button" @click="confirmOpen = true"
@@ -220,6 +231,25 @@
                                 </div>
                             </div>
                         </template>
+
+                        {{-- Standard SSL live log dropdown --}}
+                        <div x-show="sslPhase !== 'idle' && sslLogsOpen" x-cloak x-collapse
+                             class="mt-3 rounded-lg border border-gray-200 bg-gray-900 text-gray-100 overflow-hidden">
+                            <div class="px-4 py-2 border-b border-gray-700 flex items-center justify-between">
+                                <span class="text-sm font-semibold uppercase tracking-wide text-gray-300">Live SSL issuance log</span>
+                                <span class="text-sm font-mono text-gray-400" x-text="sslElapsed + 's elapsed'"></span>
+                            </div>
+                            <div class="px-4 py-3 max-h-64 overflow-y-auto font-mono text-sm leading-relaxed"
+                                 x-ref="sslLogPane"
+                                 x-effect="sslLogs.length && $refs.sslLogPane && ($refs.sslLogPane.scrollTop = $refs.sslLogPane.scrollHeight)">
+                                <template x-for="(line, i) in sslLogs" :key="i">
+                                    <div x-text="line" :class="line.includes('ERROR') ? 'text-red-300' : 'text-gray-200'"></div>
+                                </template>
+                                <template x-if="sslPhase === 'done'">
+                                    <div class="text-green-300 mt-1">✓ Certificate is now active. Reloading...</div>
+                                </template>
+                            </div>
+                        </div>
 
                         {{-- Wildcard progress panel --}}
                         <div x-show="phase === 'running' || phase === 'error'" x-cloak
@@ -402,6 +432,16 @@ function wildcardSsl(domainId, initialPhase) {
         pollTimer: null,
         elapsedTimer: null,
 
+        // Regular (non-wildcard) SSL progress — same UX (live log) as wildcard,
+        // backed by the agent's /ssl/progress endpoint. Triggered when the
+        // standard "Issue SSL" form submits.
+        sslPhase: 'idle',           // 'idle' | 'running' | 'done' | 'error'
+        sslLogs: [],
+        sslLogsOpen: false,
+        sslElapsed: 0,
+        sslPollTimer: null,
+        sslElapsedTimer: null,
+
         init() {
             @foreach($mainDomains as $d)
                 @if($d->sslCertificate?->status === 'active')
@@ -483,6 +523,66 @@ function wildcardSsl(domainId, initialPhase) {
             this.phase = 'idle';
             this.errorMsg = '';
             this.elapsed = 0;
+        },
+
+        // Hook into the standard Issue SSL form: prevent the classic POST,
+        // submit via fetch, then open the live log dropdown.
+        async issueSSL(form) {
+            this.sslPhase = 'running';
+            this.sslLogs = ['[0s] Submitting issuance request...'];
+            this.sslLogsOpen = true;
+            this.sslElapsed = 0;
+
+            try {
+                const formData = new FormData(form);
+                const res = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
+                });
+                if (!res.ok && res.status >= 400 && res.status !== 302) {
+                    this.sslPhase = 'error';
+                    this.sslLogs.push('[ERROR] Request failed: HTTP ' + res.status);
+                    return;
+                }
+            } catch (e) {
+                this.sslPhase = 'error';
+                this.sslLogs.push('[ERROR] Network: ' + e.message);
+                return;
+            }
+
+            this.startSSLPolling();
+        },
+
+        startSSLPolling() {
+            this.sslElapsedTimer = setInterval(() => { this.sslElapsed++; }, 1000);
+            this.sslPollTimer    = setInterval(() => this.pollSSL(), 2000);
+            this.pollSSL();
+        },
+
+        async pollSSL() {
+            try {
+                const res = await fetch(`{{ route('user.ssl.progress') }}?domain_id=${domainId}`, {
+                    headers: { 'Accept': 'application/json' },
+                });
+                if (!res.ok) return;
+                const data = await res.json();
+                if (Array.isArray(data.logs)) this.sslLogs = data.logs;
+                if (data.step === 'done') {
+                    this.sslPhase = 'done';
+                    this.stopSSLPolling();
+                    // Reload after a brief delay so the cert badge flips to Active.
+                    setTimeout(() => window.location.reload(), 1200);
+                } else if (data.step === 'error') {
+                    this.sslPhase = 'error';
+                    this.stopSSLPolling();
+                }
+            } catch {}
+        },
+
+        stopSSLPolling() {
+            clearInterval(this.sslPollTimer);
+            clearInterval(this.sslElapsedTimer);
         },
 
         async cancelWildcard(domainId) {

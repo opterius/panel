@@ -30,10 +30,22 @@ class PhpController extends Controller
                 $versions = $response->json('versions', []);
             }
 
-            // Get domains on this server
+            // Paginated list for the table (handles servers with hundreds
+            // of domains without rendering a 5000-row page).
             $domains = Domain::with('account')
                 ->where('server_id', $selectedServer->id)
                 ->where('status', 'active')
+                ->orderBy('domain')
+                ->paginate(20)
+                ->withQueryString();
+
+            // Separate full list for the "config per domain" select below the
+            // table — admins need to be able to pick ANY domain, not just the
+            // current page.
+            $allDomains = Domain::with('account')
+                ->where('server_id', $selectedServer->id)
+                ->where('status', 'active')
+                ->orderBy('domain')
                 ->get();
         }
 
@@ -49,7 +61,8 @@ class PhpController extends Controller
             }
         }
 
-        return view('php.index', compact('servers', 'selectedServer', 'versions', 'domains', 'extensions', 'selectedVersion'));
+        $allDomains = $allDomains ?? collect();
+        return view('php.index', compact('servers', 'selectedServer', 'versions', 'domains', 'allDomains', 'extensions', 'selectedVersion'));
     }
 
     public function toggleExtension(Request $request)

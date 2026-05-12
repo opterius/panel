@@ -395,6 +395,7 @@ Route::middleware([
         // SSL Certificates
         Route::get('/ssl', [SslController::class, 'index'])->name('ssl.index');
         Route::post('/ssl/issue', [SslController::class, 'issue'])->name('ssl.issue');
+        Route::get('/ssl/progress', [SslController::class, 'progress'])->name('ssl.progress');
         Route::post('/ssl/upload', [SslController::class, 'upload'])->name('ssl.upload');
         Route::post('/ssl/{certificate}/renew', [SslController::class, 'renew'])->name('ssl.renew');
         Route::delete('/ssl/{certificate}', [SslController::class, 'destroy'])->name('ssl.destroy');

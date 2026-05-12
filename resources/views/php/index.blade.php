@@ -223,6 +223,11 @@
                         <div x-data="{ showConfig: false }" x-show="false" class="hidden">{{-- placeholder for Alpine scope --}}</div>
                     @endforeach
                 </div>
+                @if(method_exists($domains, 'hasPages') && $domains->hasPages())
+                    <div class="px-6 py-4 border-t border-gray-100">
+                        {{ $domains->links() }}
+                    </div>
+                @endif
             </div>
 
             <!-- PHP Config per Domain -->
@@ -237,7 +242,7 @@
                         <label for="config_domain_id" class="block text-sm font-medium text-gray-700 mb-1.5">{{ __('php.domain') }}</label>
                         <select name="domain_id" id="config_domain_id"
                             class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
-                            @foreach($domains as $domain)
+                            @foreach($allDomains as $domain)
                                 <option value="{{ $domain->id }}">{{ $domain->domain }} (PHP {{ $domain->php_version }})</option>
                             @endforeach
                         </select>
