@@ -129,4 +129,33 @@ class ServerController extends Controller
 
         return redirect()->route('admin.servers.index')->with('success', __('servers.server_deleted'));
     }
+
+    /**
+     * POST /admin/servers/{server}/repair-accounts
+     *
+     * Sweeps every hosting account on the server and applies the current
+     * "ensureSystemUser" hygiene (chown home, chmod 0750, ACLs, /bin/bash
+     * shell, .ssh perms). For retrofitting accounts created by older agents
+     * without forcing the admin into SSH/root.
+     */
+    public function repairAccounts(Server $server)
+    {
+        $response = AgentService::for($server)->post('/account/repair-all', []);
+
+        if (! $response || ! $response->successful()) {
+            $error = $response ? $response->json('error', 'Unknown error') : 'Could not reach agent';
+            return back()->with('error', "Repair failed: {$error}");
+        }
+
+        $count = (int) $response->json('count', 0);
+        $reports = $response->json('reports', []);
+        $errors = collect($reports)->flatMap(fn ($r) => $r['errors'] ?? [])->count();
+
+        ActivityLogger::log('server.repaired', 'server', $server->id, $server->name,
+            "Repaired {$count} account(s) on {$server->name} ({$errors} sub-errors)",
+            ['count' => $count, 'errors' => $errors]);
+
+        $msg = "Repaired {$count} account(s)" . ($errors > 0 ? " ({$errors} non-fatal issues — see activity log)" : '');
+        return back()->with('success', $msg);
+    }
 }

@@ -1,8 +1,14 @@
 @php
-    $tbUserAccounts = Auth::user()->accessibleAccounts()->with('domains')->get()
-        ->sortBy(fn($a) => strtolower($a->domains->whereNull('parent_id')->first()?->domain ?? $a->username))
-        ->values();
-    $tbCurrentAcct = Auth::user()->currentAccount();
+    // Account selector only shows in Hosting Mode (user.* routes). In Server
+    // Mode (admin.*) it would be meaningless — admins manage the fleet, not
+    // a single customer account.
+    $tbInHostingMode = request()->routeIs('user.*');
+    $tbCurrentAcct   = $tbInHostingMode ? Auth::user()->currentAccount() : null;
+    $tbUserAccounts  = $tbInHostingMode
+        ? Auth::user()->accessibleAccounts()->with('domains')->get()
+            ->sortBy(fn($a) => strtolower($a->domains->whereNull('parent_id')->first()?->domain ?? $a->username))
+            ->values()
+        : collect();
 @endphp
 <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
     <!-- Page Title + Active Account -->
@@ -11,7 +17,7 @@
             <div>{{ $header }}</div>
         @endif
 
-        @if($tbCurrentAcct)
+        @if($tbInHostingMode && $tbCurrentAcct)
             @if($tbUserAccounts->count() > 1)
                 <div class="relative" x-data="{ open: false, search: '' }" @keydown.escape.window="open = false" @click.outside="open = false">
                     <button type="button" @click="open = !open; if (open) $nextTick(() => $refs.tbAcctSearch?.focus())"
@@ -31,7 +37,7 @@
                                 name="tb-acct-filter-{{ uniqid() }}"
                                 class="w-full bg-gray-50 border border-gray-200 rounded-md pl-8 pr-2 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                         </div>
-                        <div class="max-h-72 overflow-y-auto space-y-1" style="scrollbar-width: thin;">
+                        <div class="space-y-1 overflow-y-auto" style="max-height: 320px; scrollbar-width: thin;">
                             @foreach($tbUserAccounts as $acct)
                                 @php
                                     $tbAcctDomain = $acct->domains->whereNull('parent_id')->first()?->domain ?? $acct->username;

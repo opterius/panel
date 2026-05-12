@@ -88,6 +88,7 @@ Route::middleware([
         })->name('dashboard');
 
         Route::resource('servers', ServerController::class);
+        Route::post('/servers/{server}/repair-accounts', [ServerController::class, 'repairAccounts'])->name('servers.repair-accounts');
         Route::get('/servers/{server}/time', [\App\Http\Controllers\ServerTimeController::class, 'show'])->name('servers.time');
         Route::post('/servers/{server}/time/timezone', [\App\Http\Controllers\ServerTimeController::class, 'updateTimezone'])->name('servers.time.timezone');
         Route::post('/servers/{server}/time/sync', [\App\Http\Controllers\ServerTimeController::class, 'syncNow'])->name('servers.time.sync');

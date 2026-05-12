@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'php_versions' => ['8.2', '8.3', '8.4'],
+    'php_versions' => ['8.2', '8.3', '8.4', '8.5'],
 
     'default_php_version' => '8.4',
 
@@ -83,7 +83,7 @@ return [
         'rate_limit' => env('OPTERIUS_API_RATE_LIMIT', 60),
     ],
 
-    'version' => '2.9.0',
+    'version' => '2.9.1',
     'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
     'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),
 

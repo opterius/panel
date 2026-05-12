@@ -95,6 +95,7 @@ class PhpController extends Controller
         ]);
 
         if ($response && $response->successful()) {
+            \App\Services\PhpVersionsService::flush();
             return redirect()
                 ->route('admin.php.index', ['server_id' => $server->id])
                 ->with('success', __('php.php_installed', ['version' => $validated['version']]));
