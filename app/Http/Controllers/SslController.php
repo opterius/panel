@@ -22,7 +22,9 @@ class SslController extends Controller
             ->orderBy('domain')
             ->get();
 
-        // Sync DB status with actual cert files on disk (for any domain that has a cert record)
+        // First pass — write any DB updates (mark cert active/error based on disk).
+        // The agent /ssl/status response is cached in $this->sslStatusCache so
+        // the second pass below doesn't need to round-trip the agent again.
         foreach ($mainDomains as $main) {
             $this->syncDomainSslStatus($main);
             foreach ($main->subdomains as $sub) {
@@ -30,7 +32,7 @@ class SslController extends Controller
             }
         }
 
-        // Reload after sync
+        // Reload so sslCertificate relations reflect any newly-created rows.
         $mainDomains = Domain::with('server', 'account', 'sslCertificate', 'subdomains.sslCertificate', 'subdomains.server')
             ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->whereNull('parent_id')
@@ -38,7 +40,28 @@ class SslController extends Controller
             ->orderBy('domain')
             ->get();
 
+        // Re-apply the dynamic wildcard/apex flags on the freshly loaded models
+        // (they were set on the old instances thrown away by the reload above).
+        // Reads from the cache, no extra HTTP calls.
+        foreach ($mainDomains as $main) {
+            $this->applyCachedSslFlags($main);
+            foreach ($main->subdomains as $sub) {
+                $this->applyCachedSslFlags($sub);
+            }
+        }
+
         return view('ssl.index', compact('mainDomains'));
+    }
+
+    /** @var array<int,array> domain_id => agent /ssl/status response */
+    private array $sslStatusCache = [];
+
+    private function applyCachedSslFlags(Domain $domain): void
+    {
+        $data = $this->sslStatusCache[$domain->id] ?? null;
+        if ($data === null) return;
+        $domain->wildcard_active = (bool) ($data['wildcard_exists'] ?? false);
+        $domain->apex_active     = (bool) ($data['apex_exists'] ?? false);
     }
 
     /**
@@ -59,9 +82,14 @@ class SslController extends Controller
         $apexExists     = $response->json('apex_exists', false);
         $cert           = $domain->sslCertificate;
 
-        // Cache wildcard presence on the model so the view can show a
-        // "Wildcard also active" badge alongside the apex cert. Stored as a
-        // dynamic property — no migration needed because it's read-only UI hint.
+        // Cache the full response keyed by domain id so the controller can
+        // re-apply these flags onto reloaded models without round-tripping.
+        $this->sslStatusCache[$domain->id] = [
+            'exists'          => $exists,
+            'wildcard_exists' => $wildcardExists,
+            'apex_exists'     => $apexExists,
+        ];
+
         $domain->wildcard_active = $wildcardExists;
         $domain->apex_active     = $apexExists;
 
