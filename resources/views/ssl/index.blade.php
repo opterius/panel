@@ -89,6 +89,16 @@
                                     </div>
                                 </div>
                                 <span x-show="certActive" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>
+                                @if(!empty($domain->wildcard_active))
+                                    {{-- Wildcard cert exists on disk (independent of the apex's DB row).
+                                         Shown as a separate badge so the customer always sees that
+                                         *.domain is active for their subdomains, even after they
+                                         issue a standard HTTP-01 cert for the apex. --}}
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-sm font-medium bg-violet-100 text-violet-700" title="Wildcard *.{{ $domain->domain }} active — covers every subdomain">
+                                        <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3l14 9-14 9V3z"/></svg>
+                                        Wildcard *.{{ $domain->domain }}
+                                    </span>
+                                @endif
                                 <span x-show="!certActive && phase === 'idle'" class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium {{ $info['statusColor'] }}">{{ $info['statusLabel'] }}</span>
                                 <span x-show="phase === 'running'" x-cloak class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-700">
                                     <svg class="w-3 h-3 mr-1 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>

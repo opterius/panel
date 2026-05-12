@@ -54,21 +54,34 @@ class SslController extends Controller
 
         if (!$response || !$response->successful()) return;
 
-        $exists = $response->json('exists', false);
-        $cert = $domain->sslCertificate;
+        $exists         = $response->json('exists', false);
+        $wildcardExists = $response->json('wildcard_exists', false);
+        $apexExists     = $response->json('apex_exists', false);
+        $cert           = $domain->sslCertificate;
+
+        // Cache wildcard presence on the model so the view can show a
+        // "Wildcard also active" badge alongside the apex cert. Stored as a
+        // dynamic property — no migration needed because it's read-only UI hint.
+        $domain->wildcard_active = $wildcardExists;
+        $domain->apex_active     = $apexExists;
 
         if ($exists) {
-            // Cert exists on disk → mark active
-            if (!$cert || $cert->status !== 'active') {
-                SslCertificate::updateOrCreate(
-                    ['domain_id' => $domain->id],
-                    [
-                        'type'       => $cert->type ?? 'letsencrypt',
-                        'status'     => 'active',
-                        'expires_at' => now()->addDays(90),
-                        'auto_renew' => true,
-                    ]
-                );
+            // Don't tear down a wildcard record just because the apex got its own
+            // HTTP-01 cert — both can coexist. Only flip type back to wildcard
+            // if no DB record exists yet.
+            if (!$cert) {
+                SslCertificate::create([
+                    'domain_id'  => $domain->id,
+                    'type'       => $wildcardExists && !$apexExists ? 'wildcard' : 'letsencrypt',
+                    'status'     => 'active',
+                    'expires_at' => now()->addDays(90),
+                    'auto_renew' => true,
+                ]);
+            } elseif ($cert->status !== 'active') {
+                $cert->update([
+                    'status'     => 'active',
+                    'expires_at' => now()->addDays(90),
+                ]);
             }
         } else if ($cert && $cert->status !== 'pending') {
             // Cert was supposed to exist but doesn't → mark error
