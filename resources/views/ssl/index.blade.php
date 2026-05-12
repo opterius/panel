@@ -211,20 +211,38 @@
                                                 <div class="w-12 h-12 rounded-full bg-violet-100 flex items-center justify-center shrink-0">
                                                     <svg class="w-6 h-6 text-violet-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
                                                 </div>
-                                                <div>
+                                                <div class="flex-1">
                                                     <h3 class="text-lg font-semibold text-gray-900">Issue Wildcard SSL</h3>
                                                     <p class="mt-1 text-sm text-gray-500">
-                                                        Issue a wildcard certificate for <strong class="font-mono text-gray-700">*.{{ $domain->domain }}</strong>?
-                                                        This uses DNS validation via PowerDNS and takes 1–3 minutes.
+                                                        Issue a wildcard certificate for <strong class="font-mono text-gray-700">*.{{ $domain->domain }}</strong>.
+                                                        Covers every subdomain (api., mail., app., etc.) under this domain.
+                                                        Uses DNS validation via PowerDNS; takes 1–3 minutes.
                                                         Any existing Let's Encrypt certificates on subdomains will be replaced.
                                                     </p>
+
+                                                    <div class="mt-4 rounded-lg border border-amber-200 bg-amber-50 p-3">
+                                                        <div class="flex items-start gap-2">
+                                                            <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
+                                                            <div class="text-sm text-amber-900">
+                                                                <p class="font-semibold mb-1">Requires nameservers pointing to this server</p>
+                                                                <p class="text-amber-800">
+                                                                    Wildcard validation needs Let's Encrypt to read a DNS TXT record from <strong>this server's PowerDNS</strong>.
+                                                                    Your domain's <code class="bg-amber-100 px-1 rounded">NS</code> records at the registrar must list this server's nameservers
+                                                                    (not Linode, Cloudflare, GoDaddy, etc.).
+                                                                </p>
+                                                                <p class="mt-2 text-amber-800">
+                                                                    If your NS is somewhere else, issuance will stall on "Waiting for DNS propagation" — cancel it and use <strong>Issue SSL</strong> (HTTP validation, no DNS changes needed) on each subdomain instead.
+                                                                </p>
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="flex items-center justify-end space-x-3 px-6 py-5 bg-gray-50">
                                             <button type="button" @click="confirmOpen = false" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">Cancel</button>
                                             <button type="button" @click="confirmOpen = false; startWildcard()" class="inline-flex items-center px-4 py-2.5 text-sm font-medium text-white rounded-lg transition" style="background:#7c3aed">
-                                                Issue Wildcard
+                                                I understand — issue wildcard
                                             </button>
                                         </div>
                                     </div>
