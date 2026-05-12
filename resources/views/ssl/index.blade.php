@@ -144,6 +144,26 @@
                                             Wildcard SSL
                                         </button>
                                         @endif
+
+                                        @if($info['status'] === 'active' && ($info['cert']?->type ?? '') === 'wildcard')
+                                            {{-- Wildcard *.domain does NOT cover the apex (domain itself). Browsers
+                                                 reject https://domain because the cert SAN list has only *.domain.
+                                                 Offer a one-click HTTP-01 issuance for the apex; this rewrites the
+                                                 apex nginx vhost to use the new apex cert while subdomains keep
+                                                 using the wildcard. --}}
+                                            <form action="{{ route('user.ssl.issue') }}" method="POST"
+                                                  @submit.prevent="issueSSL($el)">
+                                                @csrf
+                                                <input type="hidden" name="domain_id" value="{{ $domain->id }}">
+                                                <input type="hidden" name="email" value="{{ auth()->user()->email }}">
+                                                <button type="submit"
+                                                    class="inline-flex items-center px-3 py-1.5 bg-amber-100 text-amber-800 text-xs font-medium rounded-lg hover:bg-amber-200 transition"
+                                                    title="Wildcard doesn't cover the apex — issue a separate cert for {{ $domain->domain }} + www.{{ $domain->domain }}">
+                                                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.67 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.33.19 3 1.73 3z"/></svg>
+                                                    Issue apex SSL
+                                                </button>
+                                            </form>
+                                        @endif
                                         @if($info['status'] === 'active')
                                         <div x-data="{ open: false, loading: false }">
                                             <button type="button" @click="open = true"
@@ -332,6 +352,22 @@
                                     Retry
                                 </button>
                             </div>
+
+                            {{-- Stall warning: same step for >2 minutes. The polling endpoint
+                                 may have lost the job state (agent restart, in-memory map
+                                 cleared) while the cert itself was actually issued. Tell the
+                                 user to refresh — Laravel will read the DB and show truth. --}}
+                            <div x-show="stalled && phase === 'running'" x-cloak class="mt-3 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                                <p class="text-sm text-amber-800 font-medium mb-1">Taking longer than expected</p>
+                                <p class="text-sm text-amber-700 mb-3">
+                                    The progress hasn't advanced for over 2 minutes. The certificate may have actually been issued — refresh the page to see the latest status.
+                                </p>
+                                <button type="button" @click="window.location.reload()"
+                                    class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg transition">
+                                    <svg class="w-3.5 h-3.5 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                                    Refresh page
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -449,6 +485,9 @@ function wildcardSsl(domainId, initialPhase) {
         confirmOpen: false,
         pollTimer: null,
         elapsedTimer: null,
+        stepChangedAt: 0,
+        lastSeenStep: '',
+        stalled: false,
 
         // Regular (non-wildcard) SSL progress — same UX (live log) as wildcard,
         // backed by the agent's /ssl/progress endpoint. Triggered when the
@@ -505,6 +544,8 @@ function wildcardSsl(domainId, initialPhase) {
         startPolling() {
             this.elapsedTimer = setInterval(() => { this.elapsed++; }, 1000);
             this.pollTimer = setInterval(() => this.poll(), 3000);
+            this.stepChangedAt = Date.now();
+            this.lastSeenStep = '';
             this.poll();
         },
 
@@ -516,18 +557,39 @@ function wildcardSsl(domainId, initialPhase) {
                 if (!res.ok) return;
 
                 const data = await res.json();
-                this.currentStep = data.step || 'starting';
-                this.currentStepIndex = Math.max(0, stepOrder.indexOf(this.currentStep));
+                const step = data.step || 'starting';
+
+                // Track step changes so we can detect a stall (agent stuck on
+                // the same step too long → likely the goroutine died, the
+                // process restarted, or the network call's hung).
+                if (step !== this.lastSeenStep) {
+                    this.lastSeenStep = step;
+                    this.stepChangedAt = Date.now();
+                    this.stalled = false;
+                }
+
+                this.currentStep = step;
+                this.currentStepIndex = Math.max(0, stepOrder.indexOf(step));
 
                 if (data.step === 'done') {
                     this.stopPolling();
                     this.certActive = true;
                     this.certLabel = 'Wildcard · Expires in 90 days';
                     this.phase = 'idle';
+                    return;
                 } else if (data.step === 'error') {
                     this.stopPolling();
                     this.phase = 'error';
                     this.errorMsg = data.error || data.message || 'Unknown error';
+                    return;
+                }
+
+                // Stall: same step for >120s (agent advances steps roughly
+                // every 30-60s on a healthy run). Surface a "Refresh page"
+                // button so the user isn't stuck staring at a spinner that
+                // will never resolve on its own.
+                if (Date.now() - this.stepChangedAt > 120000) {
+                    this.stalled = true;
                 }
             } catch {}
         },
