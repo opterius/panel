@@ -124,6 +124,34 @@
                                     <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
                                 @enderror
                             </div>
+
+                            {{-- Advanced: optional document root override. Hidden by default — the
+                                 standard /home/USER/DOMAIN/public_html is what 95% of accounts need;
+                                 customers running Laravel/Symfony or migrating from a custom layout
+                                 expand this to point the vhost at their actual public/ folder. --}}
+                            <div class="border-t border-gray-100"
+                                 x-data="{ advancedOpen: {{ old('document_root') ? 'true' : 'false' }} }">
+                                <button type="button" @click="advancedOpen = !advancedOpen"
+                                        class="w-full px-6 py-3 flex items-center justify-between text-sm font-medium text-gray-600 hover:bg-gray-50 transition">
+                                    <span class="flex items-center gap-2">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                        Advanced (document root)
+                                    </span>
+                                    <svg class="w-4 h-4 transition-transform" :class="advancedOpen ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                                </button>
+                                <div x-show="advancedOpen" x-cloak x-collapse class="px-6 pb-5">
+                                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Custom document root <span class="font-normal text-gray-400">(optional)</span></label>
+                                    <input type="text" name="document_root" value="{{ old('document_root') }}"
+                                        class="w-full font-mono text-sm rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                                        x-bind:placeholder="'/home/' + (username || 'USER') + '/' + (domain || 'DOMAIN') + '/public_html'">
+                                    <p class="mt-1.5 text-sm text-gray-500">
+                                        Leave blank for the standard <code class="font-mono">/home/USER/DOMAIN/public_html</code>. Override if your app's public folder lives elsewhere (e.g. Laravel: <code class="font-mono">.../app/public</code>).
+                                    </p>
+                                    @error('document_root')
+                                        <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>
+                                    @enderror
+                                </div>
+                            </div>
                         </div>
 
                         {{-- Section 3: Account Owner --}}

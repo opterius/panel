@@ -82,6 +82,9 @@ class AccountController extends Controller
             'owner_email'    => 'required|email|max:255',
             'owner_name'     => 'nullable|string|max:255',
             'owner_password' => 'nullable|string|min:8',
+            // Optional override from the "Advanced" section. Absolute path on
+            // the server; left empty keeps the standard /home/USER/DOMAIN/public_html.
+            'document_root'  => ['nullable', 'string', 'max:512', 'starts_with:/'],
         ]);
 
         $package = Package::findOrFail($validated['package_id']);
@@ -124,11 +127,12 @@ class AccountController extends Controller
                 'disk_quota'   => $diskQuota,
             ]);
 
+            $defaultRoot = $homeDir . '/' . $validated['domain'] . '/public_html';
             Domain::create([
                 'server_id'     => $validated['server_id'],
                 'account_id'    => $account->id,
                 'domain'        => $validated['domain'],
-                'document_root' => $homeDir . '/' . $validated['domain'] . '/public_html',
+                'document_root' => !empty($validated['document_root']) ? $validated['document_root'] : $defaultRoot,
                 'php_version'   => $phpVersion,
                 'status'        => 'pending',
             ]);

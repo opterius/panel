@@ -301,6 +301,7 @@ Route::middleware([
 
         // Domains (create/store removed — domain is created with the account)
         Route::resource('domains', DomainController::class)->only(['index', 'destroy']);
+        Route::post('/domains/{domain}/catchall', [DomainController::class, 'toggleCatchall'])->name('domains.catchall');
         Route::post('/domains/{domain}/toggle-htaccess', [HtaccessController::class, 'toggle'])->name('domains.toggle-htaccess');
         Route::get('/htaccess', [HtaccessController::class, 'index'])->name('htaccess.index');
 

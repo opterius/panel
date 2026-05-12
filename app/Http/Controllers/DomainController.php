@@ -55,4 +55,60 @@ class DomainController extends Controller
 
         return redirect()->route('user.domains.index')->with('success', __('domains.subdomain_deleted', ['domain' => $domain->domain]));
     }
+
+    /**
+     * POST /user/domains/{domain}/catchall
+     *
+     * Toggles multi-tenant catch-all mode: when enabled, every *.{domain}
+     * subdomain serves the same nginx vhost without needing a per-subdomain
+     * record. Useful for SaaS where customers get acmeN.fastbiz.ro on signup.
+     * Pairs with a wildcard SSL cert on the same domain.
+     */
+    public function toggleCatchall(Request $request, Domain $domain)
+    {
+        $domain->load('account.server');
+
+        if (!$domain->account->userCan(auth()->user(), 'settings')) {
+            return back()->with('error', __('domains.no_permission'));
+        }
+
+        if ($domain->isSubdomain()) {
+            return back()->with('error', 'Catch-all only applies to main domains.');
+        }
+
+        $enabled = (bool) $request->boolean('enabled');
+
+        // Optional custom doc root — NULL means inherit from main domain vhost.
+        $docRoot = trim((string) $request->input('document_root', ''));
+        if ($enabled && $docRoot !== '' && !str_starts_with($docRoot, '/')) {
+            return back()->with('error', 'Document root must be an absolute path (start with /).');
+        }
+
+        $response = AgentService::for($domain->account->server)->post('/domain/catchall', [
+            'domain'        => $domain->domain,
+            'username'      => $domain->account->username,
+            'enabled'       => $enabled,
+            'document_root' => $docRoot,
+            'php_version'   => $domain->php_version,
+        ]);
+
+        if (!$response || !$response->successful()) {
+            $error = $response ? $response->json('error', 'Unknown error') : 'Could not reach agent';
+            return back()->with('error', "Catch-all toggle failed: {$error}");
+        }
+
+        $domain->update([
+            'catchall_subdomains'     => $enabled,
+            'catchall_document_root'  => $enabled && $docRoot !== '' ? $docRoot : null,
+        ]);
+
+        ActivityLogger::log('domain.catchall', 'domain', $domain->id, $domain->domain,
+            ($enabled ? 'Enabled' : 'Disabled') . " catch-all subdomains for {$domain->domain}",
+            ['enabled' => $enabled]);
+
+        $msg = $enabled
+            ? "Catch-all enabled — any *.{$domain->domain} subdomain now serves the same site."
+            : "Catch-all disabled — subdomains again require their own record.";
+        return back()->with('success', $msg);
+    }
 }
