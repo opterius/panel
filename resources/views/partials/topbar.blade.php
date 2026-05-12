@@ -1,8 +1,62 @@
+@php
+    $tbUserAccounts = Auth::user()->accessibleAccounts()->with('domains')->get()
+        ->sortBy(fn($a) => strtolower($a->domains->whereNull('parent_id')->first()?->domain ?? $a->username))
+        ->values();
+    $tbCurrentAcct = Auth::user()->currentAccount();
+@endphp
 <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 shrink-0">
-    <!-- Page Title -->
-    <div>
+    <!-- Page Title + Active Account -->
+    <div class="flex items-center gap-4 min-w-0">
         @if (isset($header))
-            {{ $header }}
+            <div>{{ $header }}</div>
+        @endif
+
+        @if($tbCurrentAcct)
+            @if($tbUserAccounts->count() > 1)
+                <div class="relative" x-data="{ open: false, search: '' }" @keydown.escape.window="open = false" @click.outside="open = false">
+                    <button type="button" @click="open = !open; if (open) $nextTick(() => $refs.tbAcctSearch?.focus())"
+                        class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg transition">
+                        <svg class="w-4 h-4 text-indigo-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg>
+                        <span class="text-sm font-medium text-gray-800 truncate max-w-[180px]">{{ $tbCurrentAcct->domains->whereNull('parent_id')->first()?->domain ?? $tbCurrentAcct->username }}</span>
+                        <svg class="w-3.5 h-3.5 text-gray-400 transition-transform" :class="open ? 'rotate-180' : ''" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                    </button>
+                    <div x-show="open" x-transition class="absolute left-0 top-full mt-1 w-72 bg-white border border-gray-200 rounded-lg shadow-lg z-50 p-2" style="display:none;">
+                        <div class="relative mb-2">
+                            <svg class="w-4 h-4 text-gray-400 absolute left-2.5 top-1/2 -translate-y-1/2 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+                            <input type="search" x-ref="tbAcctSearch" x-model="search"
+                                placeholder="Search account…"
+                                autocomplete="new-password"
+                                autocorrect="off" autocapitalize="off" spellcheck="false"
+                                data-lpignore="true" data-1p-ignore data-form-type="other" data-bwignore
+                                name="tb-acct-filter-{{ uniqid() }}"
+                                class="w-full bg-gray-50 border border-gray-200 rounded-md pl-8 pr-2 py-1.5 text-sm text-gray-800 placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
+                        </div>
+                        <div class="max-h-72 overflow-y-auto space-y-1" style="scrollbar-width: thin;">
+                            @foreach($tbUserAccounts as $acct)
+                                @php
+                                    $tbAcctDomain = $acct->domains->whereNull('parent_id')->first()?->domain ?? $acct->username;
+                                    $tbHaystack  = strtolower($tbAcctDomain . ' ' . $acct->username);
+                                @endphp
+                                <form method="POST" action="{{ route('user.switch-account') }}"
+                                      x-show="search === '' || @js($tbHaystack).includes(search.toLowerCase().trim())">
+                                    @csrf
+                                    <input type="hidden" name="account_id" value="{{ $acct->id }}">
+                                    <button type="submit" class="w-full text-left px-3 py-2 rounded-md text-sm transition
+                                        {{ $tbCurrentAcct->id === $acct->id ? 'bg-indigo-600 text-white' : 'text-gray-700 hover:bg-gray-100' }}">
+                                        <div class="font-medium truncate">{{ $tbAcctDomain }}</div>
+                                        <div class="text-sm opacity-75 truncate">{{ $acct->username }}</div>
+                                    </button>
+                                </form>
+                            @endforeach
+                        </div>
+                    </div>
+                </div>
+            @else
+                <div class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-lg">
+                    <svg class="w-4 h-4 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3"/></svg>
+                    <span class="text-sm font-medium text-gray-800">{{ $tbCurrentAcct->domains->whereNull('parent_id')->first()?->domain ?? $tbCurrentAcct->username }}</span>
+                </div>
+            @endif
         @endif
     </div>
 
