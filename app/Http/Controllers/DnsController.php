@@ -72,7 +72,10 @@ class DnsController extends Controller
 
         $response = AgentService::for($domain->account->server)->post('/dns/delete-record', [
             'domain' => $domain->domain,
-            'id'     => $validated['record_id'],
+            // Cast to int so the JSON body sends a number — the agent's
+            // DNSDeleteRecordRequest.id is typed int64 and rejects strings
+            // with "cannot unmarshal string into Go struct field".
+            'id'     => (int) $validated['record_id'],
         ]);
 
         if ($response && $response->successful()) {
