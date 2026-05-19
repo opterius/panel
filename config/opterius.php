@@ -83,6 +83,10 @@ return [
         'rate_limit' => env('OPTERIUS_API_RATE_LIMIT', 60),
     ],
 
+    // Shared secret for SSO from opterius.com client zone.
+    // Must match OPTERIUS_SSO_SECRET on opterius.com.
+    'sso_secret' => env('OPTERIUS_SSO_SECRET'),
+
     'version' => '2.9.9',
     'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
     'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),

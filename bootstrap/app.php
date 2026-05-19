@@ -28,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // shared token in the request body).
         $middleware->validateCsrfTokens(except: [
             'api/cron/report',
+            'sso/issue',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

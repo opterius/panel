@@ -19,6 +19,22 @@ class DomainController extends Controller
             ->latest()
             ->get();
 
+        // Annotate each domain with `wildcard_active` so the catch-all card
+        // can give the right SSL warning. The cert record's `type` is set
+        // when the wildcard is first issued, but switches to 'letsencrypt'
+        // the moment the apex gets its own HTTP-01 cert — so we can't trust
+        // it alone. Asking the agent is authoritative: it checks the
+        // wildcard cert file on disk.
+        foreach ($domains as $d) {
+            $d->wildcard_active = false;
+            if ($d->server) {
+                $resp = AgentService::for($d->server)->post('/ssl/status', ['domain' => $d->domain]);
+                if ($resp && $resp->successful()) {
+                    $d->wildcard_active = (bool) $resp->json('wildcard_exists', false);
+                }
+            }
+        }
+
         return view('domains.index', compact('domains'));
     }
 
