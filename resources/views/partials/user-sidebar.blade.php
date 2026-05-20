@@ -84,7 +84,7 @@
     @php
         // Pre-compute which groups should auto-open based on the current route.
         $active = [
-            'domain'      => request()->routeIs('user.domains.*', 'user.subdomains.*', 'user.aliases.*', 'user.redirects.*', 'user.ssl.*', 'user.dns.*'),
+            'domain'      => request()->routeIs('user.subdomains.*', 'user.aliases.*', 'user.redirects.*', 'user.ssl.*', 'user.dns.*'),
             'files'       => request()->routeIs('user.filemanager.*', 'user.ftp.*', 'user.ssh.*', 'user.terminal.*'),
             'databases'   => request()->routeIs('user.databases.*', 'user.postgres.*'),
             'email'       => request()->routeIs('user.emails.*', 'user.forwarders.*', 'user.autoresponders.*'),
@@ -112,12 +112,6 @@
                 <svg class="w-3 h-3 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7" /></svg>
             </button>
             <div x-show="open" x-collapse class="space-y-1 mt-1">
-                <x-sidebar-link href="{{ route('user.domains.index') }}" :active="request()->routeIs('user.domains.*')">
-                    <x-slot name="icon">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" /></svg>
-                    </x-slot>
-                    {{ __('domains.domains') }}
-                </x-sidebar-link>
                 <x-sidebar-link href="{{ route('user.subdomains.index') }}" :active="request()->routeIs('user.subdomains.*')">
                     <x-slot name="icon">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" /></svg>
