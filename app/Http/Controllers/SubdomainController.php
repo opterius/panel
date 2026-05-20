@@ -13,7 +13,7 @@ class SubdomainController extends Controller
 {
     public function index()
     {
-        $domains = Domain::with('account.server', 'subdomains')
+        $domains = Domain::with('account.server', 'subdomains', 'sslCertificate')
             ->whereIn('account_id', auth()->user()->currentAccountIds())
             ->whereNull('parent_id')
             ->where('status', 'active')
