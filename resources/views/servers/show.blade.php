@@ -192,7 +192,53 @@
     </div>
 
     <!-- Maintenance -->
-    <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-amber-100">
+    <div class="bg-white rounded-xl shadow-sm p-6 mb-6 border border-amber-100"
+         x-data="{
+            running: false,
+            done: false,
+            error: null,
+            lines: [],
+            async run() {
+                this.running = true;
+                this.done = false;
+                this.error = null;
+                this.lines = [];
+                try {
+                    const res = await fetch('{{ route('admin.servers.repair-accounts', $server) }}', {
+                        method: 'POST',
+                        headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Accept': 'application/json' },
+                    });
+                    const data = await res.json();
+                    if (!res.ok) {
+                        this.error = data.error ?? 'Unknown error';
+                    } else {
+                        const reports = data.reports ?? [];
+                        if (reports.length === 0) {
+                            this.lines.push({ type: 'ok', text: 'No accounts found on this server.' });
+                        }
+                        for (const r of reports) {
+                            const steps = r.steps ?? [];
+                            const errs  = r.errors ?? [];
+                            if (steps.length === 0 && errs.length === 0) {
+                                this.lines.push({ type: 'ok', text: r.username + ': already clean' });
+                            } else {
+                                for (const s of steps) {
+                                    this.lines.push({ type: 'step', text: r.username + ': ' + s });
+                                }
+                                for (const e of errs) {
+                                    this.lines.push({ type: 'err', text: r.username + ': ' + e });
+                                }
+                            }
+                        }
+                        this.lines.push({ type: 'done', text: 'Done — ' + data.count + ' account(s) processed.' + (data.errors > 0 ? ' ' + data.errors + ' non-fatal issue(s).' : '') });
+                    }
+                } catch (e) {
+                    this.error = 'Could not reach the server.';
+                }
+                this.running = false;
+                this.done = true;
+            }
+         }">
         <h3 class="text-base font-semibold text-gray-800 mb-2">Account Maintenance</h3>
         <p class="text-sm text-gray-500 mb-4">
             Reapply standard hygiene to every hosting account on this server:
@@ -201,14 +247,38 @@
             Idempotent — safe to run any time. Use this to retrofit accounts
             created by older agent builds.
         </p>
-        <form method="POST" action="{{ route('admin.servers.repair-accounts', $server) }}"
-              onsubmit="return confirm('Repair every account on this server? Safe to run, but may take a few seconds on busy servers.');">
-            @csrf
-            <button type="submit" class="inline-flex items-center px-4 py-2.5 bg-amber-50 text-amber-700 text-sm font-medium border border-amber-300 rounded-lg hover:bg-amber-100 transition">
+
+        <button @click="run" :disabled="running"
+                class="inline-flex items-center px-4 py-2.5 bg-amber-50 text-amber-700 text-sm font-medium border border-amber-300 rounded-lg hover:bg-amber-100 transition disabled:opacity-50 disabled:cursor-not-allowed">
+            <template x-if="!running">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                Repair all accounts
-            </button>
-        </form>
+            </template>
+            <template x-if="running">
+                <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                </svg>
+            </template>
+            <span x-text="running ? 'Repairing...' : 'Repair all accounts'"></span>
+        </button>
+
+        {{-- Results log --}}
+        <div x-show="lines.length > 0 || error" x-cloak class="mt-4">
+            <div x-show="error" class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3" x-text="error"></div>
+            <div x-show="lines.length > 0"
+                 class="bg-gray-900 rounded-xl p-4 font-mono text-sm max-h-72 overflow-y-auto space-y-1">
+                <template x-for="(line, i) in lines" :key="i">
+                    <div :class="{
+                            'text-green-400': line.type === 'ok',
+                            'text-amber-300': line.type === 'step',
+                            'text-red-400':   line.type === 'err',
+                            'text-white font-semibold': line.type === 'done',
+                         }"
+                         x-text="line.text">
+                    </div>
+                </template>
+            </div>
+        </div>
     </div>
 
     <!-- Danger Zone -->

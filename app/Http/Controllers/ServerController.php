@@ -144,16 +144,27 @@ class ServerController extends Controller
 
         if (! $response || ! $response->successful()) {
             $error = $response ? $response->json('error', 'Unknown error') : 'Could not reach agent';
+            if (request()->expectsJson()) {
+                return response()->json(['error' => $error], 502);
+            }
             return back()->with('error', "Repair failed: {$error}");
         }
 
-        $count = (int) $response->json('count', 0);
+        $count   = (int) $response->json('count', 0);
         $reports = $response->json('reports', []);
-        $errors = collect($reports)->flatMap(fn ($r) => $r['errors'] ?? [])->count();
+        $errors  = collect($reports)->flatMap(fn ($r) => $r['errors'] ?? [])->count();
 
         ActivityLogger::log('server.repaired', 'server', $server->id, $server->name,
             "Repaired {$count} account(s) on {$server->name} ({$errors} sub-errors)",
             ['count' => $count, 'errors' => $errors]);
+
+        if (request()->expectsJson()) {
+            return response()->json([
+                'count'   => $count,
+                'reports' => $reports,
+                'errors'  => $errors,
+            ]);
+        }
 
         $msg = "Repaired {$count} account(s)" . ($errors > 0 ? " ({$errors} non-fatal issues — see activity log)" : '');
         return back()->with('success', $msg);
