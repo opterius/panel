@@ -87,7 +87,7 @@ return [
     // Must match OPTERIUS_SSO_SECRET on opterius.com.
     'sso_secret' => env('OPTERIUS_SSO_SECRET'),
 
-    'version' => '2.9.12',
+    'version' => '2.9.13',
     'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
     'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),
 
