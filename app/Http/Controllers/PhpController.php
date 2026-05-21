@@ -125,14 +125,15 @@ class PhpController extends Controller
             'new_version' => 'required|string|regex:/^\d+\.\d+$/',
         ]);
 
-        $domain = Domain::with('account.server')->findOrFail($validated['domain_id']);
+        $domain = Domain::with('account.server', 'parent')->findOrFail($validated['domain_id']);
         $oldVersion = $domain->php_version;
 
         $response = AgentService::for($domain->account->server)->post('/php/switch-version', [
-            'domain'      => $domain->domain,
-            'username'    => $domain->account->username,
-            'old_version' => $oldVersion,
-            'new_version' => $validated['new_version'],
+            'domain'        => $domain->domain,
+            'username'      => $domain->account->username,
+            'old_version'   => $oldVersion,
+            'new_version'   => $validated['new_version'],
+            'parent_domain' => $domain->parent?->domain ?? '',
         ]);
 
         if ($response && $response->successful()) {
