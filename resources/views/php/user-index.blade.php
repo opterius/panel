@@ -87,11 +87,6 @@
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
                                 </div>
                                 <div>
-                                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">max_input_vars</label>
-                                    <input type="number" name="max_input_vars" value="{{ $cfg['max_input_vars'] ?? '1000' }}" placeholder="1000"
-                                        class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">
-                                </div>
-                                <div>
                                     <label class="block text-sm font-semibold text-gray-700 mb-1.5">display_errors</label>
                                     <select name="display_errors"
                                         class="w-full text-sm border border-gray-300 rounded-lg px-3 py-2 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500">

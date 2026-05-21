@@ -66,7 +66,6 @@ class UserPhpController extends Controller
             'max_execution_time'  => 'nullable|integer|min:0|max:3600',
             'upload_max_filesize' => 'nullable|string|max:10',
             'post_max_size'       => 'nullable|string|max:10',
-            'max_input_vars'      => 'nullable|integer|min:100|max:100000',
             'display_errors'      => 'nullable|in:On,Off',
             'allow_url_fopen'     => 'nullable|in:On,Off',
             'enabled_funcs'       => 'nullable|array',
@@ -82,7 +81,7 @@ class UserPhpController extends Controller
         }
 
         $values = [];
-        foreach (['memory_limit', 'upload_max_filesize', 'post_max_size', 'max_execution_time', 'max_input_vars', 'display_errors', 'allow_url_fopen'] as $key) {
+        foreach (['memory_limit', 'upload_max_filesize', 'post_max_size', 'max_execution_time', 'display_errors', 'allow_url_fopen'] as $key) {
             if (!empty($validated[$key])) {
                 $values[$key] = (string) $validated[$key];
             }
