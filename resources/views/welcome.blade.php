@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Opterius Panel</title>
+    <title>OPanel</title>
     <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
     <link rel="preconnect" href="https://fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=inter:400,500,600,700&display=swap" rel="stylesheet" />
@@ -14,7 +14,7 @@
     <!-- Nav -->
     <nav class="flex items-center justify-between px-8 py-5">
         <div class="flex items-center">
-            <img src="{{ asset('img/logo.png') }}" alt="Opterius">
+            <img src="{{ asset('img/logo.png') }}" alt="OPanel">
         </div>
         <div class="flex items-center space-x-4">
             @auth
@@ -29,11 +29,11 @@
     <main class="flex-1 flex items-center justify-center px-8">
         <div class="text-center max-w-2xl">
             <div class="inline-flex items-center px-3 py-1 rounded-full bg-orange-500/20 border border-orange-500/30 text-orange-400 text-xs font-medium mb-6">
-                v{{ config('opterius.version', '1.0.0') }}
+                v{{ config('opanel.version', '1.0.0') }}
             </div>
 
             <h1 class="text-5xl sm:text-6xl font-bold leading-tight">
-                <span class="text-white">Opterius</span>
+                <span class="text-white">OPanel</span>
                 <span style="color:#ff6900;">Panel</span>
             </h1>
 
@@ -68,7 +68,7 @@
 
     <!-- Footer -->
     <footer class="px-8 py-6 text-center">
-        <p class="text-sm text-gray-600">&copy; {{ date('Y') }} Opterius. All rights reserved.</p>
+        <p class="text-sm text-gray-600">&copy; {{ date('Y') }} OPanel. All rights reserved.</p>
     </footer>
 
 </body>

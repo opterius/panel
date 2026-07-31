@@ -163,7 +163,7 @@ class EmailController extends Controller
 
         if (!$url) {
             // SSO not configured or failed — fall back to plain webmail URL
-            $url = str_replace('SERVER_IP', request()->getHost(), config('opterius.webmail_url'));
+            $url = str_replace('SERVER_IP', request()->getHost(), config('opanel.webmail_url'));
         }
 
         return redirect($url);

@@ -54,8 +54,8 @@ class AliasController extends Controller
             AgentService::for($domain->account->server)->post('/dns/create-zone', [
                 'domain'    => $validated['alias_domain'],
                 'server_ip' => $domain->account->server->ip_address,
-                'ns1'       => config('opterius.ns1'),
-                'ns2'       => config('opterius.ns2'),
+                'ns1'       => config('opanel.ns1'),
+                'ns2'       => config('opanel.ns2'),
             ]);
 
             ActivityLogger::log('alias.created', 'domain', $domain->id, $validated['alias_domain'],

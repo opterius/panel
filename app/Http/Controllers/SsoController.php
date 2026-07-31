@@ -11,16 +11,16 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 
 /**
- * SSO — token-based auto-login from opterius.com client zone.
+ * SSO — token-based auto-login from github.com/siyamex/panel client zone.
  *
  * Flow:
- *   1. opterius.com calls POST /sso/issue (server-to-server, HMAC-signed).
+ *   1. github.com/siyamex/panel calls POST /sso/issue (server-to-server, HMAC-signed).
  *      Panel validates signature and returns a one-time token.
- *   2. opterius.com redirects the user's browser to GET /sso/login?token=...
+ *   2. github.com/siyamex/panel redirects the user's browser to GET /sso/login?token=...
  *      Panel validates the token, logs the user in, redirects to dashboard.
  *
  * Required .env:
- *   OPTERIUS_SSO_SECRET=<shared secret, min 32 chars, same on opterius.com>
+ *   OPANEL_SSO_SECRET=<shared secret, min 32 chars, same on github.com/siyamex/panel>
  */
 class SsoController extends Controller
 {
@@ -28,13 +28,13 @@ class SsoController extends Controller
 
     /**
      * POST /sso/issue
-     * Server-to-server — called by opterius.com.
+     * Server-to-server — called by github.com/siyamex/panel.
      *
      * Body: { "email": "...", "timestamp": 1234567890, "signature": "hex-hmac-sha256" }
      */
     public function issue(Request $request): JsonResponse
     {
-        $secret = config('opterius.sso_secret');
+        $secret = config('opanel.sso_secret');
 
         if (empty($secret)) {
             return response()->json(['error' => 'SSO is not configured.'], 403);
@@ -74,11 +74,11 @@ class SsoController extends Controller
 
     /**
      * GET /sso/login?token=...
-     * Browser redirect — user arrives here from opterius.com.
+     * Browser redirect — user arrives here from github.com/siyamex/panel.
      */
     public function login(Request $request): RedirectResponse
     {
-        $secret = config('opterius.sso_secret');
+        $secret = config('opanel.sso_secret');
 
         if (empty($secret)) {
             return redirect()->route('login')->withErrors(['email' => 'SSO is not configured.']);

@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Cache;
 
 class PhpVersionsService
 {
-    private const CACHE_KEY = 'opterius:php_versions:union';
+    private const CACHE_KEY = 'opanel:php_versions:union';
     private const CACHE_TTL = 3600; // 1 hour — re-poll the agents at most once an hour
 
     /**
@@ -35,7 +35,7 @@ class PhpVersionsService
             return $keys;
         });
 
-        return $versions ?: config('opterius.php_versions', []);
+        return $versions ?: config('opanel.php_versions', []);
     }
 
     /**

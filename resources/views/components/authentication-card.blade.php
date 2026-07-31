@@ -7,5 +7,5 @@
         {{ $slot }}
     </div>
 
-    <p class="mt-6 text-xs text-gray-500">&copy; {{ date('Y') }} Opterius</p>
+    <p class="mt-6 text-xs text-gray-500">&copy; {{ date('Y') }} OPanel</p>
 </div>

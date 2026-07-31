@@ -2,7 +2,7 @@
     <!-- Logo -->
     <div class="h-16 flex items-center px-6 border-b border-gray-800">
         <a href="{{ route('admin.dashboard') }}" class="flex items-center">
-            <img src="{{ asset('img/logo.png') }}" alt="Opterius">
+            <img src="{{ asset('img/logo.png') }}" alt="OPanel">
         </a>
     </div>
 
@@ -219,6 +219,6 @@
     </nav>
 
     <div class="px-4 py-3 border-t border-gray-800 text-xs text-gray-500">
-        <a href="{{ route('admin.updates.index') }}" class="hover:text-gray-300 transition">Opterius Panel v{{ config('opterius.version', '1.0.0') }}</a>
+        <a href="{{ route('admin.updates.index') }}" class="hover:text-gray-300 transition">OPanel v{{ config('opanel.version', '1.0.0') }}</a>
     </div>
 </aside>

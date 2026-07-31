@@ -2,223 +2,92 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Http;
-
+/**
+ * License enforcement has been removed from this fork.
+ *
+ * Every method reports a valid, unlimited licence and no request is made to
+ * any external licence server. The public API is unchanged so existing call
+ * sites (AccountController, ServerController, ProvisioningService,
+ * LicenseMiddleware) and the Blade views keep working untouched.
+ *
+ * Note: 0 means "unlimited" in the original status payload, and the max*()
+ * helpers translate that to PHP_INT_MAX — the value the `$atLimit` checks in
+ * the controllers and views compare against to hide their limit banners.
+ */
 class LicenseService
 {
-    private string $serverUrl;
-    private string $licenseKey;
-
-    public function __construct()
-    {
-        $this->serverUrl = rtrim(config('opterius.license_server_url'), '/');
-        $this->licenseKey = config('opterius.license_key', '');
-    }
-
     /**
-     * Verify the license with the central server.
-     * Caches the result for 24 hours so the panel works even if the license server is down.
+     * The status array shared with every view by LicenseMiddleware.
      */
     public function verify(): array
     {
-        if (empty($this->licenseKey)) {
-            return $this->restricted('no_key', 'No license key configured.');
-        }
-
-        // Return cached response if available
-        $cached = Cache::get('license_status');
-        if ($cached !== null) {
-            return $cached;
-        }
-
-        try {
-            $response = Http::timeout(10)
-                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                ->post($this->serverUrl . '/api/license/verify', [
-                    'key'           => $this->licenseKey,
-                    'server_ip'     => $this->getServerIp(),
-                    'panel_version' => config('opterius.version', '1.0.0'),
-                    'os'            => php_uname('s') . ' ' . php_uname('r'),
-                ]);
-
-            if ($response->successful()) {
-                $data = $response->json();
-                Cache::put('license_status', $data, now()->addHours(24));
-                return $data;
-            }
-
-            $data = $response->json();
-            $result = [
-                'valid'        => false,
-                'reason'       => $data['reason'] ?? 'unknown',
-                'message'      => $data['message'] ?? 'License check failed.',
-                'max_domains'  => $data['max_domains']  ?? 1,
-                'max_accounts' => $data['max_accounts'] ?? 1,
-                'max_servers'  => $data['max_servers']  ?? 1,
-                'plan'         => $data['plan'] ?? 'trial',
-            ];
-            Cache::put('license_status', $result, now()->addHours(24));
-            return $result;
-
-        } catch (\Exception $e) {
-            // License server unreachable — use Laravel cache first
-            $cached = Cache::get('license_status');
-            if ($cached !== null) {
-                return $cached;
-            }
-
-            // Try agent's cache file as fallback
-            $agentCache = '/etc/opterius/license-cache.json';
-            if (file_exists($agentCache)) {
-                $data = json_decode(file_get_contents($agentCache), true);
-                if ($data && ($data['valid'] ?? false)) {
-                    Cache::put('license_status', $data, now()->addHours(24));
-                    return $data;
-                }
-            }
-
-            // No cache, no server — allow restricted mode
-            return $this->restricted('unreachable', 'License server unreachable. Running in restricted mode.');
-        }
-    }
-
-    /**
-     * Register a trial license during installation.
-     */
-    public function registerTrial(): ?array
-    {
-        try {
-            $response = Http::timeout(10)->post($this->serverUrl . '/api/license/register', [
-                'server_ip'     => $this->getServerIp(),
-                'hostname'      => gethostname(),
-                'panel_version' => config('opterius.version', '1.0.0'),
-                'os'            => php_uname('s') . ' ' . php_uname('r'),
-            ]);
-
-            if ($response->successful()) {
-                return $response->json();
-            }
-
-            return null;
-        } catch (\Exception) {
-            return null;
-        }
-    }
-
-    /**
-     * Check if the current license is valid.
-     */
-    public function isValid(): bool
-    {
-        $status = $this->verify();
-        return $status['valid'] ?? false;
-    }
-
-    /**
-     * Get the maximum number of domains allowed.
-     */
-    public function maxDomains(): int
-    {
-        $status = $this->verify();
-        $max = $status['max_domains'] ?? 1;
-        return $max === 0 ? PHP_INT_MAX : $max; // 0 = unlimited
-    }
-
-    /**
-     * Get the maximum number of accounts allowed.
-     */
-    public function maxAccounts(): int
-    {
-        $status = $this->verify();
-        $max = $status['max_accounts'] ?? $status['max_domains'] ?? 3;
-        return $max === 0 ? PHP_INT_MAX : $max; // 0 = unlimited
-    }
-
-    /**
-     * Get the maximum number of servers allowed.
-     */
-    public function maxServers(): int
-    {
-        $status = $this->verify();
-        $max = $status['max_servers'] ?? 1;
-        return $max === 0 ? PHP_INT_MAX : $max; // 0 = unlimited
-    }
-
-    /**
-     * Stripe subscription status of the license owner ('active', 'past_due',
-     * 'trialing', 'canceled', null for free users). Used to drive billing
-     * warning banners in the admin UI.
-     */
-    public function subscriptionStatus(): ?string
-    {
-        return $this->verify()['subscription_status'] ?? null;
-    }
-
-    /**
-     * True if the owner has scheduled cancellation but is still within the
-     * paid period — show "Subscription ends on ..." banner.
-     */
-    public function cancelAtPeriodEnd(): bool
-    {
-        return (bool) ($this->verify()['cancel_at_period_end'] ?? false);
-    }
-
-    /**
-     * ISO timestamp string of the current billing period's end. Null for
-     * free users. Used in banner copy ("ends on Jun 15, 2026").
-     */
-    public function currentPeriodEnd(): ?string
-    {
-        return $this->verify()['current_period_end'] ?? null;
-    }
-
-    /**
-     * Get the current license plan.
-     */
-    public function plan(): string
-    {
-        $status = $this->verify();
-        return $status['plan'] ?? 'trial';
-    }
-
-    /**
-     * Clear the cached license status (force re-check).
-     */
-    public function clearCache(): void
-    {
-        Cache::forget('license_status');
-    }
-
-    private function restricted(string $reason, string $message): array
-    {
         return [
-            'valid'        => false,
-            'reason'       => $reason,
-            'message'      => $message,
-            'max_domains'  => 1,
-            'max_accounts' => 1,
-            'max_servers'  => 1,
-            'plan'         => 'restricted',
+            'valid'                => true,
+            'reason'               => 'unlicensed_build',
+            'message'              => 'Unlimited — licence enforcement removed.',
+            'max_domains'          => 0, // 0 = unlimited
+            'max_accounts'         => 0,
+            'max_servers'          => 0,
+            'plan'                 => 'unlimited',
+            'subscription_status'  => null,
+            'cancel_at_period_end' => false,
+            'current_period_end'   => null,
         ];
     }
 
-    private function getServerIp(): string
+    /**
+     * Kept for the installer's call path; there is no trial to register.
+     */
+    public function registerTrial(): ?array
     {
-        // Force IPv4 — must match what the agent reports, otherwise the
-        // panel and agent end up with separate activation entries (one per
-        // address family) and exhaust the license's server slot.
-        try {
-            $ip = Http::timeout(5)
-                ->withOptions(['curl' => [CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4]])
-                ->get('https://api.ipify.org')
-                ->body();
-            if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                return $ip;
-            }
-        } catch (\Exception) {
-        }
+        return $this->verify();
+    }
 
-        return request()->server('SERVER_ADDR', '127.0.0.1');
+    public function isValid(): bool
+    {
+        return true;
+    }
+
+    public function maxDomains(): int
+    {
+        return PHP_INT_MAX;
+    }
+
+    public function maxAccounts(): int
+    {
+        return PHP_INT_MAX;
+    }
+
+    public function maxServers(): int
+    {
+        return PHP_INT_MAX;
+    }
+
+    public function subscriptionStatus(): ?string
+    {
+        return null;
+    }
+
+    public function cancelAtPeriodEnd(): bool
+    {
+        return false;
+    }
+
+    public function currentPeriodEnd(): ?string
+    {
+        return null;
+    }
+
+    public function plan(): string
+    {
+        return 'unlimited';
+    }
+
+    /**
+     * No-op — nothing is cached because nothing is fetched.
+     */
+    public function clearCache(): void
+    {
+        //
     }
 }

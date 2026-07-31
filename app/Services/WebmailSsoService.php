@@ -16,12 +16,17 @@ class WebmailSsoService
      */
     public static function loginUrl(string $email): ?string
     {
-        $secret     = config('opterius.webmail_sso_secret');
-        $webmailUrl = rtrim(config('opterius.webmail_url'), '/');
+        $secret     = config('opanel.webmail_sso_secret');
+        $webmailUrl = rtrim(config('opanel.webmail_url'), '/');
 
         if (!$secret || !$webmailUrl || str_contains($webmailUrl, 'SERVER_IP')) {
             return null;
         }
+
+        // The webmail lowercases the address before recomputing the HMAC, so
+        // we must sign the lowercased form too — otherwise any address with a
+        // capital letter produces a signature mismatch and SSO silently fails.
+        $email = strtolower($email);
 
         $timestamp = time();
         $signature = hash_hmac('sha256', "{$email}:{$timestamp}", $secret);

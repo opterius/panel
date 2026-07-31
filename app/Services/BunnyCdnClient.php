@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Http;
 use RuntimeException;
 
 /**
- * Thin wrapper around the BunnyCDN HTTP API. Only the calls Opterius needs:
+ * Thin wrapper around the BunnyCDN HTTP API. Only the calls OPanel needs:
  * create / delete / get a Pull Zone, and purge cache.
  *
  * The API key comes from the panel's "integrations" settings group, written
@@ -42,7 +42,7 @@ class BunnyCdnClient
      * Create a Pull Zone for a domain.
      *
      * BunnyCDN zone names must be globally unique across all BunnyCDN accounts,
-     * so we prefix with "opterius-" + the domain (sanitised).
+     * so we prefix with "opanel-" + the domain (sanitised).
      *
      * @return array<string,mixed> The created zone, including 'Id' and 'Hostnames'.
      */
@@ -114,11 +114,11 @@ class BunnyCdnClient
     /**
      * Build a unique zone name for a domain. Zone names are globally unique
      * across all BunnyCDN accounts, so we use the panel admin's account ID
-     * as a prefix to avoid collisions with other Opterius customers.
+     * as a prefix to avoid collisions with other OPanel customers.
      */
     private function buildZoneName(string $domain): string
     {
-        $accountId = Setting::get('integrations_bunnycdn_prefix', 'opterius');
+        $accountId = Setting::get('integrations_bunnycdn_prefix', 'opanel');
         $clean     = preg_replace('/[^a-z0-9]/', '-', strtolower($domain));
         $clean     = trim((string) $clean, '-');
         return substr("{$accountId}-{$clean}", 0, 60);

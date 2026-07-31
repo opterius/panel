@@ -27,8 +27,8 @@ return [
     |
     */
 
-    'agent_port' => env('OPTERIUS_AGENT_PORT', 7443),
-    'agent_timeout' => env('OPTERIUS_AGENT_TIMEOUT', 30),
+    'agent_port' => env('OPANEL_AGENT_PORT', 7443),
+    'agent_timeout' => env('OPANEL_AGENT_TIMEOUT', 30),
 
     /*
     |--------------------------------------------------------------------------
@@ -42,8 +42,8 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'ns1' => env('OPTERIUS_NS1', 'ns1.opterius.com'),
-    'ns2' => env('OPTERIUS_NS2', 'ns2.opterius.com'),
+    'ns1' => env('OPANEL_NS1', 'ns1.github.com/siyamex/panel'),
+    'ns2' => env('OPANEL_NS2', 'ns2.github.com/siyamex/panel'),
 
     /*
     |--------------------------------------------------------------------------
@@ -51,12 +51,12 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'webmail_url'         => env('OPTERIUS_WEBMAIL_URL', 'http://SERVER_IP:8090'),
+    'webmail_url'         => env('OPANEL_WEBMAIL_URL', 'http://SERVER_IP:8090'),
 
-    // Shared secret for one-click SSO into the Opterius Mail webmail.
+    // Shared secret for one-click SSO into the OPanel Mail webmail.
     // Must match PANEL_SSO_SECRET in the webmail's .env.
     // Leave empty to disable SSO (webmail link will open the login page instead).
-    'webmail_sso_secret'  => env('OPTERIUS_WEBMAIL_SSO_SECRET'),
+    'webmail_sso_secret'  => env('OPANEL_WEBMAIL_SSO_SECRET'),
 
     /*
     |--------------------------------------------------------------------------
@@ -65,13 +65,13 @@ return [
     */
 
     // The installer sets up phpMyAdmin on plain HTTP at port 8081. If you put
-    // it behind SSL, override via OPTERIUS_PHPMYADMIN_URL=https://your-host in .env
-    'phpmyadmin_url' => env('OPTERIUS_PHPMYADMIN_URL', 'http://SERVER_IP:8081'),
+    // it behind SSL, override via OPANEL_PHPMYADMIN_URL=https://your-host in .env
+    'phpmyadmin_url' => env('OPANEL_PHPMYADMIN_URL', 'http://SERVER_IP:8081'),
 
     // Shared secret for one-click SSO into phpMyAdmin. Must match the value in
-    // /etc/opterius/pma-signon-secret on each managed server.
+    // /etc/opanel/pma-signon-secret on each managed server.
     // Leave empty to disable SSO (clicking phpMyAdmin opens the login page instead).
-    'phpmyadmin_sso_secret' => env('OPTERIUS_PMA_SSO_SECRET'),
+    'phpmyadmin_sso_secret' => env('OPANEL_PMA_SSO_SECRET'),
 
     /*
     |--------------------------------------------------------------------------
@@ -80,15 +80,15 @@ return [
     */
 
     'api' => [
-        'rate_limit' => env('OPTERIUS_API_RATE_LIMIT', 60),
+        'rate_limit' => env('OPANEL_API_RATE_LIMIT', 60),
     ],
 
-    // Shared secret for SSO from opterius.com client zone.
-    // Must match OPTERIUS_SSO_SECRET on opterius.com.
-    'sso_secret' => env('OPTERIUS_SSO_SECRET'),
+    // Shared secret for SSO from github.com/siyamex/panel client zone.
+    // Must match OPANEL_SSO_SECRET on github.com/siyamex/panel.
+    'sso_secret' => env('OPANEL_SSO_SECRET'),
 
     'version' => '2.9.16',
-    'license_key' => env('OPTERIUS_LICENSE_KEY', ''),
-    'license_server_url' => env('OPTERIUS_LICENSE_URL', 'https://opterius.com'),
+    'license_key' => env('OPANEL_LICENSE_KEY', ''),
+    'license_server_url' => env('OPANEL_LICENSE_URL', 'https://github.com/siyamex/panel'),
 
 ];

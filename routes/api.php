@@ -10,10 +10,10 @@ Route::get('/user', function (Request $request) {
 
 /*
 |--------------------------------------------------------------------------
-| Opterius Provisioning API v1
+| OPanel Provisioning API v1
 |--------------------------------------------------------------------------
 |
-| Used by WHMCS, Opterius Hub, and other billing systems to auto-create,
+| Used by WHMCS, OPanel Hub, and other billing systems to auto-create,
 | suspend, unsuspend, and terminate hosting accounts.
 |
 */

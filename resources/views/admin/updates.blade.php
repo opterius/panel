@@ -31,7 +31,7 @@
                         @endif
                     </div>
                     <div>
-                        <div class="text-lg font-bold text-gray-900">Opterius v{{ $currentVersion }}</div>
+                        <div class="text-lg font-bold text-gray-900">OPanel v{{ $currentVersion }}</div>
                         <div class="text-sm text-gray-500">
                             @if($updateAvailable)
                                 <span class="text-amber-600 font-medium">Version {{ $latestVersion }} is available</span>
@@ -57,7 +57,7 @@
                                 <template x-if="updating">
                                     <svg class="w-4 h-4 mr-2 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                                 </template>
-                                <span x-text="updating ? 'Updating...' : 'Update Opterius'">Update Opterius</span>
+                                <span x-text="updating ? 'Updating...' : 'Update OPanel'">Update OPanel</span>
                             </button>
                         </form>
                     @else
@@ -176,7 +176,7 @@
         </button>
         <div x-show="open" x-collapse class="mt-3 bg-gray-50 border border-gray-200 rounded-lg p-4">
             <p class="text-xs text-gray-500 mb-3">
-                These actions are for troubleshooting only. The main <strong>Update Opterius</strong> button above already updates both the panel and the agent together.
+                These actions are for troubleshooting only. The main <strong>Update OPanel</strong> button above already updates both the panel and the agent together.
             </p>
             <form action="{{ route('admin.updates.agent') }}" method="POST"
                   x-data="{ busy: false }" @submit="busy = true">

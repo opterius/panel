@@ -65,7 +65,7 @@
                     @endif
                     <input type="text" name="agent_token" id="agent_token" value="{{ old('agent_token', $agentToken) }}"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500 font-mono"
-                        placeholder="Secret from /etc/opterius/agent.conf">
+                        placeholder="Secret from /etc/opanel/agent.conf">
                     <p class="mt-1.5 text-xs text-gray-400">{{ __('servers.agent_token_hint') }}</p>
                     @error('agent_token')
                         <p class="mt-1.5 text-sm text-red-600">{{ $message }}</p>

@@ -112,25 +112,25 @@
             <h3 class="text-base font-semibold text-gray-800">License Key</h3>
         </div>
 
-        @if(empty(config('opterius.license_key')))
+        @if(empty(config('opanel.license_key')))
             {{-- No license — show helper text with registration links --}}
             <div class="px-6 py-6">
                 <div class="bg-blue-50 border border-blue-200 rounded-xl p-5 mb-6">
                     <h4 class="font-bold text-blue-900 mb-2">How to get your free license key</h4>
                     <ol class="list-decimal list-inside space-y-2 text-sm text-blue-800">
-                        <li>Create a free account on <a href="https://opterius.com/register" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 hover:text-blue-800 underline">opterius.com/register</a></li>
+                        <li>Create a free account on <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener noreferrer" class="font-semibold text-blue-600 hover:text-blue-800 underline">github.com/siyamex/panel/register</a></li>
                         <li>Verify your email address</li>
                         <li>Go to <strong>My Licenses</strong> in your dashboard</li>
                         <li>Click <strong>Add License</strong> — a free key will be generated</li>
                         <li>Copy the key and paste it below</li>
                     </ol>
                     <div class="mt-4 flex flex-wrap items-center gap-4">
-                        <a href="https://opterius.com/register" target="_blank" rel="noopener noreferrer"
+                        <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener noreferrer"
                            class="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/></svg>
                             Create Free Account
                         </a>
-                        <a href="https://opterius.com/login" target="_blank" rel="noopener noreferrer"
+                        <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener noreferrer"
                            class="text-sm font-semibold text-blue-700 hover:text-blue-900 transition">
                             Already registered? Log in →
                         </a>
@@ -142,14 +142,14 @@
             </div>
         @endif
 
-        <form action="{{ route('admin.license.update') }}" method="POST" class="px-6 py-5 {{ empty(config('opterius.license_key')) ? 'pt-0' : '' }}">
+        <form action="{{ route('admin.license.update') }}" method="POST" class="px-6 py-5 {{ empty(config('opanel.license_key')) ? 'pt-0' : '' }}">
             @csrf
             @method('PUT')
             <div class="flex items-end gap-4">
                 <div class="flex-1">
                     <label for="license_key" class="block text-sm font-medium text-gray-700 mb-1.5">License Key</label>
                     <input type="text" name="license_key" id="license_key"
-                        value="{{ config('opterius.license_key') }}"
+                        value="{{ config('opanel.license_key') }}"
                         class="w-full rounded-lg border-gray-300 shadow-sm text-sm font-mono focus:border-indigo-500 focus:ring-indigo-500"
                         placeholder="XXXXXXXX-XXXXXXXX-XXXXXXXX-XXXXXXXX">
                     @error('license_key')

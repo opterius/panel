@@ -27,8 +27,8 @@ class WhmcsApiController extends Controller
             'result'  => 'success',
             'message' => 'Connection successful.',
             'data'    => [
-                'panel'   => 'Opterius Panel',
-                'version' => config('opterius.version', '1.0.0'),
+                'panel'   => 'OPanel',
+                'version' => config('opanel.version', '1.0.0'),
             ],
         ]);
     }

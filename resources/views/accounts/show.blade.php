@@ -160,7 +160,7 @@
         <div class="flex items-center justify-between">
             <div>
                 <h3 class="text-base font-semibold text-gray-800">{{ __('accounts.account_owner') }}</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Used to log into the Opterius Panel (web UI).</p>
+                <p class="text-xs text-gray-500 mt-0.5">Used to log into the OPanel (web UI).</p>
                 <div class="mt-2 flex items-center space-x-3">
                     <div class="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center">
                         <span class="text-sm font-bold text-indigo-600">{{ strtoupper(substr($account->user->name, 0, 2)) }}</span>

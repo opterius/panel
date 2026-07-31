@@ -55,7 +55,7 @@
             <ol class="text-sm text-gray-600 space-y-2 list-decimal list-inside">
                 <li>In WHMCS, go to <span class="font-medium">Configuration &gt; System Settings &gt; Servers</span></li>
                 <li>Click <span class="font-medium">Add New Server</span></li>
-                <li>Set <span class="font-medium">Module</span> to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">Opterius</code></li>
+                <li>Set <span class="font-medium">Module</span> to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">OPanel</code></li>
                 <li>Set <span class="font-medium">Hostname</span> to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">{{ request()->getHost() }}</code></li>
                 <li>Set <span class="font-medium">Port</span> to <code class="bg-gray-100 px-1.5 py-0.5 rounded text-xs">{{ request()->getPort() }}</code></li>
                 <li>Paste the API key above into the <span class="font-medium">Access Hash</span> field</li>

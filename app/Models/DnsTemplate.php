@@ -28,8 +28,8 @@ class DnsTemplate extends Model
      */
     public function resolveRecords(string $domain, string $serverIp): array
     {
-        $ns1 = config('opterius.ns1', 'ns1.' . $domain);
-        $ns2 = config('opterius.ns2', 'ns2.' . $domain);
+        $ns1 = config('opanel.ns1', 'ns1.' . $domain);
+        $ns2 = config('opanel.ns2', 'ns2.' . $domain);
 
         return collect($this->records)->map(function ($record) use ($domain, $serverIp, $ns1, $ns2) {
             $replace = fn ($str) => str_replace(

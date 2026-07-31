@@ -36,13 +36,6 @@ class AccountController extends Controller
 
     public function create()
     {
-        // Block account creation if no license key is configured
-        $licenseKey = config('opterius.license_key') ?: env('OPTERIUS_LICENSE_KEY', '');
-        if (empty($licenseKey)) {
-            return redirect()->route('admin.license.index')
-                ->with('error', 'Please activate a license key before creating hosting accounts.');
-        }
-
         $servers = Server::all();
         $packages = Package::orderByDesc('is_default')->orderBy('name')->get();
         $defaultPackage = $packages->firstWhere('is_default', true);
@@ -158,8 +151,8 @@ class AccountController extends Controller
             AgentService::for($server)->post('/dns/create-zone', [
                 'domain'    => $domain->domain,
                 'server_ip' => $server->ip_address,
-                'ns1'       => config('opterius.ns1', 'ns1.' . $domain->domain),
-                'ns2'       => config('opterius.ns2', 'ns2.' . $domain->domain),
+                'ns1'       => config('opanel.ns1', 'ns1.' . $domain->domain),
+                'ns2'       => config('opanel.ns2', 'ns2.' . $domain->domain),
             ]);
 
             // Auto SSL

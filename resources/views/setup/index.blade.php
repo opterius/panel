@@ -34,7 +34,7 @@
                 <div class="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center">
                     <span class="text-white font-bold text-xl">O</span>
                 </div>
-                <span class="text-2xl font-bold text-gray-900">Opterius Panel</span>
+                <span class="text-2xl font-bold text-gray-900">OPanel</span>
             </div>
             <p class="mt-3 text-gray-500">{{ __('setup.welcome') }}</p>
         </div>
@@ -113,7 +113,7 @@
         </div>
 
         <p class="text-center text-xs text-gray-400 mt-6">
-            Opterius Panel v{{ config('opterius.version', '1.0.0') }}
+            OPanel v{{ config('opanel.version', '1.0.0') }}
         </p>
     </div>
 

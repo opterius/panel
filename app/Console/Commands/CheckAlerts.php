@@ -116,7 +116,7 @@ class CheckAlerts extends Command
     private function sendEmail(string $to, string $message): string
     {
         \Illuminate\Support\Facades\Mail::raw($message, function ($m) use ($to) {
-            $m->to($to)->subject('Opterius Alert');
+            $m->to($to)->subject('OPanel Alert');
         });
         return 'Email sent to ' . $to;
     }

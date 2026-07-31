@@ -32,7 +32,7 @@
               x-data="{
                   domain: '{{ old('domain') }}',
                   selectedAccountId: '{{ old('account_id', $accounts->first()->id) }}',
-                  phpVersion: '{{ old('php_version', config('opterius.default_php_version')) }}'
+                  phpVersion: '{{ old('php_version', config('opanel.default_php_version')) }}'
               }">
             @csrf
 
@@ -107,11 +107,11 @@
                     </div>
                     <div class="px-6 py-5">
                         <div class="flex flex-wrap gap-3">
-                            @foreach(config('opterius.php_versions') as $ver)
+                            @foreach(config('opanel.php_versions') as $ver)
                                 <label class="relative">
                                     <input type="radio" name="php_version" value="{{ $ver }}" class="peer sr-only"
                                         x-model="phpVersion"
-                                        @checked(old('php_version', config('opterius.default_php_version')) === $ver)>
+                                        @checked(old('php_version', config('opanel.default_php_version')) === $ver)>
                                     <div class="px-4 py-2.5 border border-gray-200 rounded-lg cursor-pointer text-sm font-medium
                                         peer-checked:border-indigo-500 peer-checked:bg-indigo-50 peer-checked:text-indigo-700
                                         hover:bg-gray-50 transition">

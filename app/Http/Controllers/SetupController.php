@@ -50,8 +50,8 @@ class SetupController extends Controller
             Package::create([
                 'name'                => 'Default',
                 'description'         => 'Default hosting package',
-                'php_versions'        => config('opterius.php_versions'),
-                'default_php_version' => config('opterius.default_php_version'),
+                'php_versions'        => config('opanel.php_versions'),
+                'default_php_version' => config('opanel.default_php_version'),
                 'disk_quota'          => 0,
                 'bandwidth'           => 0,
                 'max_subdomains'      => 0,
@@ -86,11 +86,11 @@ class SetupController extends Controller
                 } catch (\Exception $e) {}
             }
 
-            $agentToken = config('opterius.agent_secret') ?: env('OPTERIUS_AGENT_SECRET', '');
+            $agentToken = config('opanel.agent_secret') ?: env('OPANEL_AGENT_SECRET', '');
 
             Server::create([
                 'user_id'     => $admin->id,
-                'name'        => 'Opterius Server',
+                'name'        => 'OPanel Server',
                 'ip_address'  => $publicIp ?: '127.0.0.1',
                 'hostname'    => gethostname() ?: 'localhost',
                 'agent_url'   => 'http://127.0.0.1:7443',

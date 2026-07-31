@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'title'                 => 'Opterius Panel — Setup',
+    'title'                 => 'OPanel — Setup',
     'welcome'               => 'Welcome! Let\'s set up your admin account.',
     'create_admin_account'  => 'Create Admin Account',
     'create_admin_desc'     => 'This will be the main administrator of your hosting panel.',

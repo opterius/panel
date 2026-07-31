@@ -61,7 +61,7 @@ Route::post('/setup', [App\Http\Controllers\SetupController::class, 'store'])->n
 // shared agent_token in the body — no session/CSRF (excluded in bootstrap/app.php).
 Route::post('/api/cron/report', [CronJobController::class, 'report'])->name('api.cron.report');
 
-// SSO — token-based auto-login from opterius.com client zone.
+// SSO — token-based auto-login from github.com/siyamex/panel client zone.
 Route::post('/sso/issue', [App\Http\Controllers\SsoController::class, 'issue'])->name('sso.issue');
 Route::get('/sso/login',  [App\Http\Controllers\SsoController::class, 'login'])->name('sso.login');
 

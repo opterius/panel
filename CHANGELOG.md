@@ -4,7 +4,7 @@ Add force webmail update button and webmail version display in Updates page
 
 # Changelog
 
-All notable changes to Opterius (panel + agent) are documented here.
+All notable changes to OPanel (panel + agent) are documented here.
 The format follows [Keep a Changelog](https://keepachangelog.com/) and
 [Semantic Versioning](https://semver.org/).
 
@@ -32,19 +32,19 @@ Each release ships panel and agent together under the same version number.
 - New `.htaccess` management page under Advanced (previously buried in the domains list)
 
 ### Added — Branding
-- Opterius logo + favicon everywhere (welcome page, auth pages, sidebars, browser tab)
+- OPanel logo + favicon everywhere (welcome page, auth pages, sidebars, browser tab)
 - Dark-themed login / password / register pages matching the welcome page
 - Email account password fields now have **Generate random password**, **Show/Hide**, and **Copy** buttons (cryptographically secure, avoids confusing characters)
 
 ### Changed
-- **Brand color everywhere is now #ff6900 (Opterius orange)** — all previously indigo buttons, badges, and highlights now use the brand color
+- **Brand color everywhere is now #ff6900 (OPanel orange)** — all previously indigo buttons, badges, and highlights now use the brand color
 - Create-account page redesigned as a two-column layout (left: account info/domain/owner; right: package selection + summary)
 - Removed redundant Domain icon from user dashboard (sidebar Domains link replaces it)
 - User sidebar groups are now collapsible with auto-expand for the active page
 - Account switcher: alphabetical sort, search box, scrollable list — for users with many accounts
 - phpMyAdmin: multi-server accounts see a server dropdown (top button previously only reached the first server)
 - phpMyAdmin top button now uses cookie auth (`?server=2`) — fixes "Missing token" error
-- Single "Update Opterius" button updates panel and agent together
+- Single "Update OPanel" button updates panel and agent together
 - Force agent re-download moved to an Advanced section for troubleshooting
 - Server details page: shows "Agent connected" state with collapsible reinstall instructions when the agent is online, or a prominent install card when it's offline; agent token is now displayed as a masked copyable field
 

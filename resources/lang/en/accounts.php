@@ -51,7 +51,7 @@ return [
     'account_suspended'                 => 'Account suspended.',
     'account_unsuspended'               => 'Account unsuspended.',
     'account_deleted'                   => 'Account deleted.',
-    'account_limit_reached'             => 'Account limit reached (:current/:max). Upgrade your license at opterius.com to create more accounts.',
+    'account_limit_reached'             => 'Account limit reached (:current/:max). Upgrade your license at github.com/siyamex/panel to create more accounts.',
     'reseller_account_limit_reached'    => 'Reseller account limit reached (:used/:limit).',
     'permission_denied_create'          => 'You do not have permission to create accounts.',
     'permission_denied_suspend'         => 'You do not have permission to suspend accounts.',

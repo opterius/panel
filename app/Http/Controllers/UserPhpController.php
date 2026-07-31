@@ -51,7 +51,7 @@ class UserPhpController extends Controller
 
         // Fallback to config if agent returned nothing
         if (empty($versions)) {
-            $versions = config('opterius.php_versions', []);
+            $versions = config('opanel.php_versions', []);
         }
 
         $toggleableFuncs = self::TOGGLEABLE_FUNCS;

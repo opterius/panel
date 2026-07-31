@@ -17,7 +17,7 @@ return new class extends Migration
             // BunnyCDN-specific identifiers
             $table->unsignedBigInteger('zone_id')->nullable();
             $table->string('zone_name', 100)->nullable();
-            $table->string('cdn_hostname')->nullable();   // e.g. opterius-example-com.b-cdn.net
+            $table->string('cdn_hostname')->nullable();   // e.g. opanel-example-com.b-cdn.net
 
             // Asset paths the agent should rewrite via Nginx sub_filter
             $table->json('rewrite_paths')->nullable();    // ["/wp-content/", "/wp-includes/"]

@@ -95,9 +95,8 @@
         {{-- License status badge — visible to admins --}}
         @if(Auth::user()->isAdmin())
             @php
-                $licenseKey = config('opterius.license_key') ?: env('OPTERIUS_LICENSE_KEY', '');
-                $licenseStatus = cache('license_status');
-                $isValid = ! empty($licenseKey) && ($licenseStatus['valid'] ?? false);
+                $licenseStatus = (new \App\Services\LicenseService())->verify();
+                $isValid = $licenseStatus['valid'] ?? false;
                 $planName = is_array($licenseStatus['plan'] ?? null)
                     ? ($licenseStatus['plan']['name'] ?? 'Free')
                     : ($licenseStatus['plan'] ?? 'Free');
@@ -110,9 +109,6 @@
                 @if($isValid)
                     <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
                     {{ ucfirst($planName) }}
-                @elseif(empty($licenseKey))
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
-                    No License
                 @else
                     <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
                     Invalid License
@@ -151,9 +147,9 @@
                     {{ __('Profile') }}
                 </x-dropdown-link>
 
-                <a href="https://opterius.com" target="_blank" rel="noopener"
+                <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener"
                    class="block w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition">
-                    Opterius website
+                    OPanel website
                     <svg class="inline-block w-3 h-3 ml-1 -mt-0.5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
                 </a>
 

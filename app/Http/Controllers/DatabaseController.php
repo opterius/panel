@@ -67,7 +67,7 @@ class DatabaseController extends Controller
         $fullUser = $account->prefixDbIdentifier($validated['db_username']);
 
         // Uniqueness check on the FINAL prefixed name (so two accounts named
-        // "app" don't both get rejected — they'd be opterius_app vs other_app).
+        // "app" don't both get rejected — they'd be opanel_app vs other_app).
         if (Database::where('name', $fullName)->exists()) {
             return back()
                 ->withErrors(['name' => "Database '{$fullName}' already exists."])
@@ -190,11 +190,11 @@ class DatabaseController extends Controller
             abort(403);
         }
 
-        $secret = config('opterius.phpmyadmin_sso_secret');
+        $secret = config('opanel.phpmyadmin_sso_secret');
         if (!$secret) {
             return redirect()->away(
                 str_replace('SERVER_IP', $database->account->server->ip_address,
-                    config('opterius.phpmyadmin_url', 'http://SERVER_IP:8081'))
+                    config('opanel.phpmyadmin_url', 'http://SERVER_IP:8081'))
             );
         }
 
@@ -221,7 +221,7 @@ class DatabaseController extends Controller
 
         $serverIp = $database->account->server->ip_address;
         $pmaBase  = str_replace('SERVER_IP', $serverIp,
-            config('opterius.phpmyadmin_url', 'http://SERVER_IP:8081'));
+            config('opanel.phpmyadmin_url', 'http://SERVER_IP:8081'));
 
         ActivityLogger::log('database.pma_sso', 'database', $database->id, $database->name,
             "phpMyAdmin SSO login for database {$database->name}", [
@@ -229,7 +229,7 @@ class DatabaseController extends Controller
                 'server_ip'   => $serverIp,
             ]);
 
-        return redirect()->away($pmaBase . '/opterius-signon.php?t=' . $tokenB64);
+        return redirect()->away($pmaBase . '/opanel-signon.php?t=' . $tokenB64);
     }
 
     public function destroy(Request $request, Database $database)

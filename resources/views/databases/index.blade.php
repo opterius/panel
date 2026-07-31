@@ -19,7 +19,7 @@
         // Each server runs its own phpMyAdmin instance. Build one URL per
         // unique server the user has databases on, so multi-server accounts
         // can reach every phpMyAdmin, not just the first one.
-        $pmaTemplate = config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081');
+        $pmaTemplate = config('opanel.phpmyadmin_url', 'https://SERVER_IP:8081');
         $pmaServers = $databases
             ->pluck('account.server')
             ->filter()
@@ -29,7 +29,7 @@
                 'name' => $server->name,
                 'url'  => str_replace('SERVER_IP', $server->ip_address, $pmaTemplate) . '/?server=2',
             ]);
-        $pmaHasSso = (bool) config('opterius.phpmyadmin_sso_secret');
+        $pmaHasSso = (bool) config('opanel.phpmyadmin_sso_secret');
     @endphp
 
     <div class="bg-white rounded-xl shadow-sm">
@@ -126,7 +126,7 @@
                                     phpMyAdmin
                                 </a>
                             @else
-                                @php $rowPmaUrl = str_replace('SERVER_IP', $database->account->server->ip_address, config('opterius.phpmyadmin_url', 'https://SERVER_IP:8081')) . '/?server=2'; @endphp
+                                @php $rowPmaUrl = str_replace('SERVER_IP', $database->account->server->ip_address, config('opanel.phpmyadmin_url', 'https://SERVER_IP:8081')) . '/?server=2'; @endphp
                                 <a href="{{ $rowPmaUrl }}" target="_blank" rel="noopener noreferrer"
                                    title="{{ __('databases.pma_manual_login') }}"
                                    class="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-purple-700 bg-purple-50 hover:bg-purple-100 rounded-lg transition">

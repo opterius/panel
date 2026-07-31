@@ -62,13 +62,13 @@
             </div>
             @php
                 // Auto-detected from each server's agent (/php/list-versions),
-                // unioned and cached for 1h. Falls back to config('opterius.php_versions')
+                // unioned and cached for 1h. Falls back to config('opanel.php_versions')
                 // if no agent is reachable.
                 $availableVersions = \App\Services\PhpVersionsService::available();
                 $currentVersions = old('php_versions', $package?->php_versions ?? $availableVersions);
                 // System Settings → Domains → "default PHP version" overrides the
                 // hard-coded config default. Existing packages keep their own value.
-                $systemDefault = \App\Models\Setting::get('default_php_version', config('opterius.default_php_version'));
+                $systemDefault = \App\Models\Setting::get('default_php_version', config('opanel.default_php_version'));
                 $currentDefault = old('default_php_version', $package?->default_php_version ?? $systemDefault);
             @endphp
             <div class="px-6 py-5 space-y-5" x-data="{

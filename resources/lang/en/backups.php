@@ -12,7 +12,7 @@ return [
     'restore_this_backup'       => 'Restore this backup? This will overwrite current files/databases.',
     'creating_backup'           => 'Creating backup...',
     'restoring'                 => 'Restoring...',
-    'stored_at'                 => 'Stored at /var/backups/opterius/ on the server.',
+    'stored_at'                 => 'Stored at /var/backups/opanel/ on the server.',
     'no_backups_yet'            => 'No backups yet',
     'create_your_first_backup'  => 'Create your first backup above.',
     'size'                      => 'Size',

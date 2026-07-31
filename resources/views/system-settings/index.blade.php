@@ -119,7 +119,7 @@
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Zone Name Prefix</label>
                                     <input type="text" name="bunnycdn_prefix" maxlength="32" pattern="[a-z0-9-]*"
-                                           value="{{ $settings['bunnycdn_prefix'] ?? 'opterius' }}"
+                                           value="{{ $settings['bunnycdn_prefix'] ?? 'opanel' }}"
                                            class="w-full max-w-sm rounded-lg border-gray-300 shadow-sm text-sm focus:border-indigo-500 focus:ring-indigo-500">
                                     <p class="text-xs text-gray-500 mt-1">Used to namespace pull zone names so they don't collide with other BunnyCDN customers. Lowercase letters, digits, and hyphens only.</p>
                                 </div>

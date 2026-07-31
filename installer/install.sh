@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Opterius Panel Installer
-# Usage: curl -sL https://get.opterius.com/install.sh -o /tmp/install.sh && bash /tmp/install.sh
+# OPanel Installer
+# Usage: curl -sL https://github.com/siyamex/panel/releases/latest/download/install.sh -o /tmp/install.sh && bash /tmp/install.sh
 #
 # Supports: Ubuntu 22.04, Ubuntu 24.04, Debian 12, AlmaLinux 9
 #
@@ -31,7 +31,7 @@ err()   { echo -e "${RED}[ERROR]${NC} $1"; exit 1; }
 # ============================================================
 [[ $EUID -ne 0 ]] && err "This script must be run as root."
 
-info "Starting Opterius Panel installation..."
+info "Starting OPanel installation..."
 echo ""
 
 # ============================================================
@@ -68,20 +68,20 @@ ok "Detected OS: $OS_ID $OS_VERSION"
 # ============================================================
 # Configuration
 # ============================================================
-PANEL_DIR="/opt/opterius"
+PANEL_DIR="/opt/opanel"
 AGENT_DIR="/usr/local/bin"
-AGENT_CONF_DIR="/etc/opterius"
+AGENT_CONF_DIR="/etc/opanel"
 PANEL_PORT=8443
 AGENT_PORT=7443
 PHP_VERSION="8.4"
-DB_NAME="opterius"
-DB_USER="opterius"
+DB_NAME="opanel"
+DB_USER="opanel"
 DB_PASS=$(openssl rand -base64 24 | tr -dc 'a-zA-Z0-9' | head -c 32)
 AGENT_SECRET=$(openssl rand -hex 32)
-GITHUB_PANEL="https://github.com/opterius/panel"
-AGENT_DOWNLOAD_URL="https://get.opterius.com/agent/opterius-agent-linux-amd64"
+GITHUB_PANEL="https://github.com/opanel/panel"
+AGENT_DOWNLOAD_URL="https://github.com/siyamex/opanel-agent/releases/latest/download/opanel-agent-linux-amd64"
 
-# Detect public IP early — used in .env and Opterius Mail config
+# Detect public IP early — used in .env and OPanel Mail config
 SERVER_IP=$(curl -s4 --max-time 10 ifconfig.me 2>/dev/null || hostname -I | awk '{print $1}')
 
 # ============================================================
@@ -175,7 +175,7 @@ Listen 127.0.0.1:8080
 EOPORTS
 
     # Global Apache settings: hide version, allow .htaccess, set sensible defaults
-    cat > /etc/apache2/conf-available/opterius.conf <<'EOAPACHE'
+    cat > /etc/apache2/conf-available/opanel.conf <<'EOAPACHE'
 ServerTokens Prod
 ServerSignature Off
 
@@ -191,7 +191,7 @@ ServerSignature Off
     Require all granted
 </Directory>
 EOAPACHE
-    a2enconf opterius
+    a2enconf opanel
 
     # Remove the default listen directives from apache2.conf so only ports.conf applies
     sed -i 's/^Listen 80$/#Listen 80/' /etc/apache2/apache2.conf 2>/dev/null || true
@@ -208,7 +208,7 @@ else
     sed -i 's/^Listen 80$/Listen 127.0.0.1:8080/' /etc/httpd/conf/httpd.conf
 
     # Global settings
-    cat > /etc/httpd/conf.d/opterius.conf <<'EOAPACHE'
+    cat > /etc/httpd/conf.d/opanel.conf <<'EOAPACHE'
 ServerTokens Prod
 ServerSignature Off
 
@@ -394,8 +394,8 @@ postconf -e "virtual_mailbox_maps = hash:/etc/postfix/vmailbox"
 postconf -e "virtual_uid_maps = static:5000"
 postconf -e "virtual_gid_maps = static:5000"
 postconf -e "virtual_transport = lmtp:unix:private/dovecot-lmtp"
-postconf -e "smtpd_tls_cert_file = /etc/ssl/opterius/panel.crt"
-postconf -e "smtpd_tls_key_file = /etc/ssl/opterius/panel.key"
+postconf -e "smtpd_tls_cert_file = /etc/ssl/opanel/panel.crt"
+postconf -e "smtpd_tls_key_file = /etc/ssl/opanel/panel.key"
 postconf -e "smtpd_tls_security_level = may"
 postconf -e "smtpd_sasl_type = dovecot"
 postconf -e "smtpd_sasl_path = private/auth"
@@ -473,8 +473,8 @@ EODOVE
 
 cat > /etc/dovecot/conf.d/10-ssl.conf <<EODOVE
 ssl = yes
-ssl_cert = </etc/ssl/opterius/panel.crt
-ssl_key = </etc/ssl/opterius/panel.key
+ssl_cert = </etc/ssl/opanel/panel.crt
+ssl_key = </etc/ssl/opanel/panel.key
 ssl_min_protocol = TLSv1.2
 EODOVE
 
@@ -588,19 +588,19 @@ curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin
 ok "Composer installed"
 
 # ============================================================
-# Step 7b: Install Opterius Mail (webmail) — needs Composer
+# Step 7b: Install OPanel Mail (webmail) — needs Composer
 # ============================================================
-info "Installing Opterius Mail webmail..."
+info "Installing OPanel Mail webmail..."
 
-MAIL_DIR="/opt/opterius-mail"
-MAIL_DB="opterius_mail"
+MAIL_DIR="/opt/opanel-mail"
+MAIL_DB="opanel_mail"
 MAIL_DB_PASS=$(openssl rand -base64 16 | tr -dc 'a-zA-Z0-9' | head -c 24)
 MAIL_APP_KEY=$(php -r "echo 'base64:' . base64_encode(random_bytes(32));")
 MAIL_SSO_SECRET=$(openssl rand -hex 32)
 
-# Clone Opterius Mail (remove any leftover from a previous run)
+# Clone OPanel Mail (remove any leftover from a previous run)
 rm -rf ${MAIL_DIR}
-git clone --depth=1 https://github.com/opterius/mail.git ${MAIL_DIR}
+git clone --depth=1 https://github.com/opanel/mail.git ${MAIL_DIR}
 git config --global --add safe.directory ${MAIL_DIR}
 
 # Create database
@@ -617,7 +617,7 @@ composer install --no-dev --optimize-autoloader --no-interaction --working-dir=$
 
 # Write .env
 cat > ${MAIL_DIR}/.env <<EOENV_MAIL
-APP_NAME="Opterius Mail"
+APP_NAME="OPanel Mail"
 APP_ENV=production
 APP_KEY=${MAIL_APP_KEY}
 APP_DEBUG=false
@@ -671,11 +671,11 @@ else
     MAIL_FPM_SOCK="/run/php-fpm/www.sock"
 fi
 
-# Configure Nginx for Opterius Mail (webmail on port 8090)
+# Configure Nginx for OPanel Mail (webmail on port 8090)
 if [[ "$PKG_MANAGER" == "apt" ]]; then
-    MAIL_VHOST="/etc/nginx/sites-available/opterius-mail.conf"
+    MAIL_VHOST="/etc/nginx/sites-available/opanel-mail.conf"
 else
-    MAIL_VHOST="/etc/nginx/conf.d/opterius-mail.conf"
+    MAIL_VHOST="/etc/nginx/conf.d/opanel-mail.conf"
 fi
 
 cat > ${MAIL_VHOST} <<EONGINX_MAIL
@@ -706,12 +706,12 @@ EONGINX_MAIL
 # Enable site (remove old roundcube config if present)
 rm -f /etc/nginx/sites-enabled/roundcube.conf /etc/nginx/conf.d/roundcube.conf
 if [[ "$PKG_MANAGER" == "apt" ]]; then
-    ln -sf /etc/nginx/sites-available/opterius-mail.conf /etc/nginx/sites-enabled/
+    ln -sf /etc/nginx/sites-available/opanel-mail.conf /etc/nginx/sites-enabled/
 fi
 
 nginx -t && systemctl reload nginx
 
-ok "Opterius Mail webmail installed (port 8090)"
+ok "OPanel Mail webmail installed (port 8090)"
 
 # ============================================================
 # Step 7c: Install WP-CLI
@@ -737,7 +737,7 @@ ok "Node.js $(node --version) installed"
 # ============================================================
 # Step 9: Install Laravel Panel
 # ============================================================
-info "Installing Opterius Panel to $PANEL_DIR..."
+info "Installing OPanel to $PANEL_DIR..."
 rm -rf "$PANEL_DIR"
 git clone --depth 1 "$GITHUB_PANEL" "$PANEL_DIR"
 
@@ -756,23 +756,23 @@ sed -i "s|# DB_USERNAME=.*|DB_USERNAME=${DB_USER}|" .env
 sed -i "s|DB_USERNAME=.*|DB_USERNAME=${DB_USER}|" .env
 sed -i "s|# DB_PASSWORD=.*|DB_PASSWORD=${DB_PASS}|" .env
 sed -i "s|DB_PASSWORD=.*|DB_PASSWORD=${DB_PASS}|" .env
-sed -i "s|APP_NAME=.*|APP_NAME=\"Opterius Panel\"|" .env
-sed -i "s|OPTERIUS_AGENT_SECRET=.*|OPTERIUS_AGENT_SECRET=${AGENT_SECRET}|" .env 2>/dev/null || echo "OPTERIUS_AGENT_SECRET=${AGENT_SECRET}" >> .env
+sed -i "s|APP_NAME=.*|APP_NAME=\"OPanel\"|" .env
+sed -i "s|OPANEL_AGENT_SECRET=.*|OPANEL_AGENT_SECRET=${AGENT_SECRET}|" .env 2>/dev/null || echo "OPANEL_AGENT_SECRET=${AGENT_SECRET}" >> .env
 
 php artisan key:generate --force
 php artisan migrate --force
 
-# Wire up Opterius Mail SSO into the Panel .env (MAIL_SSO_SECRET set in Step 7b)
+# Wire up OPanel Mail SSO into the Panel .env (MAIL_SSO_SECRET set in Step 7b)
 if [[ -n "${MAIL_SSO_SECRET:-}" ]]; then
-    if grep -q "OPTERIUS_WEBMAIL_SSO_SECRET" .env; then
-        sed -i "s|OPTERIUS_WEBMAIL_SSO_SECRET=.*|OPTERIUS_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}|" .env
+    if grep -q "OPANEL_WEBMAIL_SSO_SECRET" .env; then
+        sed -i "s|OPANEL_WEBMAIL_SSO_SECRET=.*|OPANEL_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}|" .env
     else
-        echo "OPTERIUS_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}" >> .env
+        echo "OPANEL_WEBMAIL_SSO_SECRET=${MAIL_SSO_SECRET}" >> .env
     fi
-    if grep -q "OPTERIUS_WEBMAIL_URL" .env; then
-        sed -i "s|OPTERIUS_WEBMAIL_URL=.*|OPTERIUS_WEBMAIL_URL=http://127.0.0.1:8090|" .env
+    if grep -q "OPANEL_WEBMAIL_URL" .env; then
+        sed -i "s|OPANEL_WEBMAIL_URL=.*|OPANEL_WEBMAIL_URL=http://127.0.0.1:8090|" .env
     else
-        echo "OPTERIUS_WEBMAIL_URL=http://127.0.0.1:8090" >> .env
+        echo "OPANEL_WEBMAIL_URL=http://127.0.0.1:8090" >> .env
     fi
 fi
 
@@ -794,14 +794,14 @@ chmod -R 775 "$PANEL_DIR/storage" "$PANEL_DIR/bootstrap/cache"
 # Install Laravel scheduler cron — runs every minute and triggers all
 # scheduled commands (monitor:collect, alerts:check, etc). Without this,
 # server stats and alert checks would never accumulate.
-cat > /etc/cron.d/opterius <<EOCRON
-# Opterius Panel — Laravel scheduler tick
+cat > /etc/cron.d/opanel <<EOCRON
+# OPanel — Laravel scheduler tick
 # Runs every minute and dispatches all scheduled commands.
 * * * * * root cd ${PANEL_DIR} && /usr/bin/php artisan schedule:run >> /dev/null 2>&1
 EOCRON
-chmod 644 /etc/cron.d/opterius
+chmod 644 /etc/cron.d/opanel
 
-ok "Opterius Panel installed"
+ok "OPanel installed"
 
 # ============================================================
 # Step 10: Configure Nginx for Panel
@@ -809,14 +809,14 @@ ok "Opterius Panel installed"
 info "Configuring Nginx for panel on port $PANEL_PORT..."
 
 # Generate self-signed SSL first (fallback)
-mkdir -p /etc/ssl/opterius
+mkdir -p /etc/ssl/opanel
 openssl req -x509 -nodes -days 3650 -newkey rsa:2048 \
-    -keyout /etc/ssl/opterius/panel.key \
-    -out /etc/ssl/opterius/panel.crt \
+    -keyout /etc/ssl/opanel/panel.key \
+    -out /etc/ssl/opanel/panel.crt \
     -subj "/CN=${PANEL_HOSTNAME}" 2>/dev/null
 
-PANEL_SSL_CERT="/etc/ssl/opterius/panel.crt"
-PANEL_SSL_KEY="/etc/ssl/opterius/panel.key"
+PANEL_SSL_CERT="/etc/ssl/opanel/panel.crt"
+PANEL_SSL_KEY="/etc/ssl/opanel/panel.key"
 
 # Try to get Let's Encrypt cert for panel hostname
 if [[ -n "$PANEL_HOSTNAME" ]]; then
@@ -883,10 +883,10 @@ fi
 
 # On Debian/Ubuntu use sites-available + symlink; on RHEL/Rocky write directly to conf.d
 if [[ "$PKG_MANAGER" == "apt" ]]; then
-    NGINX_VHOST="/etc/nginx/sites-available/opterius-panel.conf"
+    NGINX_VHOST="/etc/nginx/sites-available/opanel-panel.conf"
     mkdir -p /etc/nginx/sites-available /etc/nginx/sites-enabled
 else
-    NGINX_VHOST="/etc/nginx/conf.d/opterius-panel.conf"
+    NGINX_VHOST="/etc/nginx/conf.d/opanel-panel.conf"
 fi
 
 cat > ${NGINX_VHOST} <<EONGINX
@@ -915,7 +915,7 @@ EONGINX
 
 # Enable site (Debian/Ubuntu only — symlink into sites-enabled)
 if [[ "$PKG_MANAGER" == "apt" ]]; then
-    ln -sf /etc/nginx/sites-available/opterius-panel.conf /etc/nginx/sites-enabled/
+    ln -sf /etc/nginx/sites-available/opanel-panel.conf /etc/nginx/sites-enabled/
 fi
 
 nginx -t && systemctl reload nginx
@@ -924,31 +924,31 @@ ok "Nginx configured for panel"
 # ============================================================
 # Step 11: Install Go Agent
 # ============================================================
-info "Installing Opterius Agent..."
+info "Installing OPanel Agent..."
 
 mkdir -p "$AGENT_CONF_DIR"
 
 # Download agent binary
-curl -sL -o "${AGENT_DIR}/opterius-agent" "$AGENT_DOWNLOAD_URL"
-chmod +x "${AGENT_DIR}/opterius-agent"
+curl -sL -o "${AGENT_DIR}/opanel-agent" "$AGENT_DOWNLOAD_URL"
+chmod +x "${AGENT_DIR}/opanel-agent"
 
 # Write agent config
 cat > "${AGENT_CONF_DIR}/agent.conf" <<EOCONF
-# Opterius Agent Configuration
+# OPanel Agent Configuration
 secret=${AGENT_SECRET}
 listen_addr=127.0.0.1
 port=${AGENT_PORT}
 EOCONF
 
 # Install systemd service
-cat > /etc/systemd/system/opterius-agent.service <<EOSERVICE
+cat > /etc/systemd/system/opanel-agent.service <<EOSERVICE
 [Unit]
-Description=Opterius Agent
+Description=OPanel Agent
 After=network.target
 
 [Service]
 Type=simple
-ExecStart=${AGENT_DIR}/opterius-agent --config ${AGENT_CONF_DIR}/agent.conf
+ExecStart=${AGENT_DIR}/opanel-agent --config ${AGENT_CONF_DIR}/agent.conf
 Restart=always
 RestartSec=5
 User=root
@@ -959,8 +959,8 @@ WantedBy=multi-user.target
 EOSERVICE
 
 systemctl daemon-reload
-systemctl enable --now opterius-agent
-ok "Opterius Agent installed and running"
+systemctl enable --now opanel-agent
+ok "OPanel Agent installed and running"
 
 # ============================================================
 # Step 12: Firewall
@@ -1006,7 +1006,7 @@ SERVER_IP=$(hostname -I | awk '{print $1}')
 
 echo ""
 echo -e "${GREEN}${BOLD}========================================${NC}"
-echo -e "${GREEN}${BOLD}   Opterius Panel installed!${NC}"
+echo -e "${GREEN}${BOLD}   OPanel installed!${NC}"
 echo -e "${GREEN}${BOLD}========================================${NC}"
 echo ""
 echo -e "  Panel URL:    ${CYAN}${PANEL_SCHEME}://${SERVER_IP}:${PANEL_PORT}${NC}"
@@ -1016,22 +1016,22 @@ echo -e "  Hostname:     ${CYAN}${PANEL_HOSTNAME}${NC} (point DNS to this IP for
 echo ""
 echo -e "  Open the Panel URL in your browser to create your admin account."
 echo ""
-echo -e "  Agent status: $(systemctl is-active opterius-agent)"
-echo -e "  Cron status:  $([ -f /etc/cron.d/opterius ] && echo 'installed' || echo 'MISSING')"
+echo -e "  Agent status: $(systemctl is-active opanel-agent)"
+echo -e "  Cron status:  $([ -f /etc/cron.d/opanel ] && echo 'installed' || echo 'MISSING')"
 echo ""
 if [[ "$PANEL_SCHEME" == "http" ]]; then
     echo -e "${YELLOW}  Note: The panel is running over HTTP. To enable HTTPS, point${NC}"
     echo -e "${YELLOW}  your hostname DNS to this server and issue an SSL certificate.${NC}"
 fi
 echo ""
-echo -e "  Documentation: ${CYAN}https://opterius.com/docs${NC}"
-echo -e "  GitHub:        ${CYAN}https://github.com/opterius/panel${NC}"
+echo -e "  Documentation: ${CYAN}https://github.com/siyamex/panel#documentation${NC}"
+echo -e "  GitHub:        ${CYAN}https://github.com/opanel/panel${NC}"
 echo ""
 echo ""
-read -rp "  Would you like to star Opterius on GitHub? (y/n): " STAR_ANSWER
+read -rp "  Would you like to star OPanel on GitHub? (y/n): " STAR_ANSWER
 if [[ "$STAR_ANSWER" == "y" || "$STAR_ANSWER" == "Y" ]]; then
     echo ""
     echo -e "  ${CYAN}Thanks! Open this link in your browser:${NC}"
-    echo -e "  ${BOLD}https://github.com/opterius/panel${NC}"
+    echo -e "  ${BOLD}https://github.com/opanel/panel${NC}"
 fi
 echo ""

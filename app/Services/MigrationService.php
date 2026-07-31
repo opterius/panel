@@ -150,7 +150,7 @@ class MigrationService
      *
      * cPanel stores subdomains as full FQDNs (e.g. "blog.pivlu.com") with
      * their document root under the main domain's homedir. We map each one
-     * to an Opterius subdomain with parent_id → main domain.
+     * to an OPanel subdomain with parent_id → main domain.
      */
     private function createSubdomains(Server $server, Account $account, array $subdomains, string $mainDomain): array
     {
@@ -178,7 +178,7 @@ class MigrationService
             // cPanel subdomain document roots are typically:
             //   /home/user/subdomain.domain.com   (separate dir)
             //   /home/user/public_html/subdomain   (inside public_html)
-            // Opterius uses: /home/user/subdomain.domain.com/public_html
+            // OPanel uses: /home/user/subdomain.domain.com/public_html
             // The files from cPanel are already under the account homedir,
             // so we just create the vhost pointing to wherever the files are.
             $docRoot = "/home/{$account->username}/{$sub}/public_html";

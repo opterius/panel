@@ -11,24 +11,24 @@ class UpdateController extends Controller
 {
     public function index()
     {
-        $currentVersion = config('opterius.version', '1.0.0');
+        $currentVersion = config('opanel.version', '1.0.0');
 
         // Check for latest version. Authoritative source is
-        // get.opterius.com/agent/version.txt — it's bumped by every release.sh
+        // github.com/siyamex/opanel-agent/agent/version.txt — it's bumped by every release.sh
         // run, so it always matches what's actually deployed. The old license
         // server API at /api/version/latest is kept as a fallback only.
         $latestVersion = null;
         try {
-            $response = Http::timeout(5)->get('https://get.opterius.com/agent/version.txt');
+            $response = Http::timeout(5)->get('https://github.com/siyamex/opanel-agent/releases/latest/download/VERSION');
             if ($response->successful()) {
                 $latestVersion = trim($response->body());
             }
         } catch (\Exception $e) {
-            // get.opterius.com unreachable — try the license server.
+            // github.com/siyamex/opanel-agent unreachable — try the license server.
         }
         if (! $latestVersion) {
             try {
-                $response = Http::timeout(5)->get(config('opterius.license_server_url') . '/api/version/latest');
+                $response = Http::timeout(5)->get(config('opanel.license_server_url') . '/api/version/latest');
                 if ($response->successful()) {
                     $latestVersion = $response->json('version');
                 }
@@ -139,7 +139,7 @@ class UpdateController extends Controller
     }
 
     /**
-     * Force an immediate webmail (Opterius Mail) git pull + migrate via the agent.
+     * Force an immediate webmail (OPanel Mail) git pull + migrate via the agent.
      */
     public function forceMailUpdate(Request $request)
     {

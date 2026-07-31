@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Opterius') }} — {{ __('common.admin') }}</title>
+        <title>{{ config('app.name', 'OPanel') }} — {{ __('common.admin') }}</title>
 
         <link rel="icon" type="image/png" href="{{ asset('img/favicon.png') }}">
 
@@ -49,7 +49,7 @@
                                 <strong class="font-semibold text-red-900">Payment failed</strong>
                                 <p class="text-sm text-red-800 mt-0.5">Your last invoice could not be charged. Stripe will retry automatically, but we recommend updating your payment method now to avoid service interruption.</p>
                             </div>
-                            <a href="https://opterius.com/dashboard/billing" target="_blank" rel="noopener"
+                            <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener"
                                class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition">
                                 Update payment
                                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -64,7 +64,7 @@
                                 <strong class="font-semibold text-amber-900">Subscription ending {{ $endHuman }}</strong>
                                 <p class="text-sm text-amber-800 mt-0.5">Your subscription was cancelled. You'll keep full access until then, then drop to the Free plan. Your data and existing accounts are never deleted.</p>
                             </div>
-                            <a href="https://opterius.com/dashboard/billing" target="_blank" rel="noopener"
+                            <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener"
                                class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-lg transition">
                                 Resume subscription
                             </a>

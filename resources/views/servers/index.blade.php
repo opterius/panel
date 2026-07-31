@@ -26,15 +26,15 @@
                 <p class="mt-1 text-sm text-amber-800">
                     Your current license plan allows up to <strong>{{ $maxServers }} {{ $maxServers === 1 ? 'server' : 'servers' }}</strong>. To connect more servers to this Panel,
                     upgrade your plan at
-                    <a href="https://opterius.com/dashboard/billing" target="_blank" rel="noopener" class="font-semibold underline hover:text-amber-900">opterius.com/dashboard/billing</a>.
+                    <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener" class="font-semibold underline hover:text-amber-900">github.com/siyamex/panel/dashboard/billing</a>.
                 </p>
                 <p class="mt-1 text-xs text-amber-700">
                     Plans: Plus = 1 server · Business = 3 servers · Datacenter = unlimited.
                     Each server you add uses one activation slot. You can also revoke an unused activation
-                    at <a href="https://opterius.com/dashboard/licenses" target="_blank" rel="noopener" class="font-semibold underline hover:text-amber-900">opterius.com/dashboard/licenses</a> to free a slot.
+                    at <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener" class="font-semibold underline hover:text-amber-900">github.com/siyamex/panel/dashboard/licenses</a> to free a slot.
                 </p>
             </div>
-            <a href="https://opterius.com/dashboard/billing" target="_blank" rel="noopener"
+            <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener"
                class="shrink-0 inline-flex items-center gap-1.5 px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-sm font-semibold rounded-lg transition">
                 Upgrade Plan
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
@@ -57,7 +57,7 @@
                 </p>
             </div>
             @if(isset($atLimit) && $atLimit)
-                <a href="https://opterius.com/dashboard/billing" target="_blank" rel="noopener"
+                <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener"
                    class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-amber-100 hover:bg-amber-200 text-amber-800 text-sm font-medium rounded-lg transition"
                    title="Server limit reached — click to upgrade your plan">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12"/></svg>

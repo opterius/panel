@@ -1,7 +1,7 @@
 #!/bin/bash
 #
-# Opterius Agent Installer
-# Usage: curl -sL https://get.opterius.com/agent | bash -s -- --token=YOUR_TOKEN
+# OPanel Agent Installer
+# Usage: curl -sL https://github.com/siyamex/opanel-agent | bash -s -- --token=YOUR_TOKEN
 #
 # Supports: Ubuntu 22.04, Ubuntu 24.04, Debian 12, AlmaLinux 9
 #
@@ -69,15 +69,15 @@ esac
 # ============================================================
 # Configuration
 # ============================================================
-AGENT_BIN="/usr/local/bin/opterius-agent"
-CONF_DIR="/etc/opterius"
+AGENT_BIN="/usr/local/bin/opanel-agent"
+CONF_DIR="/etc/opanel"
 CONF_FILE="${CONF_DIR}/agent.conf"
-DOWNLOAD_URL="https://github.com/opterius/agent/releases/latest/download/opterius-agent-${ARCH_SUFFIX}"
+DOWNLOAD_URL="https://github.com/opanel/agent/releases/latest/download/opanel-agent-${ARCH_SUFFIX}"
 
 # ============================================================
 # Install
 # ============================================================
-info "Downloading Opterius Agent..."
+info "Downloading OPanel Agent..."
 curl -sL -o "$AGENT_BIN" "$DOWNLOAD_URL"
 chmod +x "$AGENT_BIN"
 ok "Agent binary installed to $AGENT_BIN"
@@ -93,7 +93,7 @@ info "Writing configuration..."
 mkdir -p "$CONF_DIR"
 
 cat > "$CONF_FILE" <<EOF
-# Opterius Agent Configuration
+# OPanel Agent Configuration
 # Managed by installer — edit carefully
 secret=${TOKEN}
 listen_addr=${LISTEN_ADDR}
@@ -107,9 +107,9 @@ ok "Configuration written to $CONF_FILE"
 # Systemd service
 # ============================================================
 info "Installing systemd service..."
-cat > /etc/systemd/system/opterius-agent.service <<EOF
+cat > /etc/systemd/system/opanel-agent.service <<EOF
 [Unit]
-Description=Opterius Agent
+Description=OPanel Agent
 After=network.target
 
 [Service]
@@ -125,7 +125,7 @@ WantedBy=multi-user.target
 EOF
 
 systemctl daemon-reload
-systemctl enable --now opterius-agent
+systemctl enable --now opanel-agent
 ok "Agent service started"
 
 # ============================================================
@@ -194,15 +194,15 @@ HEALTH=$(curl -s http://127.0.0.1:${PORT}/health 2>/dev/null || echo '{"status":
 
 echo ""
 echo -e "${GREEN}${BOLD}========================================${NC}"
-echo -e "${GREEN}${BOLD}   Opterius Agent installed!${NC}"
+echo -e "${GREEN}${BOLD}   OPanel Agent installed!${NC}"
 echo -e "${GREEN}${BOLD}========================================${NC}"
 echo ""
-echo -e "  Status:    $(systemctl is-active opterius-agent)"
+echo -e "  Status:    $(systemctl is-active opanel-agent)"
 echo -e "  Listening: ${LISTEN_ADDR}:${PORT}"
 echo -e "  Health:    ${HEALTH}"
 echo -e "  Config:    ${CONF_FILE}"
 echo ""
 echo -e "  Installed: Nginx, PHP 8.3, MariaDB, Certbot"
 echo ""
-echo -e "${CYAN}  This server is now ready to be managed from Opterius Panel.${NC}"
+echo -e "${CYAN}  This server is now ready to be managed from OPanel.${NC}"
 echo ""

@@ -2,7 +2,7 @@
     <!-- Logo -->
     <div class="h-16 flex items-center px-6 border-b border-gray-800">
         <a href="{{ route('dashboard') }}" class="flex items-center">
-            <img src="{{ asset('img/logo.png') }}" alt="Opterius">
+            <img src="{{ asset('img/logo.png') }}" alt="OPanel">
         </a>
     </div>
 
@@ -163,6 +163,6 @@
 
     <!-- Panel Info -->
     <div class="px-4 py-3 border-t border-gray-800 text-xs text-gray-500">
-        <div>Opterius Panel v1.0</div>
+        <div>OPanel v1.0</div>
     </div>
 </aside>

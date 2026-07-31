@@ -41,6 +41,6 @@ return [
 
     // Agent unreachable
     'agent_unreachable_title' => 'Server agent unreachable',
-    'agent_unreachable_text'  => "Could not connect to the Opterius agent on this server. Make sure the agent is running and that port :port is reachable.",
+    'agent_unreachable_text'  => "Could not connect to the OPanel agent on this server. Make sure the agent is running and that port :port is reachable.",
 
 ];

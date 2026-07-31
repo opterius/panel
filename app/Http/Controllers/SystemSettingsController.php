@@ -47,9 +47,9 @@ class SystemSettingsController extends Controller
         // this controller-side rather than in Blade so subviews stay clean.
         $extra = [];
         if ($category === 'domains') {
-            $extra['php_versions'] = config('opterius.php_versions', ['8.1', '8.2', '8.3', '8.4']);
+            $extra['php_versions'] = config('opanel.php_versions', ['8.1', '8.2', '8.3', '8.4']);
             $extra['default_php_version'] = $settings['default_php_version']
-                ?? config('opterius.default_php_version', '8.3');
+                ?? config('opanel.default_php_version', '8.3');
         }
 
         return view('system-settings.index', [
@@ -74,7 +74,7 @@ class SystemSettingsController extends Controller
         switch ($category) {
             case 'domains':
                 $validated = $request->validate([
-                    'default_php_version' => 'required|in:' . implode(',', config('opterius.php_versions', ['8.1', '8.2', '8.3', '8.4'])),
+                    'default_php_version' => 'required|in:' . implode(',', config('opanel.php_versions', ['8.1', '8.2', '8.3', '8.4'])),
                 ]);
                 Setting::set('default_php_version', $validated['default_php_version'], 'system_domains');
                 break;
@@ -88,7 +88,7 @@ class SystemSettingsController extends Controller
                 ]);
                 // Empty string clears the key — useful for revoking the integration.
                 Setting::set('integrations_bunnycdn_api_key',    $validated['bunnycdn_api_key']    ?? '', 'system_integrations');
-                Setting::set('integrations_bunnycdn_prefix',     $validated['bunnycdn_prefix']     ?? 'opterius', 'system_integrations');
+                Setting::set('integrations_bunnycdn_prefix',     $validated['bunnycdn_prefix']     ?? 'opanel', 'system_integrations');
                 Setting::set('integrations_maxmind_account_id',  $validated['maxmind_account_id']  ?? '', 'system_integrations');
                 Setting::set('integrations_maxmind_license_key', $validated['maxmind_license_key'] ?? '', 'system_integrations');
                 break;

@@ -140,7 +140,7 @@
                                         </form>
 
                                         {{-- Stop --}}
-                                        @if($service['name'] !== 'opterius-agent')
+                                        @if($service['name'] !== 'opanel-agent')
                                             <div x-data="{ confirmStop: false }">
                                                 <button type="button" @click="confirmStop = true" class="inline-flex items-center px-3 py-1.5 text-xs font-medium text-red-600 bg-red-50 rounded-lg hover:bg-red-100 transition">
                                                     Stop

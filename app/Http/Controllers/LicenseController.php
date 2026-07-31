@@ -23,7 +23,7 @@ class LicenseController extends Controller
         ]);
 
         // Update .env file
-        $this->setEnvValue('OPTERIUS_LICENSE_KEY', $validated['license_key']);
+        $this->setEnvValue('OPANEL_LICENSE_KEY', $validated['license_key']);
 
         // Clear config and license cache
         Artisan::call('config:clear');

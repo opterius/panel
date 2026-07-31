@@ -3,11 +3,8 @@
         <h2 class="text-lg font-semibold text-gray-800">{{ __('dashboard.dashboard') }}</h2>
     </x-slot>
 
-    {{-- License activation banner — shown until a valid license key is configured --}}
-    @php
-        $licenseKey = config('opterius.license_key') ?: env('OPTERIUS_LICENSE_KEY', '');
-    @endphp
-    @if(Auth::user()->isAdmin() && empty($licenseKey))
+    {{-- License activation banner — disabled: this fork has no licence limits --}}
+    @if(false)
         <div class="mb-6 bg-amber-50 border border-amber-200 rounded-xl p-5 flex items-start gap-4">
             <div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center shrink-0">
                 <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
@@ -22,7 +19,7 @@
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"/></svg>
                         I have a license key
                     </a>
-                    <a href="https://opterius.com/register" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-amber-700 hover:text-amber-900 transition">
+                    <a href="https://github.com/siyamex/panel" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 text-sm font-semibold text-amber-700 hover:text-amber-900 transition">
                         Get a free license →
                     </a>
                 </div>
