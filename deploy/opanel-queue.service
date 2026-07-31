@@ -1,0 +1,26 @@
+[Unit]
+Description=OPanel queue worker
+After=network.target
+# The worker provisions through the agent, so start it after the agent is up.
+After=opanel-agent.service
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/opanel
+
+# --sleep=3 keeps idle polling cheap on the database driver.
+# --max-time=3600 recycles the worker hourly so a leaked connection or a
+# stale in-memory config cannot persist indefinitely.
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --timeout=300
+
+Restart=always
+RestartSec=5s
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=opanel-queue
+
+[Install]
+WantedBy=multi-user.target

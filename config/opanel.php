@@ -42,8 +42,10 @@ return [
     |--------------------------------------------------------------------------
     */
 
-    'ns1' => env('OPANEL_NS1', 'ns1.github.com/siyamex/panel'),
-    'ns2' => env('OPANEL_NS2', 'ns2.github.com/siyamex/panel'),
+    // Hostnames, not URLs. Override per-install in System Settings → System,
+    // which takes precedence over these defaults.
+    'ns1' => env('OPANEL_NS1', 'ns1.example.com'),
+    'ns2' => env('OPANEL_NS2', 'ns2.example.com'),
 
     /*
     |--------------------------------------------------------------------------

@@ -79,6 +79,95 @@
                         </div>
                     </form>
 
+                @elseif(in_array($category, ['display', 'mail', 'security', 'ssl', 'php', 'notifications', 'system'], true))
+                    {{-- Every remaining category is built from the shared field
+                         partial, so they stay consistent and a new setting is one
+                         @include rather than a block of hand-written markup. --}}
+                    <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ __("system-settings.{$category}_title") }}</h3>
+                    <p class="text-sm text-gray-500 mb-6">{{ __("system-settings.{$category}_subtitle") }}</p>
+
+                    <form action="{{ route('admin.system-settings.update', ['category' => $category]) }}" method="POST">
+                        @csrf
+
+                        @php
+                            $t = fn ($k) => __("system-settings.{$k}");
+
+                            $schema = match ($category) {
+                                'display' => [
+                                    ['field' => 'text',   'name' => 'panel_name'],
+                                    ['field' => 'color',  'name' => 'primary_color'],
+                                    ['field' => 'url',    'name' => 'logo_url'],
+                                    ['field' => 'select', 'name' => 'default_locale',
+                                     'options' => array_combine($extra['locales'], array_map('strtoupper', $extra['locales']))],
+                                    ['field' => 'number', 'name' => 'items_per_page', 'min' => 10, 'max' => 200],
+                                ],
+                                'mail' => [
+                                    ['field' => 'email',    'name' => 'from_address'],
+                                    ['field' => 'text',     'name' => 'from_name'],
+                                    ['field' => 'text',     'name' => 'smtp_host'],
+                                    ['field' => 'number',   'name' => 'smtp_port', 'min' => 1, 'max' => 65535],
+                                    ['field' => 'select',   'name' => 'smtp_encryption',
+                                     'options' => ['none' => 'None', 'tls' => 'TLS', 'ssl' => 'SSL']],
+                                    ['field' => 'text',     'name' => 'smtp_username'],
+                                    ['field' => 'password', 'name' => 'smtp_password'],
+                                    ['field' => 'number',   'name' => 'max_hourly_per_account', 'min' => 0],
+                                ],
+                                'security' => [
+                                    ['field' => 'number',   'name' => 'password_min_length', 'min' => 8, 'max' => 128],
+                                    ['field' => 'checkbox', 'name' => 'require_2fa_admins'],
+                                    ['field' => 'number',   'name' => 'session_lifetime', 'min' => 5],
+                                    ['field' => 'number',   'name' => 'max_login_attempts', 'min' => 1],
+                                    ['field' => 'number',   'name' => 'lockout_minutes', 'min' => 1],
+                                    ['field' => 'textarea', 'name' => 'admin_ip_allowlist', 'rows' => 4],
+                                ],
+                                'ssl' => [
+                                    ['field' => 'checkbox', 'name' => 'auto_issue'],
+                                    ['field' => 'checkbox', 'name' => 'force_https'],
+                                    ['field' => 'email',    'name' => 'le_contact_email'],
+                                    ['field' => 'number',   'name' => 'renew_days_before', 'min' => 1, 'max' => 89],
+                                ],
+                                'php' => [
+                                    ['field' => 'text',     'name' => 'memory_limit'],
+                                    ['field' => 'number',   'name' => 'max_execution_time', 'min' => 5],
+                                    ['field' => 'text',     'name' => 'upload_max_filesize'],
+                                    ['field' => 'text',     'name' => 'post_max_size'],
+                                    ['field' => 'textarea', 'name' => 'disable_functions', 'rows' => 3],
+                                ],
+                                'notifications' => [
+                                    ['field' => 'email',    'name' => 'admin_email'],
+                                    ['field' => 'checkbox', 'name' => 'notify_account_created'],
+                                    ['field' => 'checkbox', 'name' => 'notify_account_suspended'],
+                                    ['field' => 'number',   'name' => 'disk_threshold', 'min' => 50, 'max' => 99],
+                                    ['field' => 'number',   'name' => 'load_threshold', 'min' => 0.5, 'step' => '0.5'],
+                                ],
+                                'system' => [
+                                    ['field' => 'text',   'name' => 'ns1'],
+                                    ['field' => 'text',   'name' => 'ns2'],
+                                    ['field' => 'text',   'name' => 'panel_hostname'],
+                                    ['field' => 'select', 'name' => 'timezone',
+                                     'options' => array_combine($extra['timezones'], $extra['timezones'])],
+                                    ['field' => 'number', 'name' => 'backup_retention_days', 'min' => 1, 'max' => 365],
+                                    ['field' => 'number', 'name' => 'metrics_retention_days', 'min' => 1, 'max' => 365],
+                                ],
+                                default => [],
+                            };
+                        @endphp
+
+                        @foreach($schema as $f)
+                            @include('system-settings._fields', $f + [
+                                'label' => $t($f['name'] . '_label'),
+                                'hint'  => $t($f['name'] . '_hint'),
+                            ])
+                        @endforeach
+
+                        <div class="pt-4 border-t border-gray-100">
+                            <button type="submit"
+                                    class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition">
+                                {{ __('system-settings.save') }}
+                            </button>
+                        </div>
+                    </form>
+
                 @elseif($category === 'integrations')
                     {{-- ── Integrations category ─────────────────────────── --}}
                     <h3 class="text-lg font-semibold text-gray-800 mb-1">Third-Party Integrations</h3>

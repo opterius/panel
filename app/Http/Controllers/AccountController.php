@@ -151,8 +151,8 @@ class AccountController extends Controller
             AgentService::for($server)->post('/dns/create-zone', [
                 'domain'    => $domain->domain,
                 'server_ip' => $server->ip_address,
-                'ns1'       => config('opanel.ns1', 'ns1.' . $domain->domain),
-                'ns2'       => config('opanel.ns2', 'ns2.' . $domain->domain),
+                'ns1'       => \App\Support\SystemSetting::ns1($domain->domain),
+                'ns2'       => \App\Support\SystemSetting::ns2($domain->domain),
             ]);
 
             // Auto SSL

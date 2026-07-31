@@ -1,0 +1,28 @@
+[Unit]
+Description=OPanel Commerce queue worker
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/commerce
+
+# Commerce dispatches every provisioning action as a queued job
+# (CreateHostingAccountJob, SuspendHostingAccountJob, ...). Without this
+# worker running, a paid order is written to the jobs table and never
+# provisions — the single most common "nothing happened" failure.
+#
+# --timeout=600 because a provisioning call can wait on the panel, which in
+# turn waits on the agent creating a user and issuing a certificate.
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600 --timeout=600
+
+Restart=always
+RestartSec=5s
+
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=commerce-queue
+
+[Install]
+WantedBy=multi-user.target
